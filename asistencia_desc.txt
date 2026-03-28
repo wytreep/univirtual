@@ -1,0 +1,7 @@
+﻿Field	Type	Null	Key	Default	Extra
+idAsistencia	int(11)	NO	PRI	NULL	auto_increment
+idMateria	int(11)	NO	MUL	NULL	
+idEstudiante	int(11)	NO	MUL	NULL	
+fecha	date	NO		NULL	
+asistio	tinyint(1)	YES		0	
+observacion	varchar(200)	YES		NULL	
