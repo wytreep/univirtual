@@ -90,4 +90,24 @@ class Entrega extends Model {
         $stmt->execute([$idActividad, $idEstudiante]);
         return (bool)$stmt->fetch();
     }
+
+    /**
+     * Obtiene el conteo de entregas hechas vs total de actividades de un estudiante.
+     */
+    public function getConteoEstudiante(int $idEstudiante): array {
+        $stmt = $this->db->prepare(
+            "SELECT
+               COUNT(DISTINCT e.idEntrega) AS entregas_hechas,
+               COUNT(DISTINCT a.idActividad) AS total_actividades
+             FROM actividades a
+             JOIN aulas_virtuales av ON a.idAula = av.idAula
+             JOIN materias m ON av.idMateria = m.idMateria
+             JOIN inscripciones i ON m.idMateria = i.idMateria
+             LEFT JOIN entregas e ON a.idActividad = e.idActividad
+               AND e.idEstudiante = ?
+             WHERE i.idEstudiante = ?"
+        );
+        $stmt->execute([$idEstudiante, $idEstudiante]);
+        return $stmt->fetch() ?: ['entregas_hechas' => 0, 'total_actividades' => 0];
+    }
 }

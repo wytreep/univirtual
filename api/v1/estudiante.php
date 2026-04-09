@@ -65,6 +65,8 @@ public function handle(): void {
     private function dashboard(): void {
         require_once dirname(__DIR__, 2) . '/models/Asistencia.php';
         require_once dirname(__DIR__, 2) . '/models/Notificacion.php';
+        require_once dirname(__DIR__, 2) . '/models/Actividad.php';
+        require_once dirname(__DIR__, 2) . '/models/Entrega.php';
 
         $db  = db();
         $est = new Estudiante();
@@ -85,22 +87,8 @@ public function handle(): void {
         $pctAsist = $asistenciaModel->getPorcentaje($this->idEst, null);
 
         // Próximas actividades sin entregar
-        $sProx = $db->prepare(
-            "SELECT a.idActividad, a.titulo, a.fechaEntrega, a.puntaje_max,
-                    m.nombre AS materia, m.color, av.idAula
-             FROM actividades a
-             JOIN aulas_virtuales av ON a.idAula = av.idAula
-             JOIN materias m ON av.idMateria = m.idMateria
-             JOIN inscripciones i ON m.idMateria = i.idMateria
-             WHERE i.idEstudiante = ?
-               AND a.fechaEntrega >= NOW()
-               AND a.idActividad NOT IN (
-                   SELECT idActividad FROM entregas WHERE idEstudiante = ?
-               )
-             ORDER BY a.fechaEntrega ASC LIMIT 5"
-        );
-        $sProx->execute([$this->idEst, $this->idEst]);
-        $proximasTareas = $sProx->fetchAll();
+        $actividadModel  = new Actividad();
+        $proximasTareas  = $actividadModel->getProximasSinEntregar($this->idEst);
 
         // Notificaciones recientes
         $notificacionModel = new Notificacion();
@@ -108,20 +96,8 @@ public function handle(): void {
         $noLeidas = $notificacionModel->contarNoLeidas($this->idUsuario);
 
         // Conteo real de entregas hechas y total de actividades
-        $sEnt = $db->prepare(
-            "SELECT
-               COUNT(DISTINCT e.idEntrega) AS entregas_hechas,
-               COUNT(DISTINCT a.idActividad) AS total_actividades
-             FROM actividades a
-             JOIN aulas_virtuales av ON a.idAula = av.idAula
-             JOIN materias m ON av.idMateria = m.idMateria
-             JOIN inscripciones i ON m.idMateria = i.idMateria
-             LEFT JOIN entregas e ON a.idActividad = e.idActividad
-               AND e.idEstudiante = ?
-             WHERE i.idEstudiante = ?"
-        );
-        $sEnt->execute([$this->idEst, $this->idEst]);
-        $conteos = $sEnt->fetch();
+        $entregaModel = new Entrega();
+        $conteos      = $entregaModel->getConteoEstudiante($this->idEst);
 
         // Estadísticas de avance del semestre
         $semanaInicio = strtotime('2026-01-19');

@@ -85,4 +85,26 @@ class Actividad extends Model {
     public function eliminar(int $idActividad): void {
         $this->db->prepare("DELETE FROM actividades WHERE idActividad = ?")->execute([$idActividad]);
     }
+
+    /**
+     * Obtiene las próximas actividades sin entregar de un estudiante.
+     */
+    public function getProximasSinEntregar(int $idEstudiante, int $limit = 5): array {
+        $stmt = $this->db->prepare(
+            "SELECT a.idActividad, a.titulo, a.fechaEntrega, a.puntaje_max,
+                    m.nombre AS materia, m.color, av.idAula
+             FROM actividades a
+             JOIN aulas_virtuales av ON a.idAula = av.idAula
+             JOIN materias m ON av.idMateria = m.idMateria
+             JOIN inscripciones i ON m.idMateria = i.idMateria
+             WHERE i.idEstudiante = ?
+               AND a.fechaEntrega >= NOW()
+               AND a.idActividad NOT IN (
+                   SELECT idActividad FROM entregas WHERE idEstudiante = ?
+               )
+             ORDER BY a.fechaEntrega ASC LIMIT ?"
+        );
+        $stmt->execute([$idEstudiante, $idEstudiante, $limit]);
+        return $stmt->fetchAll();
+    }
 }

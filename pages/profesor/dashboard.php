@@ -60,95 +60,7 @@ const Modal=({title,onClose,children,footer,wide})=>(
   </div>
 );
 
-// ── JITSI MEET COMPONENT (SCRUM-118) ──────────────────────────────────────────────
-const JitsiMeeting=({roomName,onClose,userName})=>{
-  const containerRef=useRef(null);
-  const apiRef=useRef(null);
-  const[loading,setLoading]=useState(true);
-  const[error,setError]=useState(null);
-
-  useEffect(()=>{
-    if(!roomName||!containerRef.current)return;
-    setLoading(true);setError(null);
-
-    const script=document.getElementById('jitsi-api-script');
-    const init=()=>{
-      try{
-        apiRef.current=new window.JitsiMeetExternalAPI('meet.jit.si',{
-          roomName,
-          width:'100%',height:550,
-          parentNode:containerRef.current,
-          configOverwrite:{
-            prejoinPageEnabled:false,
-            enableWelcomePage:false,
-            startWithAudioMuted:true,
-            startWithVideoMuted:false,
-            disableModeratorIndicator:true,
-          },
-          interfaceConfigOverwrite:{
-            SHOW_JITSI_WATERMARK:false,
-            SHOW_WATERMARK_FOR_GUESTS:false,
-            TOOLBAR_BUTTONS:['microphone','camera','desktop',
-              'fullscreen','hangup','chat','tileview','raisehand'],
-          },
-          userInfo:{displayName:userName}
-        });
-        apiRef.current.addEventListener('videoConferenceJoined',
-          ()=>setLoading(false));
-        apiRef.current.addEventListener('videoConferenceLeft',
-          ()=>onClose());
-      }catch(e){
-        setError('Error al conectar con Jitsi: '+e.message);
-        setLoading(false);
-      }
-    };
-
-    if(window.JitsiMeetExternalAPI){
-      init();
-    }else{
-      const s=document.createElement('script');
-      s.id='jitsi-api-script';
-      s.src='https://meet.jit.si/external_api.js';
-      s.onload=init;
-      s.onerror=()=>{
-        setError('No se pudo cargar Jitsi Meet. Verifica tu conexión.');
-        setLoading(false);
-      };
-      document.head.appendChild(s);
-    }
-
-    return()=>{
-      if(apiRef.current){apiRef.current.dispose();apiRef.current=null;}
-    };
-  },[roomName]);
-
-  return(
-    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal" style={{maxWidth:920,width:'96%'}}>
-        <div className="modal-header">
-          <span className="modal-title">🎥 Clase Virtual</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
-        <div className="modal-body" style={{padding:0,background:'#1a1a2e',minHeight:560}}>
-          {loading&&!error&&(
-            <div className="loading-center" style={{height:560,color:'#fff',flexDirection:'column',gap:12}}>
-              <div className="spinner"/>
-              <span>Conectando a la sala...</span>
-            </div>
-          )}
-          {error&&(
-            <div className="loading-center" style={{height:560,color:'#fff',flexDirection:'column',gap:16}}>
-              <div style={{fontSize:40}}>⚠️</div>
-              <div>{error}</div>
-              <button className="btn btn-primary" onClick={onClose}>Cerrar</button>
-            </div>
-          )}
-          <div ref={containerRef} style={{width:'100%'}}/>
-        </div>
-      </div>
-    </div>
-  );
-};
+// ── JITSI MEET — Link directo (SCRUM-118) ─────────────────────────────────────────
 
 // ── DASHBOARD PROFESOR ─────────────────────────────────────────────────
 const Dashboard=({onAula,setVistaPrincipal})=>{
@@ -317,7 +229,7 @@ const Aula=({materia,onBack})=>{
 
   // ── Videollamadas (Jitsi Meet) ──────────────────────────────────────────────
   const[vlLista,setVlLista]=useState([]);const[vlModal,setVlModal]=useState(false);
-  const[vlActiva,setVlActiva]=useState(null); // Room name de la videollamada activa en el panel
+  const[vlActiva,setVlActiva]=useState(null); // Room name de la videollamada activa en el panel → eliminado, ahora es link directo
   const[fmVl,setFmVl]=useState({titulo:'',descripcion:'',programada_en:'',duracion_min:90});
   const cargarVL=useCallback(()=>{
     fetch(`/univirtual/api/v1/videollamadas.php?action=lista&idMateria=${materia.idMateria}`)
@@ -592,13 +504,14 @@ const Aula=({materia,onBack})=>{
               </div>
             </div>
             <div style={{display:'flex',gap:8,alignItems:'center',flexShrink:0}}>
-              {!finalizada&&<button
-                className={`btn ${enCurso?'btn-primary':'btn-outline'} btn-sm`}
-                style={enCurso?{background:'#1a7a48',borderColor:'#1a7a48'}:{}}
-                onClick={()=>setVlActiva(vl.roomName)}>
-                {enCurso?'📹 Unirse ahora':'🔗 Abrir sala'}
-              </button>}
-              {enCurso&&vlActiva===vl.roomName&&<button className="btn btn-danger btn-sm" onClick={()=>setVlActiva(null)}>🚪 Salir</button>}
+              {!finalizada&&<a
+                href={`https://meet.jit.si/${vl.roomName}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-sm"
+              >
+                🎥 Unirse a la clase
+              </a>}
               {!finalizada&&<button className="btn btn-outline btn-sm" onClick={()=>finalizarVL(vl.idVideoLlamada)} title="Marcar como finalizada">✅ Finalizar</button>}
               {finalizada&&<label className="btn btn-outline btn-sm" style={{cursor:'pointer'}} title="Subir grabación">
                 📼 Subir grabación
@@ -682,8 +595,6 @@ const Aula=({materia,onBack})=>{
       <div className="form-group"><label className="form-label">Retroalimentación</label><textarea className="form-input" rows={3} value={fmCalif.feedback} onChange={e=>setFmCalif({...fmCalif,feedback:e.target.value})}/></div>
       {modalCalif.archivoEntrega&&<a href={`/univirtual/api/descargar.php?id=${modalCalif.idEntrega}&tipo=entrega&preview=1`} className="btn btn-outline btn-sm" target="_blank">📄 Ver entrega</a>}
     </Modal>}
-    {/* Jitsi Meet incrustado (SCRUM-118) */}
-    {vlActiva&&<JitsiMeeting roomName={vlActiva} onClose={()=>setVlActiva(null)} userName={window.__S.nombre}/>}
   </div>;
 };
 

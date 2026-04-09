@@ -95,95 +95,7 @@ class EstudianteView extends View
           </div>
         );
 
-        // ── JITSI MEET COMPONENT (SCRUM-118) ──────────────────────────────────────────────
-        const JitsiMeeting=({roomName,onClose,userName})=>{
-          const containerRef=useRef(null);
-          const apiRef=useRef(null);
-          const[loading,setLoading]=useState(true);
-          const[error,setError]=useState(null);
-
-          useEffect(()=>{
-            if(!roomName||!containerRef.current)return;
-            setLoading(true);setError(null);
-
-            const script=document.getElementById('jitsi-api-script');
-            const init=()=>{
-              try{
-                apiRef.current=new window.JitsiMeetExternalAPI('meet.jit.si',{
-                  roomName,
-                  width:'100%',height:550,
-                  parentNode:containerRef.current,
-                  configOverwrite:{
-                    prejoinPageEnabled:false,
-                    enableWelcomePage:false,
-                    startWithAudioMuted:true,
-                    startWithVideoMuted:false,
-                    disableModeratorIndicator:true,
-                  },
-                  interfaceConfigOverwrite:{
-                    SHOW_JITSI_WATERMARK:false,
-                    SHOW_WATERMARK_FOR_GUESTS:false,
-                    TOOLBAR_BUTTONS:['microphone','camera','desktop',
-                      'fullscreen','hangup','chat','tileview','raisehand'],
-                  },
-                  userInfo:{displayName:userName}
-                });
-                apiRef.current.addEventListener('videoConferenceJoined',
-                  ()=>setLoading(false));
-                apiRef.current.addEventListener('videoConferenceLeft',
-                  ()=>onClose());
-              }catch(e){
-                setError('Error al conectar con Jitsi: '+e.message);
-                setLoading(false);
-              }
-            };
-
-            if(window.JitsiMeetExternalAPI){
-              init();
-            }else{
-              const s=document.createElement('script');
-              s.id='jitsi-api-script';
-              s.src='https://meet.jit.si/external_api.js';
-              s.onload=init;
-              s.onerror=()=>{
-                setError('No se pudo cargar Jitsi Meet. Verifica tu conexión.');
-                setLoading(false);
-              };
-              document.head.appendChild(s);
-            }
-
-            return()=>{
-              if(apiRef.current){apiRef.current.dispose();apiRef.current=null;}
-            };
-          },[roomName]);
-
-          return(
-            <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-              <div className="modal" style={{maxWidth:920,width:'96%'}}>
-                <div className="modal-header">
-                  <span className="modal-title">🎥 Clase Virtual</span>
-                  <button className="modal-close" onClick={onClose}>✕</button>
-                </div>
-                <div className="modal-body" style={{padding:0,background:'#1a1a2e',minHeight:560}}>
-                  {loading&&!error&&(
-                    <div className="loading-center" style={{height:560,color:'#fff',flexDirection:'column',gap:12}}>
-                      <div className="spinner"/>
-                      <span>Conectando a la sala...</span>
-                    </div>
-                  )}
-                  {error&&(
-                    <div className="loading-center" style={{height:560,color:'#fff',flexDirection:'column',gap:16}}>
-                      <div style={{fontSize:40}}>⚠️</div>
-                      <div>{error}</div>
-                      <button className="btn btn-primary" onClick={onClose}>Cerrar</button>
-                    </div>
-                  )}
-                  <div ref={containerRef} style={{width:'100%'}}/>
-                </div>
-              </div>
-            </div>
-          );
-        };
+        // ── JITSI MEET — Link directo (SCRUM-118) ─────────────────────────────────────────
 
         // Anillo de progreso SVG
         const Ring = ({ pct, color = '#2462b0', size = 100 }) => {
@@ -464,7 +376,6 @@ class EstudianteView extends View
           useEffect(() => cargar(), [cargar]);
           // ── Videollamadas (solo lectura para estudiante) ─────────────────────────
           const [vlLista, setVlLista] = useState([]);
-          const [vlActiva, setVlActiva] = useState(null); // Room name de la videollamada activa en el panel
           const cargarVL = useCallback(() => {
             fetch(`/univirtual/api/v1/videollamadas.php?action=lista&idMateria=${materia.idMateria}`)
               .then(r => r.json()).then(r => r.status === 'ok' && setVlLista(r.data || []));
@@ -608,12 +519,14 @@ class EstudianteView extends View
                         {vl.estado === 'programada' && vl.minutosParaInicio > 0 && <span style={{ fontSize: 12, color: 'var(--muted)', marginLeft: 10 }}>Empieza en {vl.minutosParaInicio > 59 ? Math.floor(vl.minutosParaInicio / 60) + 'h ' + vl.minutosParaInicio % 60 + 'min' : vl.minutosParaInicio + ' min'}</span>}
                       </div>
                     </div>
-                    {!finalizada && <button
-                      className={`btn ${enCurso ? 'btn-primary' : 'btn-outline'} btn-sm`}
-                      style={enCurso ? { background: '#1a7a48', borderColor: '#1a7a48', minWidth: 130 } : { minWidth: 130 }}
-                      onClick={() => setVlActiva(vl.roomName)}>
-                      {enCurso ? '📹 Unirse ahora' : '🔗 Abrir sala'}
-                    </button>}
+                    {!finalizada && <a
+                      href={`https://meet.jit.si/${vl.roomName}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-primary btn-sm"
+                    >
+                      🎥 Unirse a la clase
+                    </a>}
                     {(vl.grabaciones||[]).length>0&&<span style={{fontSize:12,color:'#1a7a48',fontWeight:600,marginLeft:10}}>
                       🎞 {vl.grabaciones.length} grabación{vl.grabaciones.length>1?'es':''}
                     </span>}
@@ -640,9 +553,6 @@ class EstudianteView extends View
                   ))}
                 </div>
               </div>}
-
-              {/* Jitsi Meet incrustado (SCRUM-118) */}
-              {vlActiva && <JitsiMeeting roomName={vlActiva} onClose={() => setVlActiva(null)} userName={window.__S.nombre}/>}
             </div>}
 
             {modal && <Modal title={`📤 Entregar: ${modal.titulo}`} onClose={() => setModal(null)} footer={<><button className="btn btn-outline" onClick={() => setModal(null)}>Cancelar</button><button className="btn btn-primary" onClick={() => entregar(modal)} disabled={saving}>{saving ? 'Enviando...' : '📤 Enviar'}</button></>}>
