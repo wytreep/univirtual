@@ -1,38 +1,27 @@
 <?php
 require_once __DIR__.'/../../config/config.php';
 require_once __DIR__.'/../../includes/auth.php';
+require_once __DIR__.'/../../includes/View.php';
 
 /**
  * ProfesorView — Panel del Profesor (SPA React)
  * Reemplaza: aula.php, actividades.php, materiales.php,
  *            calificar.php, reportes.php, notificaciones.php
  */
-class ProfesorView {
-    private string $nombre;
-    private string $initials;
-    private int    $idProf;
+class ProfesorView extends View {
+    private int $idProf;
 
     public function __construct() {
-        requireLogin('profesor');
-        $usr = usuario();
-        $this->nombre   = $usr['nombre'] ?? 'Profesor';
-        $this->initials = $this->ini($this->nombre);
-        $this->idProf   = (int)($_SESSION['idEspecifico'] ?? 0);
+        parent::__construct('profesor');
+        $this->idProf = (int)($_SESSION['idEspecifico'] ?? 0);
     }
 
-    private function ini(string $n): string {
-        $i = '';
-        foreach (explode(' ', trim($n)) as $p) $i .= strtoupper($p[0] ?? '');
-        return substr($i, 0, 2);
+    protected function sessionExtra(): array {
+        return ['idProf' => $this->idProf];
     }
 
     public function render(): void {
-        $s = json_encode([
-            'nombre'   => $this->nombre,
-            'initials' => $this->initials,
-            'idProf'   => $this->idProf,
-            'rol'      => 'Profesor',
-        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT);
+        $s = $this->sessionJS();
         $this->html($s);
     }
 

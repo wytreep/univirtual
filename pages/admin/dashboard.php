@@ -1,32 +1,21 @@
 <?php
 require_once __DIR__.'/../../config/config.php';
 require_once __DIR__.'/../../includes/auth.php';
+require_once __DIR__.'/../../includes/View.php';
 
 /**
  * AdminView — Panel de Administración
  * Clase responsable de: autenticación, inyección de sesión y renderizado HTML.
  * Toda la lógica de negocio → api/v1/ (Controllers)
  */
-class AdminView {
-    private string $nombre;
-    private string $initials;
+class AdminView extends View {
 
     public function __construct() {
-        requireLogin('admin');
-        $usr = usuario();
-        $this->nombre   = $usr['nombre'] ?? 'Administrador';
-        $this->initials = $this->buildInitials($this->nombre);
-    }
-
-    private function buildInitials(string $n): string {
-        $ini = '';
-        foreach (explode(' ', trim($n)) as $p) $ini .= strtoupper($p[0] ?? '');
-        return substr($ini, 0, 2);
+        parent::__construct('admin');
     }
 
     public function render(): void {
-        $s = json_encode(['nombre'=>$this->nombre,'initials'=>$this->initials,'rol'=>'Administrador'],
-                         JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT);
+        $s = $this->sessionJS();
         $this->html($s);
     }
 

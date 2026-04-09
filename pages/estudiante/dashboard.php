@@ -1,26 +1,22 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/View.php';
 
 /**
  * EstudianteView — Panel del Estudiante (SPA React)
  * Reemplaza: aula.php, materias.php, notas.php,
  *            notificaciones.php, tareas.php, ver_video.php
  */
-class EstudianteView
+class EstudianteView extends View
 {
-  private string $nombre;
-  private string $initials;
   private int $idEst;
   private int $semestre;
   private string $programa;
 
   public function __construct()
   {
-    requireLogin('estudiante');
-    $usr = usuario();
-    $this->nombre = $usr['nombre'] ?? 'Estudiante';
-    $this->initials = $this->ini($this->nombre);
+    parent::__construct('estudiante');
     $this->idEst = (int) ($_SESSION['idEspecifico'] ?? 0);
     // Cargar datos del estudiante para semestre/programa
     $s = db()->prepare("
@@ -35,25 +31,18 @@ class EstudianteView
     $this->programa = $d['programa'] ?? 'Ingeniería de Sistemas';
   }
 
-  private function ini(string $n): string
-  {
-    $i = '';
-    foreach (explode(' ', trim($n)) as $p)
-      $i .= strtoupper($p[0] ?? '');
-    return substr($i, 0, 2);
+  protected function sessionExtra(): array {
+    $romanos = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+    return [
+      'idEst' => $this->idEst,
+      'semestre' => 'Semestre ' . ($romanos[$this->semestre - 1] ?? $this->semestre),
+      'programa' => $this->programa,
+    ];
   }
 
   public function render(): void
   {
-    $romanos = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-    $s = json_encode([
-      'nombre' => $this->nombre,
-      'initials' => $this->initials,
-      'idEst' => $this->idEst,
-      'semestre' => 'Semestre ' . ($romanos[$this->semestre - 1] ?? $this->semestre),
-      'programa' => $this->programa,
-      'rol' => 'Estudiante',
-    ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+    $s = $this->sessionJS();
     $this->html($s);
   }
 

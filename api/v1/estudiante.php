@@ -63,6 +63,9 @@ public function handle(): void {
 
     // ── GET dashboard ──────────────────────────────────────────────────────────
     private function dashboard(): void {
+        require_once dirname(__DIR__, 2) . '/models/Asistencia.php';
+        require_once dirname(__DIR__, 2) . '/models/Notificacion.php';
+
         $db  = db();
         $est = new Estudiante();
 
@@ -78,15 +81,8 @@ public function handle(): void {
         $promedio = count($vals) ? round(array_sum($vals) / count($vals), 1) : null;
 
         // Asistencia global del estudiante
-        $sA = $db->prepare(
-            "SELECT COUNT(*) AS total, SUM(asistio) AS asistidas
-             FROM asistencia WHERE idEstudiante = ?"
-        );
-        $sA->execute([$this->idEst]);
-        $asist    = $sA->fetch();
-        $pctAsist = ($asist['total'] > 0)
-            ? round(($asist['asistidas'] / $asist['total']) * 100)
-            : 0;
+        $asistenciaModel = new Asistencia();
+        $pctAsist = $asistenciaModel->getPorcentaje($this->idEst, null);
 
         // Próximas actividades sin entregar
         $sProx = $db->prepare(
@@ -107,19 +103,9 @@ public function handle(): void {
         $proximasTareas = $sProx->fetchAll();
 
         // Notificaciones recientes
-        $sN = $db->prepare(
-            "SELECT * FROM notificaciones WHERE idUsuario = ?
-             ORDER BY creado_en DESC LIMIT 6"
-        );
-        $sN->execute([$this->idUsuario]);
-        $notificaciones = $sN->fetchAll();
-
-        // No leídas
-        $sNL = $db->prepare(
-            "SELECT COUNT(*) FROM notificaciones WHERE idUsuario = ? AND leida = 0"
-        );
-        $sNL->execute([$this->idUsuario]);
-        $noLeidas = (int)$sNL->fetchColumn();
+        $notificacionModel = new Notificacion();
+        $notificaciones = $notificacionModel->getByUsuario($this->idUsuario, 6);
+        $noLeidas = $notificacionModel->contarNoLeidas($this->idUsuario);
 
         // Conteo real de entregas hechas y total de actividades
         $sEnt = $db->prepare(

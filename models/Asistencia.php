@@ -45,13 +45,22 @@ class Asistencia extends Model {
 
     /**
      * Calcula el porcentaje de asistencia de un estudiante en una materia.
+     * Si idMateria es null, calcula el porcentaje global (todas las materias).
      */
-    public function getPorcentaje(int $idEstudiante, int $idMateria): float {
-        $stmt = $this->db->prepare(
-            "SELECT COUNT(*) AS total, SUM(asistio) AS asistidas
-             FROM asistencia WHERE idEstudiante = ? AND idMateria = ?"
-        );
-        $stmt->execute([$idEstudiante, $idMateria]);
+    public function getPorcentaje(int $idEstudiante, ?int $idMateria): float {
+        if ($idMateria !== null) {
+            $stmt = $this->db->prepare(
+                "SELECT COUNT(*) AS total, SUM(asistio) AS asistidas
+                 FROM asistencia WHERE idEstudiante = ? AND idMateria = ?"
+            );
+            $stmt->execute([$idEstudiante, $idMateria]);
+        } else {
+            $stmt = $this->db->prepare(
+                "SELECT COUNT(*) AS total, SUM(asistio) AS asistidas
+                 FROM asistencia WHERE idEstudiante = ?"
+            );
+            $stmt->execute([$idEstudiante]);
+        }
         $row = $stmt->fetch();
         if (!$row || $row['total'] == 0) return 0.0;
         return round($row['asistidas'] / $row['total'] * 100, 1);

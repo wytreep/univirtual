@@ -30,14 +30,13 @@ class Notificacion extends Model {
     }
 
     /**
-     * Obtiene todas las notificaciones de un usuario (más recientes primero).
+     * Obtiene las notificaciones de un usuario (más recientes primero).
+     * @param int|null $limit Límite de registros (null = todas).
      */
-    public function getByUsuario(int $idUsuario): array {
-        $stmt = $this->db->prepare(
-            "SELECT * FROM notificaciones
-             WHERE idUsuario = ?
-             ORDER BY creado_en DESC"
-        );
+    public function getByUsuario(int $idUsuario, ?int $limit = null): array {
+        $sql = "SELECT * FROM notificaciones WHERE idUsuario = ? ORDER BY creado_en DESC";
+        if ($limit !== null) $sql .= " LIMIT $limit";
+        $stmt = $this->db->prepare($sql);
         $stmt->execute([$idUsuario]);
         return $stmt->fetchAll();
     }
