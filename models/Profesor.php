@@ -7,6 +7,8 @@ require_once __DIR__.'/Model.php';
  * Gestiona materias, materiales, actividades y calificaciones.
  */
 class Profesor extends Model {
+    protected string $table      = 'profesores';
+    protected string $primaryKey = 'idProfesor';
 
     public int    $idProfesor;
     public int    $idUsuario;

@@ -5,6 +5,9 @@ require_once __DIR__.'/Model.php';
  * Representa una asignatura académica del sistema.
  */
 class Materia extends Model {
+    protected string $table      = 'materias';
+    protected string $primaryKey = 'idMateria';
+
     public int    $idMateria;
     public int    $idProfesor;
     public string $nombre;

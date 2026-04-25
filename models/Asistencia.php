@@ -7,6 +7,8 @@ require_once __DIR__.'/Model.php';
  * Restricción UNIQUE sobre (idMateria, idEstudiante, fecha) — un registro por día.
  */
 class Asistencia extends Model {
+    protected string $table      = 'asistencia';
+    protected string $primaryKey = 'idAsistencia';
 
     public int    $idAsistencia;
     public int    $idMateria;

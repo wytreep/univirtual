@@ -6,6 +6,9 @@ require_once __DIR__.'/Model.php';
  * Superclase de Estudiante y Profesor.
  */
 class Usuario extends Model {
+    protected string $table      = 'usuarios';
+    protected string $primaryKey = 'idUsuario';
+
     public int    $idUsuario;
     public string $nombre;
     public string $email;

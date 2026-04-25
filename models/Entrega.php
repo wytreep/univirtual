@@ -7,6 +7,8 @@ require_once __DIR__.'/Model.php';
  * Gestiona subida de archivos, calificación y retroalimentación.
  */
 class Entrega extends Model {
+    protected string $table      = 'entregas';
+    protected string $primaryKey = 'idEntrega';
 
     public int    $idEntrega;
     public int    $idActividad;

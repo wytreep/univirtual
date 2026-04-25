@@ -7,6 +7,8 @@ require_once __DIR__.'/Model.php';
  * Gestiona el ciclo completo: creación, entrega y calificación.
  */
 class Actividad extends Model {
+    protected string $table      = 'actividades';
+    protected string $primaryKey = 'idActividad';
 
     public int    $idActividad;
     public int    $idAula;

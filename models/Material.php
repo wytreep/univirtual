@@ -7,6 +7,8 @@ require_once __DIR__.'/Model.php';
  * Gestiona la subida, descarga y eliminación de archivos.
  */
 class Material extends Model {
+    protected string $table      = 'materiales';
+    protected string $primaryKey = 'idMaterial';
 
     public int    $idMaterial;
     public int    $idAula;

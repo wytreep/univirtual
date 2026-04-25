@@ -6,6 +6,8 @@ require_once __DIR__.'/Model.php';
  * Gestiona las alertas automáticas del sistema para los usuarios.
  */
 class Notificacion extends Model {
+    protected string $table      = 'notificaciones';
+    protected string $primaryKey = 'idNotif';
 
     public int    $idNotif;
     public int    $idUsuario;

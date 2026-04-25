@@ -8,6 +8,8 @@ require_once __DIR__.'/Model.php';
  * Patrón Composite: idPadre = NULL → mensaje raíz | idPadre = INT → respuesta.
  */
 class Mensaje extends Model {
+    protected string $table      = 'mensajes';
+    protected string $primaryKey = 'idMensaje';
 
     public int    $idMensaje;
     public int    $idForo;

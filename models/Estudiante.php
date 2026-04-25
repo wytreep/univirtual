@@ -7,6 +7,8 @@ require_once __DIR__.'/Model.php';
  * Gestiona inscripciones, entregas y asistencia.
  */
 class Estudiante extends Model {
+    protected string $table      = 'estudiantes';
+    protected string $primaryKey = 'idEstudiante';
 
     public int    $idEstudiante;
     public int    $idUsuario;

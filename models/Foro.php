@@ -6,6 +6,8 @@ require_once __DIR__.'/Model.php';
  * Espacio de discusión temática dentro de un aula virtual.
  */
 class Foro extends Model {
+    protected string $table      = 'foros';
+    protected string $primaryKey = 'idForo';
 
     public int    $idForo;
     public int    $idAula;
