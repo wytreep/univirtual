@@ -59,7 +59,7 @@ class TestLogin(unittest.TestCase):
 
     def test_login_profesor(self):
         """Profesor entra a su panel correctamente"""
-        login(self.driver, "james@univirtual.edu.co", "1234567")
+        login(self.driver, "james@univirtual.edu.co", "123456")
         self.assertIn("profesor/dashboard", self.driver.current_url,
                       "Profesor no redirigió a su panel")
 
@@ -139,7 +139,7 @@ class TestProfesor(unittest.TestCase):
 
     def setUp(self):
         self.driver = make_driver()
-        login(self.driver, "james@univirtual.edu.co", "1234567")
+        login(self.driver, "james@univirtual.edu.co", "123456")
 
     def tearDown(self):
         self.driver.quit()
@@ -309,7 +309,7 @@ class TestVideollamadas(unittest.TestCase):
 
     def setUp(self):
         self.driver = make_driver()
-        login(self.driver, "james@univirtual.edu.co", "1234567")
+        login(self.driver, "james@univirtual.edu.co", "123456")
 
     def tearDown(self):
         self.driver.quit()
