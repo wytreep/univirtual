@@ -1,47 +1,19 @@
 <?php
 /**
  * DirectivoView — pages/directivo/dashboard.php
- * 
- * SCRUM-121: Agrega sección Configuración al panel del directivo.
- * SCRUM-123: Extiende la clase abstracta View.
- * 
- * El componente React Configuracion es idéntico al del estudiante,
- * pero llama a /api/v1/directivo.php (si existe) o al endpoint genérico
- * de usuarios /api/v1/usuarios.php?action=actualizar_perfil_propio.
+ * SCRUM-121: Configuración de perfil
+ * SCRUM-128: Fix — eliminadas dependencias de tablas directivos/facultades
+ *            que no existen en el schema. Componentes Profesores,
+ *            Estudiantes y MateriasFacultad implementados.
  */
 
+require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/View.php';
 
 class DirectivoView extends View {
 
-    private int    $idDirectivo;
-    private int    $idFacultad;
-    private string $facultadNombre;
-
     public function __construct() {
         parent::__construct('directivo');
-
-        // Cargar datos del directivo
-        $stmt = db()->prepare(
-            'SELECT d.idDirectivo, d.idFacultad, f.nombre AS facultad
-             FROM directivos d
-             JOIN facultades f ON f.idFacultad = d.idFacultad
-             WHERE d.idUsuario = ?'
-        );
-        $stmt->execute([$this->idUsuario]);
-        $row = $stmt->fetch();
-
-        $this->idDirectivo    = $row ? (int)$row['idDirectivo']    : 0;
-        $this->idFacultad     = $row ? (int)$row['idFacultad']     : 0;
-        $this->facultadNombre = $row ? $row['facultad']             : 'Sin facultad';
-    }
-
-    protected function sessionExtra(): array {
-        return [
-            'idDirectivo'    => $this->idDirectivo,
-            'idFacultad'     => $this->idFacultad,
-            'facultadNombre' => $this->facultadNombre,
-        ];
     }
 
     public function render(): void {
@@ -60,7 +32,6 @@ class DirectivoView extends View {
   <div id="root"></div>
 
   <?= $this->reactCDN() ?>
-  <script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <script>
     window.__S = <?= $sJS ?>;
@@ -68,10 +39,15 @@ class DirectivoView extends View {
 
   <script type="text/babel">
     const { useState, useEffect } = React;
-    const S = window.__S;
+    const S   = window.__S;
     const API = (path) => `<?= BASE_URL ?>/api/v1/${path}`;
 
-    // ── Componente Configuración (reutilizado — SCRUM-121) ──────────
+    // ── Spinner ──────────────────────────────────────────────────────
+    function Spinner() {
+      return <div className="spinner"></div>;
+    }
+
+    // ── Configuración (SCRUM-121) ────────────────────────────────────
     function Configuracion() {
       const [tab, setTab]         = useState('perfil');
       const [nombre, setNombre]   = useState(S.nombre);
@@ -83,15 +59,19 @@ class DirectivoView extends View {
 
       const guardarPerfil = async () => {
         setLoading(true); setMsg(null);
-        const res = await fetch(API('directivo.php'), {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'actualizar_perfil', nombre }),
-        });
-        const data = await res.json();
-        setMsg({ ok: data.status === 'ok', text: data.mensaje || 'Perfil actualizado' });
-        if (data.ok) S.nombre = nombre;
+        try {
+          const res  = await fetch(API('directivo.php'), {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'actualizar_perfil', nombre }),
+          });
+          const data = await res.json();
+          setMsg({ ok: data.status === 'ok', text: data.mensaje || 'Perfil actualizado' });
+          if (data.status === 'ok') S.nombre = nombre;
+        } catch(e) {
+          setMsg({ ok: false, text: 'Error de conexión' });
+        }
         setLoading(false);
       };
 
@@ -103,114 +83,130 @@ class DirectivoView extends View {
           setMsg({ ok: false, text: 'Mínimo 6 caracteres.' }); return;
         }
         setLoading(true); setMsg(null);
-        const res = await fetch(API('directivo.php'), {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'cambiar_password',
-            actual: passActual,
-            nueva:  passNueva,
-          }),
-        });
-        const data = await res.json();
-        setMsg({ ok: data.status === 'ok', text: data.mensaje || 'Contraseña actualizada' });
-        if (data.ok) { setPA(''); setPN(''); setPC(''); }
+        try {
+          const res  = await fetch(API('directivo.php'), {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'cambiar_password',
+              actual: passActual,
+              nueva:  passNueva,
+            }),
+          });
+          const data = await res.json();
+          setMsg({ ok: data.status === 'ok', text: data.mensaje || 'Contraseña actualizada' });
+          if (data.status === 'ok') { setPA(''); setPN(''); setPC(''); }
+        } catch(e) {
+          setMsg({ ok: false, text: 'Error de conexión' });
+        }
         setLoading(false);
       };
 
       return (
-        <div className="panel-section">
-          <h2 className="section-title">⚙️ Configuración</h2>
-          <div className="tabs-nav" style={{marginBottom:'24px'}}>
-            {['perfil','contraseña'].map(t => (
-              <button key={t}
-                className={`tab-btn ${tab===t?'active':''}`}
-                onClick={() => { setTab(t); setMsg(null); }}>
-                {t==='perfil'?'👤 Perfil':'🔑 Contraseña'}
-              </button>
-            ))}
+        <div className="page">
+          <div className="welcome-banner">
+            <h1>⚙️ Configuración</h1>
           </div>
-
-          {msg && (
-            <div className={`alert ${msg.ok?'alert-success':'alert-error'}`}
-                 style={{marginBottom:'16px'}}>
-              {msg.text}
-            </div>
-          )}
-
-          {tab === 'perfil' && (
-            <div style={{maxWidth:'400px'}}>
-              <label className="form-label">Nombre completo</label>
-              <input className="form-input" value={nombre}
-                onChange={e => setNombre(e.target.value)} />
-              <label className="form-label" style={{marginTop:'12px'}}>
-                Facultad (no editable)
-              </label>
-              <input className="form-input" value={S.facultadNombre}
-                disabled style={{opacity:0.6}} />
-              <button className="btn-primary"
-                onClick={guardarPerfil}
-                disabled={loading || !nombre.trim()}
-                style={{marginTop:'16px'}}>
-                {loading ? 'Guardando...' : 'Guardar cambios'}
-              </button>
-            </div>
-          )}
-
-          {tab === 'contraseña' && (
-            <div style={{maxWidth:'400px'}}>
-              {[
-                ['Contraseña actual', passActual, setPA],
-                ['Nueva contraseña (mín. 6 caracteres)', passNueva, setPN],
-                ['Confirmar contraseña', passCfm, setPC],
-              ].map(([label, val, setter]) => (
-                <div key={label} style={{marginBottom:'12px'}}>
-                  <label className="form-label">{label}</label>
-                  <input className="form-input" type="password" value={val}
-                    onChange={e => setter(e.target.value)} />
-                </div>
+          <div className="card" style={{maxWidth:'520px'}}>
+            <div className="tabs">
+              {['perfil','contraseña'].map(t => (
+                <button key={t}
+                  className={`tab ${tab===t?'active':''}`}
+                  onClick={() => { setTab(t); setMsg(null); }}>
+                  {t==='perfil'?'👤 Perfil':'🔑 Contraseña'}
+                </button>
               ))}
-              <button className="btn-primary"
-                onClick={cambiarPassword}
-                disabled={loading || !passActual || !passNueva || !passCfm}
-                style={{marginTop:'8px'}}>
-                {loading ? 'Cambiando...' : 'Cambiar contraseña'}
-              </button>
             </div>
-          )}
+
+            {msg && (
+              <div className={`alert ${msg.ok?'alert-success':'alert-error'}`}
+                   style={{margin:'16px 0'}}>
+                {msg.text}
+              </div>
+            )}
+
+            {tab === 'perfil' && (
+              <div style={{padding:'16px 0'}}>
+                <div className="form-group">
+                  <label className="form-label">Nombre completo</label>
+                  <input className="form-input" value={nombre}
+                    onChange={e => setNombre(e.target.value)} />
+                </div>
+                <div className="form-group" style={{marginTop:'12px'}}>
+                  <label className="form-label">Email (no editable)</label>
+                  <input className="form-input" value={S.email}
+                    disabled style={{opacity:0.6}} />
+                </div>
+                <button className="btn btn-primary"
+                  onClick={guardarPerfil}
+                  disabled={loading || !nombre.trim()}
+                  style={{marginTop:'16px'}}>
+                  {loading ? 'Guardando...' : 'Guardar cambios'}
+                </button>
+              </div>
+            )}
+
+            {tab === 'contraseña' && (
+              <div style={{padding:'16px 0'}}>
+                {[
+                  ['Contraseña actual', passActual, setPA],
+                  ['Nueva contraseña (mín. 6 caracteres)', passNueva, setPN],
+                  ['Confirmar contraseña', passCfm, setPC],
+                ].map(([label, val, setter]) => (
+                  <div key={label} className="form-group" style={{marginBottom:'12px'}}>
+                    <label className="form-label">{label}</label>
+                    <input className="form-input" type="password" value={val}
+                      onChange={e => setter(e.target.value)} />
+                  </div>
+                ))}
+                <button className="btn btn-primary"
+                  onClick={cambiarPassword}
+                  disabled={loading || !passActual || !passNueva || !passCfm}
+                  style={{marginTop:'8px'}}>
+                  {loading ? 'Cambiando...' : 'Cambiar contraseña'}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       );
     }
 
-    // ── Panel de estadísticas de facultad ────────────────────────────
+    // ── Resumen ──────────────────────────────────────────────────────
     function ResumenFacultad() {
       const [stats, setStats] = useState(null);
 
       useEffect(() => {
-        fetch(API(`stats.php?action=facultad&idFacultad=${S.idFacultad}`), {
-          credentials: 'include'
-        })
-        .then(r => r.json())
-        .then(d => setStats(d.data));
+        fetch(API('directivo.php?action=resumen'), { credentials: 'include' })
+          .then(r => r.json())
+          .then(d => {
+            if (d.status === 'ok') setStats(d.data);
+          })
+          .catch(() => setStats({}));
       }, []);
 
-      if (!stats) return <div className="loading">Cargando estadísticas...</div>;
+      if (!stats) return <Spinner/>;
+
+      // directivo.php?action=resumen devuelve campos directos
+      const items = [
+        { label: 'Profesores',      value: stats.totalProfesores  ?? '—', icon: '👨‍🏫' },
+        { label: 'Estudiantes',     value: stats.totalEstudiantes ?? '—', icon: '👩‍🎓' },
+        { label: 'Materias',        value: stats.totalMaterias    ?? '—', icon: '📚' },
+        { label: 'Tasa aprobación', value: `${stats.tasaAprobacion ?? 0}%`, icon: '✅' },
+      ];
 
       return (
-        <div className="panel-section">
-          <h2 className="section-title">📊 Resumen — {S.facultadNombre}</h2>
-          <div className="stats-grid">
-            {[
-              { label: 'Profesores',  value: stats.totalProfesores,  icon: '👨‍🏫' },
-              { label: 'Estudiantes', value: stats.totalEstudiantes, icon: '👩‍🎓' },
-              { label: 'Materias',    value: stats.totalMaterias,    icon: '📚' },
-              { label: 'Tasa aprobación', value: `${stats.tasaAprobacion ?? 0}%`, icon: '✅' },
-            ].map(s => (
-              <div key={s.label} className="stat-card">
-                <span className="stat-icon">{s.icon}</span>
-                <span className="stat-value">{s.value}</span>
-                <span className="stat-label">{s.label}</span>
+        <div className="page">
+          <div className="welcome-banner">
+            <h1>📊 Resumen — Facultad de Ingeniería</h1>
+          </div>
+          <div className="stat-grid-6" style={{gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))'}}>
+            {items.map(s => (
+              <div key={s.label} className="card" style={{textAlign:'center',padding:'24px 16px'}}>
+                <div style={{fontSize:'2rem',marginBottom:'8px'}}>{s.icon}</div>
+                <div style={{fontSize:'2rem',fontWeight:700,color:'var(--navy)'}}>{s.value}</div>
+                <div style={{fontSize:'0.9rem',color:'var(--muted)',marginTop:'4px'}}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -218,19 +214,191 @@ class DirectivoView extends View {
       );
     }
 
-    // ── App principal del Directivo ──────────────────────────────────
+    // ── Profesores ───────────────────────────────────────────────────
+    function Profesores() {
+      const [lista, setLista] = useState(null);
+
+      useEffect(() => {
+        fetch(API('directivo.php?action=profesores'), { credentials: 'include' })
+          .then(r => r.json())
+          .then(d => setLista(d.data || []))
+          .catch(() => setLista([]));
+      }, []);
+
+      if (!lista) return <Spinner/>;
+
+      return (
+        <div className="page">
+          <div className="welcome-banner">
+            <h1>👨‍🏫 Profesores</h1>
+            <span className="badge">{lista.length} registrados</span>
+          </div>
+          <div className="card">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Código</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lista.length === 0 && (
+                  <tr><td colSpan="4" style={{textAlign:'center',color:'var(--muted)'}}>
+                    Sin profesores registrados
+                  </td></tr>
+                )}
+                {lista.map(p => (
+                  <tr key={p.idUsuario}>
+                    <td>{p.nombre}</td>
+                    <td>{p.email}</td>
+                    <td>{p.codigoProf || '—'}</td>
+                    <td>
+                      <span className={`badge ${p.activo==1?'badge-success':'badge-danger'}`}>
+                        {p.activo==1?'Activo':'Inactivo'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Estudiantes ──────────────────────────────────────────────────
+    function Estudiantes() {
+      const [lista, setLista] = useState(null);
+
+      useEffect(() => {
+        fetch(API('directivo.php?action=estudiantes'), { credentials: 'include' })
+          .then(r => r.json())
+          .then(d => setLista(d.data || []))
+          .catch(() => setLista([]));
+      }, []);
+
+      if (!lista) return <Spinner/>;
+
+      return (
+        <div className="page">
+          <div className="welcome-banner">
+            <h1>👩‍🎓 Estudiantes</h1>
+            <span className="badge">{lista.length} registrados</span>
+          </div>
+          <div className="card">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Código</th>
+                  <th>Semestre</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lista.length === 0 && (
+                  <tr><td colSpan="5" style={{textAlign:'center',color:'var(--muted)'}}>
+                    Sin estudiantes registrados
+                  </td></tr>
+                )}
+                {lista.map(e => (
+                  <tr key={e.idUsuario}>
+                    <td>{e.nombre}</td>
+                    <td>{e.email}</td>
+                    <td>{e.codigoEst || '—'}</td>
+                    <td>{e.semestre || '—'}</td>
+                    <td>
+                      <span className={`badge ${e.activo==1?'badge-success':'badge-danger'}`}>
+                        {e.activo==1?'Activo':'Inactivo'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Materias ─────────────────────────────────────────────────────
+    function MateriasFacultad() {
+      const [lista, setLista] = useState(null);
+
+      useEffect(() => {
+        fetch(API('directivo.php?action=materias'), { credentials: 'include' })
+          .then(r => r.json())
+          .then(d => setLista(d.data || []))
+          .catch(() => setLista([]));
+      }, []);
+
+      if (!lista) return <Spinner/>;
+
+      return (
+        <div className="page">
+          <div className="welcome-banner">
+            <h1>📚 Materias</h1>
+            <span className="badge">{lista.length} activas</span>
+          </div>
+          <div className="card">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Código</th>
+                  <th>Créditos</th>
+                  <th>Profesor</th>
+                  <th>Inscritos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lista.length === 0 && (
+                  <tr><td colSpan="5" style={{textAlign:'center',color:'var(--muted)'}}>
+                    Sin materias registradas
+                  </td></tr>
+                )}
+                {lista.map(m => (
+                  <tr key={m.idMateria}>
+                    <td>
+                      <span style={{
+                        display:'inline-block',
+                        width:'10px',height:'10px',
+                        borderRadius:'50%',
+                        background: m.color || '#ccc',
+                        marginRight:'8px'
+                      }}></span>
+                      {m.nombre}
+                    </td>
+                    <td>{m.codigo}</td>
+                    <td>{m.creditos}</td>
+                    <td>{m.profesor || '—'}</td>
+                    <td>{m.totalInscritos ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── App principal ────────────────────────────────────────────────
     function DirectivoApp() {
       const [vista, setVista] = useState('resumen');
       const { nombre, initials } = window.__S;
 
       const nav = [
-        {id:'resumen',       ico:'📊', lbl:'Resumen'},
-        {id:'profesores',    ico:'👨‍🏫',lbl:'Profesores'},
-        {id:'estudiantes',   ico:'👩‍🎓',lbl:'Estudiantes'},
-        {id:'materias',      ico:'📚', lbl:'Materias'},
-        {id:'configuracion', ico:'⚙️', lbl:'Configuración'},
+        { id: 'resumen',       ico: '📊',  lbl: 'Resumen'       },
+        { id: 'profesores',    ico: '👨‍🏫', lbl: 'Profesores'    },
+        { id: 'estudiantes',   ico: '👩‍🎓', lbl: 'Estudiantes'   },
+        { id: 'materias',      ico: '📚',  lbl: 'Materias'       },
+        { id: 'configuracion', ico: '⚙️',  lbl: 'Configuración'  },
       ];
-      const titulo = nav.find(n=>n.id===vista)?.lbl || '';
+
+      const titulo = nav.find(n => n.id === vista)?.lbl || '';
 
       return (
         <>
@@ -242,23 +410,25 @@ class DirectivoView extends View {
             <div className="sb-user">
               <div className="sb-avatar">{initials}</div>
               <div>
-                <div className="sb-user-name">{nombre.split(' ').slice(0,2).join(' ')}</div>
+                <div className="sb-user-name">
+                  {nombre ? nombre.split(' ').slice(0,2).join(' ') : 'Directivo'}
+                </div>
                 <div className="sb-user-role">Directivo</div>
               </div>
             </div>
             <div className="sb-section">Principal</div>
             <nav className="sb-nav">
-              {nav.map(n=>(
+              {nav.map(n => (
                 <div key={n.id}
-                     className={`sb-item ${vista===n.id?'active':''}`}
-                     onClick={()=>setVista(n.id)}>
+                     className={`sb-item ${vista === n.id ? 'active' : ''}`}
+                     onClick={() => setVista(n.id)}>
                   <span className="sb-item-ico">{n.ico}</span>
                   <span className="sb-item-lbl">{n.lbl}</span>
                 </div>
               ))}
             </nav>
             <div className="sb-logout">
-              <a href="/univirtual/pages/auth/logout.php"
+              <a href="<?= BASE_URL ?>/pages/auth/logout.php"
                  className="sb-logout-btn">
                 <span className="sb-logout-ico">↩</span>
                 <span>Cerrar sesión</span>
@@ -277,29 +447,27 @@ class DirectivoView extends View {
             </div>
             <div className="tb-right">
               <span className="tb-semester">2026-I</span>
-              <div className="tb-notif">
-                <span>🔔</span>
-              </div>
+              <div className="tb-notif"><span>🔔</span></div>
             </div>
           </header>
 
           <main className="main">
-            {vista==='resumen'       && <ResumenFacultad/>}
-            {vista==='profesores'    && <Profesores/>}
-            {vista==='estudiantes'   && <Estudiantes/>}
-            {vista==='materias'      && <MateriasFacultad/>}
-            {vista==='configuracion' && <Configuracion rol="directivo"/>}
+            {vista === 'resumen'       && <ResumenFacultad/>}
+            {vista === 'profesores'    && <Profesores/>}
+            {vista === 'estudiantes'   && <Estudiantes/>}
+            {vista === 'materias'      && <MateriasFacultad/>}
+            {vista === 'configuracion' && <Configuracion/>}
           </main>
         </>
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<DirectivoApp />);
+    ReactDOM.createRoot(document.getElementById('root')).render(<DirectivoApp/>);
   </script>
 </body>
 </html>
 <?php
-    } // end render()
-} // end class DirectivoView
+    }
+}
 
 (new DirectivoView())->render();

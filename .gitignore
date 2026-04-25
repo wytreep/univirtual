@@ -1,16 +1,16 @@
-config/config.php
-uploads/materiales/*
-uploads/entregas/*
-uploads/enunciados/*
-uploads/reportes/*
-uploads/avatares/*
-uploads/grabaciones/*
-!uploads/materiales/.gitkeep
-!uploads/entregas/.gitkeep
-!uploads/enunciados/.gitkeep
-!uploads/reportes/.gitkeep
-!uploads/avatares/.gitkeep
-!uploads/grabaciones/.gitkeep
-*.log
+# Credenciales — NUNCA al repo
+config.php
+
+# Archivos de usuario
+uploads/
+*.zip
+*.rar
+
+# Sistema
 .DS_Store
 Thumbs.db
+*.log
+
+# IDE
+.idea/
+.vscode/

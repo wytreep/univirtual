@@ -1,165 +1,145 @@
 <?php
 require_once __DIR__.'/Controller.php';
+require_once dirname(__DIR__, 2).'/models/Usuario.php';
+require_once dirname(__DIR__, 2).'/models/Materia.php';
 
 /**
- * DirectivoController
- * API REST para el panel del directivo.
+ * DirectivoController — api/v1/directivo.php
  *
- * GET /api/v1/directivo.php?action=dashboard
- * GET /api/v1/directivo.php?action=profesores
- * GET /api/v1/directivo.php?action=estudiantes
- * GET /api/v1/directivo.php?action=materias
- * POST /api/v1/directivo.php?action=actualizar_perfil
- * POST /api/v1/directivo.php?action=cambiar_password
+ * SCRUM-128: Controller propio para el rol directivo.
+ * Antes el directivo usaba endpoints del admin (usuarios.php, materias.php)
+ * violando S e I de SOLID. Ahora tiene su propio controller con acceso
+ * restringido exclusivamente al rol directivo.
+ *
+ * SOLID:
+ * S — responsabilidad única: gestión de consultas del directivo
+ * O — extiende Controller sin modificarlo
+ * L — sustituible por Controller en cualquier contexto
+ * I — expone solo lo que el directivo necesita (no CRUD de usuarios)
+ * D — depende de modelos Usuario y Materia, no de SQL directo
+ *
+ * Acciones GET:
+ *   ?action=profesores    → lista de profesores con codigoProf y departamento
+ *   ?action=estudiantes   → lista de estudiantes con codigoEst y semestre
+ *   ?action=materias      → materias con nombre del profesor y totalInscritos
+ *   ?action=resumen       → conteos globales para el dashboard
+ *
+ * Acciones POST:
+ *   { action: 'actualizar_perfil', nombre }        → cambia nombre
+ *   { action: 'cambiar_password', actual, nueva }  → cambia contraseña
  */
 class DirectivoController extends Controller {
 
-    private int $idDirectivo;
-    private int $idUsuario;
-    private int $idFacultad;
+    private Usuario $usuarioModel;
+    private Materia $materiaModel;
 
     public function __construct() {
         parent::__construct();
+        $this->usuarioModel = new Usuario();
+        $this->materiaModel = new Materia();
     }
 
     public function handle(): void {
-        $session = $this->requireAuth('directivo');
-        $this->idDirectivo = (int)($session['idEspecifico'] ?? 0);
-        $this->idUsuario   = (int)($session['idUsuario'] ?? 0);
-        $this->idFacultad  = (int)($session['idFacultad'] ?? 0);
-
-        $body   = [];
-        if ($this->method() === 'POST') {
-            $raw  = file_get_contents('php://input');
-            $body = json_decode($raw, true) ?? [];
-        }
-        $action = $_GET['action'] ?? $_POST['action'] ?? $body['action'] ?? '';
+        $session = $this->requireAuth(['directivo']);
 
         if ($this->method() === 'GET') {
+            $action = $_GET['action'] ?? 'resumen';
+
             match($action) {
-                'dashboard'   => $this->dashboard(),
-                'profesores'  => $this->profesores(),
-                'estudiantes' => $this->estudiantes(),
-                'materias'    => $this->materias(),
-                default       => $this->error('Acción no válida')
+                'profesores'  => $this->getProfesores(),
+                'estudiantes' => $this->getEstudiantes(),
+                'materias'    => $this->getMaterias(),
+                'resumen'     => $this->getResumen(),
+                default       => $this->error('Acción no válida', 400),
             };
-        } elseif ($this->method() === 'POST') {
-            match($action) {
-                'actualizar_perfil' => $this->actualizarPerfil(),
-                'cambiar_password'  => $this->cambiarPassword(),
-                default             => $this->error('Acción no válida')
-            };
-        } else {
-            $this->error('Método no permitido', 405);
+            return;
         }
+
+        if ($this->method() === 'POST') {
+            $body   = $this->getBody();
+            $action = $body['action'] ?? '';
+
+            match($action) {
+                'actualizar_perfil' => $this->actualizarPerfil($session, $body),
+                'cambiar_password'  => $this->cambiarPassword($session, $body),
+                default             => $this->error('Acción no válida', 400),
+            };
+            return;
+        }
+
+        $this->error('Método no permitido', 405);
     }
 
-    // ── GET dashboard ──────────────────────────────────────────────────────────
-    private function dashboard(): void {
+    // ── GET ──────────────────────────────────────────────────────────
+
+    private function getProfesores(): void {
+        $profesores = $this->usuarioModel->getByRol('profesor');
+        $this->ok($profesores);
+    }
+
+    private function getEstudiantes(): void {
+        $estudiantes = $this->usuarioModel->getByRol('estudiante');
+        $this->ok($estudiantes);
+    }
+
+    private function getMaterias(): void {
+        $materias = $this->materiaModel->getAll();
+        $this->ok($materias);
+    }
+
+    private function getResumen(): void {
         $db = db();
 
-        // Totales de la facultad
-        $stmt = $db->prepare(
-            "SELECT
-                (SELECT COUNT(*) FROM profesores WHERE idFacultad = ?) AS totalProfesores,
-                (SELECT COUNT(*) FROM estudiantes e
-                 JOIN carreras c ON e.idCarrera = c.idCarrera
-                 WHERE c.idFacultad = ?) AS totalEstudiantes,
-                (SELECT COUNT(*) FROM materias m
-                 JOIN carreras c ON m.idCarrera = c.idCarrera
-                 WHERE c.idFacultad = ?) AS totalMaterias"
-        );
-        $stmt->execute([$this->idFacultad, $this->idFacultad, $this->idFacultad]);
-        $stats = $stmt->fetch();
+        $totalProfesores  = (int)$db->query("SELECT COUNT(*) FROM profesores")->fetchColumn();
+        $totalEstudiantes = (int)$db->query("SELECT COUNT(*) FROM estudiantes")->fetchColumn();
+        $totalMaterias    = (int)$db->query("SELECT COUNT(*) FROM materias")->fetchColumn();
 
-        // Tasa de aprobación promedio
-        $stmt = $db->prepare(
-            "SELECT AVG(nota_final) as promedio FROM inscripciones i
-             JOIN estudiantes e ON i.idEstudiante = e.idEstudiante
-             JOIN carreras c ON e.idCarrera = c.idCarrera
-             WHERE c.idFacultad = ? AND nota_final IS NOT NULL"
-        );
-        $stmt->execute([$this->idFacultad]);
-        $prom = $stmt->fetch();
-        $stats['tasaAprobacion'] = $prom['promedio'] ? round($prom['promedio'] / 5 * 100, 1) : 0;
+        // Tasa de aprobación: inscripciones con nota_final >= 3.0
+        $totalInsc = (int)$db->query("SELECT COUNT(*) FROM inscripciones WHERE nota_final IS NOT NULL")->fetchColumn();
+        $aprobados = (int)$db->query("SELECT COUNT(*) FROM inscripciones WHERE nota_final >= 3.0")->fetchColumn();
+        $tasa      = $totalInsc > 0 ? round(($aprobados / $totalInsc) * 100, 1) : 0;
 
-        $this->ok($stats);
+        $this->ok([
+            'totalProfesores'  => $totalProfesores,
+            'totalEstudiantes' => $totalEstudiantes,
+            'totalMaterias'    => $totalMaterias,
+            'tasaAprobacion'   => $tasa,
+        ]);
     }
 
-    // ── GET profesores ─────────────────────────────────────────────────────────
-    private function profesores(): void {
-        $stmt = db()->prepare(
-            "SELECT p.idProfesor, u.nombre, u.email, p.codigoProf, p.departamento,
-                    (SELECT COUNT(*) FROM materias WHERE idProfesor = p.idProfesor) AS total_materias
-             FROM profesores p
-             JOIN usuarios u ON p.idUsuario = u.idUsuario
-             JOIN carreras c ON p.idFacultad = c.idFacultad
-             WHERE c.idFacultad = ?
-             ORDER BY u.nombre"
-        );
-        $stmt->execute([$this->idFacultad]);
-        $this->ok($stmt->fetchAll());
-    }
+    // ── POST ─────────────────────────────────────────────────────────
 
-    // ── GET estudiantes ────────────────────────────────────────────────────────
-    private function estudiantes(): void {
-        $stmt = db()->prepare(
-            "SELECT e.idEstudiante, u.nombre, u.email, e.codigoEst, e.semestre,
-                    c.nombre AS carrera, e.creditos_aprobados
-             FROM estudiantes e
-             JOIN usuarios u ON e.idUsuario = u.idUsuario
-             JOIN carreras c ON e.idCarrera = c.idCarrera
-             WHERE c.idFacultad = ?
-             ORDER BY u.nombre"
-        );
-        $stmt->execute([$this->idFacultad]);
-        $this->ok($stmt->fetchAll());
-    }
-
-    // ── GET materias ───────────────────────────────────────────────────────────
-    private function materias(): void {
-        $stmt = db()->prepare(
-            "SELECT m.idMateria, m.nombre, m.codigo, m.creditos, m.semestre,
-                    u.nombre AS profesor,
-                    (SELECT COUNT(*) FROM inscripciones WHERE idMateria = m.idMateria) AS totalEst
-             FROM materias m
-             JOIN profesores p ON m.idProfesor = p.idProfesor
-             JOIN usuarios u ON p.idUsuario = u.idUsuario
-             JOIN carreras c ON m.idCarrera = c.idCarrera
-             WHERE c.idFacultad = ?
-             ORDER BY m.semestre, m.nombre"
-        );
-        $stmt->execute([$this->idFacultad]);
-        $this->ok($stmt->fetchAll());
-    }
-
-    // ── POST actualizar_perfil ─────────────────────────────────────────────────
-    private function actualizarPerfil(): void {
-        $body   = $this->getBody();
+    private function actualizarPerfil(array $session, array $body): void {
         $nombre = trim($body['nombre'] ?? '');
-        if (!$nombre) { $this->error('Nombre requerido', 422); return; }
-        db()->prepare('UPDATE usuarios SET nombre=? WHERE idUsuario=?')
-            ->execute([$nombre, $this->idUsuario]);
-        $this->ok(['nombre' => $nombre], 'Perfil actualizado');
+        if (!$nombre) {
+            $this->error('El nombre no puede estar vacío');
+            return;
+        }
+        $this->usuarioModel->actualizarNombre($session['idUsuario'], $nombre);
+        $this->ok([], 'Perfil actualizado correctamente');
     }
 
-    // ── POST cambiar_password ──────────────────────────────────────────────────
-    private function cambiarPassword(): void {
-        $body   = $this->getBody();
+    private function cambiarPassword(array $session, array $body): void {
         $actual = $body['actual'] ?? '';
         $nueva  = $body['nueva']  ?? '';
+
+        if (!$actual || !$nueva) {
+            $this->error('Completa todos los campos');
+            return;
+        }
         if (strlen($nueva) < 6) {
-            $this->error('Mínimo 6 caracteres', 422); return;
+            $this->error('La nueva contraseña debe tener al menos 6 caracteres');
+            return;
         }
-        $row = db()->prepare('SELECT password FROM usuarios WHERE idUsuario=?');
-        $row->execute([$this->idUsuario]);
-        $hash = $row->fetchColumn();
-        if (!password_verify($actual, $hash)) {
-            $this->error('Contraseña actual incorrecta', 401); return;
+
+        $ok = $this->usuarioModel->cambiarPassword($session['idUsuario'], $actual, $nueva);
+
+        if (!$ok) {
+            $this->error('La contraseña actual no es correcta');
+            return;
         }
-        db()->prepare('UPDATE usuarios SET password=? WHERE idUsuario=?')
-            ->execute([password_hash($nueva, PASSWORD_BCRYPT), $this->idUsuario]);
-        $this->ok(null, 'Contraseña actualizada');
+
+        $this->ok([], 'Contraseña actualizada correctamente');
     }
 }
 

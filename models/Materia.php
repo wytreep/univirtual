@@ -1,13 +1,10 @@
 <?php
 require_once __DIR__.'/Model.php';
-
 /**
  * Clase Materia
  * Representa una asignatura académica del sistema.
- * Eje central alrededor del cual se organiza el contenido.
  */
 class Materia extends Model {
-
     public int    $idMateria;
     public int    $idProfesor;
     public string $nombre;
@@ -29,6 +26,26 @@ class Materia extends Model {
     }
 
     /**
+     * Retorna todas las materias con nombre del profesor y conteo de inscritos.
+     * Usado por DirectivoController y AdminPanel — SCRUM-128.
+     */
+    public function getAll(): array {
+        $stmt = $this->db->prepare(
+            "SELECT m.idMateria, m.nombre, m.codigo, m.creditos, m.color,
+                    u.nombre AS profesor,
+                    COUNT(i.idEstudiante) AS totalInscritos
+             FROM materias m
+             LEFT JOIN profesores p  ON m.idProfesor = p.idProfesor
+             LEFT JOIN usuarios u    ON p.idUsuario   = u.idUsuario
+             LEFT JOIN inscripciones i ON m.idMateria = i.idMateria
+             GROUP BY m.idMateria
+             ORDER BY m.nombre"
+        );
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Retorna todos los estudiantes inscritos en la materia.
      */
     public function getEstudiantes(int $idMateria): array {
@@ -37,7 +54,7 @@ class Materia extends Model {
                     i.nota_parcial1, i.nota_parcial2, i.nota_talleres, i.nota_final
              FROM inscripciones i
              JOIN estudiantes est ON i.idEstudiante = est.idEstudiante
-             JOIN usuarios u ON est.idUsuario = u.idUsuario
+             JOIN usuarios u      ON est.idUsuario   = u.idUsuario
              WHERE i.idMateria = ?
              ORDER BY u.nombre"
         );
@@ -67,10 +84,9 @@ class Materia extends Model {
         );
         $stmt->execute([$idProfesor, $nombre, $codigo, $creditos, $descripcion, $color]);
         $idMateria = (int)$this->db->lastInsertId();
-
-        // Crear aula virtual automáticamente
-        $this->db->prepare("INSERT INTO aulas_virtuales (idMateria) VALUES (?)")->execute([$idMateria]);
-
+        $this->db->prepare(
+            "INSERT INTO aulas_virtuales (idMateria) VALUES (?)"
+        )->execute([$idMateria]);
         return $idMateria;
     }
 }
