@@ -107,8 +107,8 @@ class ReportesController extends Controller {
 
         $stmt = $db->prepare(
             "SELECT u.nombre, est.codigoEst,
-                    i.nota_parcial1, i.nota_parcial2, i.nota_final,
-                    i.nota_habilitacion,
+                    i.nota_parcial1, i.nota_parcial2,
+                    i.nota_talleres, i.nota_final,
                     (SELECT COUNT(*) FROM entregas e
                      JOIN actividades a ON e.idActividad = a.idActividad
                      JOIN aulas_virtuales av ON a.idAula = av.idAula

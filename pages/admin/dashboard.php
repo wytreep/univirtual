@@ -534,6 +534,178 @@ const VideollamadasAdmin=()=>{
   </div>;
 };
 
+// PanelPruebas — componente React CDN
+// Se incluye en pages/admin/dashboard.php junto a los demás panels
+// SCRUM-129
+ 
+const PanelPruebas = () => {
+    const [resumen, setResumen] = React.useState(null);
+    const [lista,   setLista]   = React.useState([]);
+    const [cargando, setCargando] = React.useState(true);
+ 
+    const BASE = '/univirtual/api/v1/PruebasController.php';
+ 
+    const cargar = () => {
+        setCargando(true);
+        Promise.all([
+            fetch(`${BASE}?action=resumen`, { credentials: 'include' }).then(r => r.json()),
+            fetch(`${BASE}?action=lista&limite=50`, { credentials: 'include' }).then(r => r.json()),
+        ]).then(([res, lst]) => {
+            if (res.status === 'ok') setResumen(res.data);
+            if (lst.status === 'ok') setLista(lst.data);
+        }).finally(() => setCargando(false));
+    };
+ 
+    const limpiar = () => {
+        if (!confirm('¿Limpiar todos los resultados de pruebas?')) return;
+        fetch(`${BASE}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'limpiar' })
+        }).then(() => cargar());
+    };
+ 
+    React.useEffect(() => { cargar(); }, []);
+ 
+    const badge = (estado) => {
+        const estilos = {
+            PASSED: { background: '#D1FAE5', color: '#065F46' },
+            FAILED: { background: '#FEE2E2', color: '#991B1B' },
+            ERROR:  { background: '#FEF3C7', color: '#92400E' },
+        };
+        return (
+            <span style={{
+                ...estilos[estado],
+                padding: '2px 10px', borderRadius: '12px',
+                fontSize: '0.78em', fontWeight: 700,
+                fontFamily: 'monospace'
+            }}>
+                {estado}
+            </span>
+        );
+    };
+ 
+    if (cargando) return <div style={{ padding: 24, color: '#64748B' }}>Cargando pruebas...</div>;
+ 
+    return (
+        <div style={{ padding: '24px 28px' }}>
+ 
+            {/* ── Título ── */}
+            <div style={{ display: 'flex', alignItems: 'center',
+                          justifyContent: 'space-between', marginBottom: 20 }}>
+                <h2 style={{ margin: 0, fontSize: '1.2em',
+                             color: '#1E3A5F', fontFamily: 'DM Sans, sans-serif' }}>
+                    🧪 Resultados de Pruebas Automatizadas
+                </h2>
+                <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={cargar}
+                        style={{ padding: '6px 16px', borderRadius: 8,
+                                 background: '#2563EB', color: '#fff',
+                                 border: 'none', cursor: 'pointer', fontSize: '0.85em' }}>
+                        🔄 Actualizar
+                    </button>
+                    <button onClick={limpiar}
+                        style={{ padding: '6px 16px', borderRadius: 8,
+                                 background: '#EF4444', color: '#fff',
+                                 border: 'none', cursor: 'pointer', fontSize: '0.85em' }}>
+                        🗑 Limpiar
+                    </button>
+                </div>
+            </div>
+ 
+            {/* ── Tarjetas resumen ── */}
+            {resumen && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+                              gap: 12, marginBottom: 24 }}>
+                    {[
+                        { label: 'Total',   valor: resumen.total,    color: '#2563EB', bg: '#EFF6FF' },
+                        { label: 'Pasando', valor: resumen.passed,   color: '#16A34A', bg: '#F0FDF4' },
+                        { label: 'Fallando',valor: resumen.failed,   color: '#DC2626', bg: '#FEF2F2' },
+                        { label: 'Duración',valor: `${resumen.duracion_total}s`, color: '#7C3AED', bg: '#F5F3FF' },
+                    ].map(({ label, valor, color, bg }) => (
+                        <div key={label} style={{
+                            background: bg, borderRadius: 10,
+                            padding: '14px 18px',
+                            border: `1px solid ${color}22`
+                        }}>
+                            <div style={{ fontSize: '0.75em', color: '#64748B',
+                                         fontWeight: 600, marginBottom: 4 }}>
+                                {label}
+                            </div>
+                            <div style={{ fontSize: '1.6em', fontWeight: 700, color }}>
+                                {valor ?? 0}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+ 
+            {/* ── Última ejecución ── */}
+            {resumen?.ultima_ejecucion && (
+                <p style={{ fontSize: '0.78em', color: '#94A3B8',
+                            marginBottom: 12, fontFamily: 'monospace' }}>
+                    Última ejecución: {resumen.ultima_ejecucion}
+                </p>
+            )}
+ 
+            {/* ── Tabla de resultados ── */}
+            {lista.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 40, color: '#94A3B8' }}>
+                    No hay resultados. Ejecuta <code>python -m pytest tests/ -v</code> para comenzar.
+                </div>
+            ) : (
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse',
+                                    fontSize: '0.83em' }}>
+                        <thead>
+                            <tr style={{ background: '#F1F5F9' }}>
+                                {['#', 'Clase', 'Test', 'Estado', 'Duración', 'Fecha'].map(h => (
+                                    <th key={h} style={{
+                                        padding: '8px 12px', textAlign: 'left',
+                                        color: '#475569', fontWeight: 700,
+                                        borderBottom: '2px solid #E2E8F0'
+                                    }}>{h}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {lista.map((p, i) => (
+                                <tr key={p.idPrueba}
+                                    style={{ borderBottom: '1px solid #F1F5F9',
+                                             background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
+                                    <td style={{ padding: '7px 12px', color: '#94A3B8' }}>
+                                        {p.idPrueba}
+                                    </td>
+                                    <td style={{ padding: '7px 12px', fontFamily: 'monospace',
+                                                 color: '#7C3AED', fontSize: '0.9em' }}>
+                                        {p.clase_test}
+                                    </td>
+                                    <td style={{ padding: '7px 12px', fontFamily: 'monospace',
+                                                 color: '#1E293B' }}>
+                                        {p.nombre_test}
+                                    </td>
+                                    <td style={{ padding: '7px 12px' }}>
+                                        {badge(p.estado)}
+                                    </td>
+                                    <td style={{ padding: '7px 12px', color: '#64748B',
+                                                 fontFamily: 'monospace' }}>
+                                        {p.duracion_seg}s
+                                    </td>
+                                    <td style={{ padding: '7px 12px', color: '#94A3B8',
+                                                 fontSize: '0.85em' }}>
+                                        {p.ejecutado_en}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    );
+};
+
 // ── APP ADMIN ─────────────────────────────────────────────────────────────
 const AdminApp=()=>{
   const q = new URLSearchParams(window.location.search);
@@ -541,8 +713,28 @@ const AdminApp=()=>{
   const[badgeNotifs,setBadgeNotifs]=useState(0);
   useEffect(()=>{api.get('/notificaciones.php').then(r=>{if(r.status==='ok')setBadgeNotifs(r.data.filter(n=>!n.leida).length);});},[]);
   const{nombre,initials}=window.__S;
-  const nav=[{id:'dashboard',ico:'📊',lbl:'Dashboard'},{id:'usuarios',ico:'👥',lbl:'Usuarios'},{id:'materias',ico:'📚',lbl:'Materias'},{id:'inscripciones',ico:'📋',lbl:'Inscripciones'},{id:'videollamadas',ico:'🎥',lbl:'Clases Virtuales'},{id:'reportes',ico:'📈',lbl:'Reportes'},{id:'configuracion',ico:'⚙️',lbl:'Configuración'},{id:'notificaciones',ico:'🔔',lbl:'Notificaciones', badge:badgeNotifs}];
-  const vistas={dashboard:<Dashboard/>,usuarios:<Usuarios/>,materias:<Materias/>,inscripciones:<Inscripciones/>,videollamadas:<VideollamadasAdmin/>,reportes:<Reportes/>,configuracion:<Configuracion/>,notificaciones:<Notificaciones/>};
+const nav=[
+  {id:'dashboard',ico:'📊',lbl:'Dashboard'},
+  {id:'usuarios',ico:'👥',lbl:'Usuarios'},
+  {id:'materias',ico:'📚',lbl:'Materias'},
+  {id:'inscripciones',ico:'📋',lbl:'Inscripciones'},
+  {id:'videollamadas',ico:'🎥',lbl:'Clases Virtuales'},
+  {id:'reportes',ico:'📈',lbl:'Reportes'},
+  {id:'configuracion',ico:'⚙️',lbl:'Configuración'},
+  {id:'notificaciones',ico:'🔔',lbl:'Notificaciones', badge:badgeNotifs},
+  {id:'pruebas',ico:'🧪',lbl:'Pruebas'},
+];
+  const vistas={
+  dashboard:<Dashboard/>,
+  usuarios:<Usuarios/>,
+  materias:<Materias/>,
+  inscripciones:<Inscripciones/>,
+  videollamadas:<VideollamadasAdmin/>,
+  reportes:<Reportes/>,
+  configuracion:<Configuracion/>,
+  notificaciones:<Notificaciones/>,
+  pruebas:<PanelPruebas/>,
+};
   const titulo=nav.find(n=>n.id===vista)?.lbl||'Admin';
   return<>
     {/* Sidebar */}
