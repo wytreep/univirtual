@@ -1,0 +1,18 @@
+Necesito diagnosticar el bug SCRUM-128 del panel directivo.
+Muéstrame lo siguiente:
+
+1. El constructor completo de DirectivoView en
+   pages/directivo/dashboard.php — las primeras 40 líneas
+
+2. El método render() o el equivalente que genera el HTML
+   con el window.__S en ese mismo archivo
+
+3. El componente DirectivoApp completo — específicamente:
+   - La línea donde lee window.__S
+   - El useState inicial
+   - El useEffect que hace fetch a la API
+   - El return() con el JSX
+
+4. Abre http://localhost/univirtual/pages/directivo/dashboard.php
+   en Chrome, abre DevTools → Console y pégame todos los
+   errores en rojo que aparezcan

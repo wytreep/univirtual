@@ -1,0 +1,32 @@
+@startuml Login Anti Timing-Attack v8
+!theme plain
+title Login con tiempo constante — UNI-VIRTUAL v8
+
+actor Usuario
+participant "login.php" as L
+participant "BD" as DB
+participant "Session" as S
+
+Usuario -> L: POST {email, password}
+activate L
+L -> L: $inicio = microtime(true)
+L -> DB: SELECT * FROM usuarios WHERE email=?
+DB --> L: $row|null
+
+alt usuario existe
+  L -> L: password_verify($pass, $row.password)
+else usuario NO existe
+  L -> L: password_verify($pass, $dummy_hash)
+  note right: Tiempo igual aunque\nel usuario no exista
+end
+
+L -> L: $elapsed = (microtime(true)-$inicio)*1000\nif($elapsed < 250) usleep(250-$elapsed)
+
+alt login OK
+  L -> S: session_regenerate_id(true)\n$_SESSION = {idUsuario, rol, idEspecifico}
+  L --> Usuario: redirect por rol
+else login FAIL
+  L --> Usuario: "Correo o contraseña incorrectos"
+end
+deactivate L
+@enduml

@@ -1,0 +1,16 @@
+# Credenciales — NUNCA al repo
+config.php
+
+# Archivos de usuario
+uploads/
+*.zip
+*.rar
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.idea/
+.vscode/

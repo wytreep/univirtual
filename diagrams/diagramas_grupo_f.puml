@@ -1,0 +1,985 @@
+' ════════════════════════════════════════════════════════════════
+'  UNI-VIRTUAL v8 — 6 Diagramas PlantUML
+'  Institución Universitaria Antonio José Camacho — Grupo F
+'  Pegar cada @startuml/@enduml en https://www.plantuml.com/plantuml/uml/
+' ════════════════════════════════════════════════════════════════
+
+' ────────────────────────────────────────────────────────────────
+'  DIAGRAMA 1 — Arquitectura del Sistema (Flujo de Peticiones)
+' ────────────────────────────────────────────────────────────────
+@startuml Diagrama_1_Arquitectura_Sistema
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #2462B0
+skinparam ArrowThickness 1.5
+skinparam componentBorderColor #2462B0
+skinparam componentBackgroundColor #EEF3FB
+skinparam componentFontColor #0D1F4E
+skinparam componentFontStyle bold
+skinparam packageBorderColor #D4A843
+skinparam packageBackgroundColor #FFFDF0
+skinparam packageFontColor #7A5C00
+skinparam packageFontStyle bold
+skinparam actorBorderColor #0D1F4E
+skinparam actorBackgroundColor #EEF3FB
+skinparam actorFontColor #0D1F4E
+skinparam noteBorderColor #D4A843
+skinparam noteBackgroundColor #FFFDF0
+skinparam databaseBorderColor #1A7A48
+skinparam databaseBackgroundColor #E8F5EE
+
+title <b>UNI-VIRTUAL v8 — Arquitectura del Sistema\nFlujo completo de una petición HTTP</b>
+
+actor "Admin"      as ADM #EEF3FB
+actor "Directivo"  as DIR #FFF8E1
+actor "Profesor"   as PRO #E8F5EE
+actor "Estudiante" as EST #F3E8FF
+
+package "Capa 1 — Cliente (Browser)" #EEF3FB {
+  component "React 18 SPA\n(Babel CDN)" as REACT
+  component "fetch() API\ncredentials:'include'" as FETCH
+  component "Chart.js 4\ngráficos" as CHART
+}
+
+package "Capa 2 — Servidor XAMPP / Apache" #FFF8E1 {
+  package "Views — PHP (MVC-V)" {
+    component "login.php\nlogout.php" as VAUTH
+    component "admin/\ndashboard.php" as VADM
+    component "directivo/\ndashboard.php" as VDIR
+    component "profesor/\ndashboard.php" as VPRO
+    component "estudiante/\ndashboard.php" as VEST
+  }
+  package "Controllers — API REST (MVC-C)" {
+    component "Controller.php\n(abstracto base)" as CTRL
+    component "stats.php\nusuarios.php\nmaterias.php" as C1
+    component "profesor.php\nestudiante.php\ninscripciones.php" as C2
+    component "videollamadas.php\nreportes.php" as C3
+  }
+  package "Models — PHP POO (MVC-M)" {
+    component "Model.php\n(Singleton PDO)" as MODEL
+    component "Usuario · Estudiante\nProfesor · Materia" as M1
+    component "Material · Actividad\nEntrega · Foro" as M2
+    component "Notificacion · Asistencia\nMensaje · Videollamada" as M3
+  }
+  package "Config & Auth" {
+    component "config.php\ndb() · notificar()" as CFG
+    component "auth.php\nrequireLogin()\nrequireNivel()" as AUTH
+  }
+}
+
+package "Capa 3 — Persistencia" #E8F5EE {
+  database "MySQL 8\nuniverse:3307\n17 tablas" as DB
+}
+
+package "Servicios Externos" #F3E8FF {
+  component "meet.jit.si\nJitsi Meet (WebRTC)" as JITSI
+  component "Google Fonts\nunpkg CDN" as CDN
+}
+
+ADM --> VAUTH
+DIR --> VAUTH
+PRO --> VAUTH
+EST --> VAUTH
+VAUTH --> CFG
+VAUTH --> AUTH
+
+VADM --> REACT
+VDIR --> REACT
+VPRO --> REACT
+VEST --> REACT
+REACT --> CHART
+REACT --> CDN
+
+REACT --> FETCH
+FETCH --> CTRL : "JSON request\n+ cookies PHP"
+
+CTRL --> AUTH   : "requireAuth(rol)"
+CTRL --> C1
+CTRL --> C2
+CTRL --> C3
+
+C1 --> MODEL
+C2 --> MODEL
+C3 --> MODEL
+
+MODEL --> M1
+MODEL --> M2
+MODEL --> M3
+M1 --> DB
+M2 --> DB
+M3 --> DB
+
+C3 --> JITSI : "roomName → URL"
+REACT --> JITSI : "Abrir sala"
+
+note right of CTRL
+  Admin siempre pasa requireAuth.
+  <b>FIX v8:</b> videollamadas.php lee
+  action del JSON body:
+  $_jsonBody = json_decode(
+    file_get_contents('php://input')
+  );
+  $action = $_GET['action']
+    ?? $_POST['action']
+    ?? $_jsonBody['action'] ?? '';
+end note
+
+note bottom of DB
+  <b>Restricciones clave:</b>
+  UNIQUE(idMateria,idEstudiante,fecha) — asistencia
+  UNIQUE(idEstudiante,idMateria) — inscripciones
+  UNIQUE roomName — videollamadas
+  Puerto 3307 en XAMPP
+end note
+@enduml
+
+' ────────────────────────────────────────────────────────────────
+'  DIAGRAMA 2 — Clases: Capa de Modelos
+' ────────────────────────────────────────────────────────────────
+@startuml Diagrama_2_Clases_Models
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam classHeaderBackgroundColor #0D1F4E
+skinparam classHeaderFontColor #FFFFFF
+skinparam classBorderColor #2462B0
+skinparam classBackgroundColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classAttributeFontSize 10
+skinparam ArrowColor #2462B0
+skinparam ArrowThickness 1.5
+skinparam packageBorderColor #D4A843
+skinparam packageBackgroundColor #FFFDF0
+
+title <b>UNI-VIRTUAL v8 — Diagrama de Clases\nCapa de Modelos (MVC — M)</b>
+
+package "models/" #EEF3FB {
+
+  abstract class Model {
+    # db : PDO <<Singleton>>
+    --
+    + {abstract} findById(id: int) : array|null
+    + {abstract} findAll() : array
+    # db() : PDO
+  }
+
+  class Usuario {
+    + idUsuario : int <<PK>>
+    + nombre : string
+    + email : string <<UNIQUE>>
+    + password : string <<bcrypt>>
+    + rol : enum
+    + activo : bool
+    + creado_en : timestamp
+    --
+    + findByEmail(email) : array|null
+    + verificarPassword(pass, hash) : bool
+    + crear(nombre, email, pass, rol) : int
+    + setActivo(id, activo) : void
+  }
+
+  class Estudiante {
+    + idEstudiante : int <<PK>>
+    + idUsuario : int <<FK>>
+    + idCarrera : int <<FK>>
+    + codigoEst : string <<UNIQUE>>
+    + semestre : int
+    + creditos_aprobados : int
+    --
+    + findByUsuario(idUsuario) : array|null
+    + getMaterias() : array
+    + getNotas() : array
+  }
+
+  class Profesor {
+    + idProfesor : int <<PK>>
+    + idUsuario : int <<FK>>
+    + idFacultad : int <<FK>>
+    + codigoProf : string <<UNIQUE>>
+    + departamento : string
+    --
+    + findByUsuario(idUsuario) : array|null
+    + getMaterias() : array
+  }
+
+  class Materia {
+    + idMateria : int <<PK>>
+    + idProfesor : int <<FK>>
+    + nombre : string
+    + codigo : string <<UNIQUE>>
+    + creditos : int
+    + creditos_minimos : int
+    + color : string
+    + activa : bool
+    --
+    + getInscritos() : array
+    + getAula() : array|null
+  }
+
+  class Material {
+    + idMaterial : int <<PK>>
+    + idAula : int <<FK>>
+    + titulo : string
+    + tipo : enum
+    + urlArchivo : string
+    + nombreOriginal : string
+    + descargas : int
+    --
+    + findByAula(idAula) : array
+    + incrementarDescargas() : void
+  }
+
+  class Actividad {
+    + idActividad : int <<PK>>
+    + idAula : int <<FK>>
+    + titulo : string
+    + fechaEntrega : datetime
+    + puntaje_max : decimal
+    --
+    + findByAula(idAula) : array
+    + getEntregas() : array
+  }
+
+  class Entrega {
+    + idEntrega : int <<PK>>
+    + idActividad : int <<FK>>
+    + idEstudiante : int <<FK>>
+    + urlArchivo : string
+    + nota : decimal
+    + feedback : text
+    + entregado_en : timestamp
+    --
+    + calificar(nota, feedback) : bool
+  }
+
+  class Foro {
+    + idForo : int <<PK>>
+    + idAula : int <<FK>>
+    + titulo : string
+    + abierto : bool
+    --
+    + findByAula(idAula) : array
+    + getMensajes() : array
+  }
+
+  class Mensaje {
+    + idMensaje : int <<PK>>
+    + idForo : int <<FK>>
+    + idUsuario : int <<FK>>
+    + idPadre : int <<FK, nullable>>
+    + contenido : text
+    + publicado_en : timestamp
+    --
+    + findByForo(idForo) : array
+    + getRespuestas() : array
+  }
+
+  class Asistencia {
+    + idAsistencia : int <<PK>>
+    + idMateria : int <<FK>>
+    + idEstudiante : int <<FK>>
+    + fecha : date
+    + asistio : bool
+    -- <<UNIQUE>> idMateria+idEstudiante+fecha --
+    + registrar(idMat, idEst, fecha, val) : void
+    + getPorFecha(idMat, fecha) : array
+  }
+
+  class Notificacion {
+    + idNotif : int <<PK>>
+    + idUsuario : int <<FK>>
+    + titulo : string
+    + tipo : enum
+    + url : string
+    + leida : bool
+    + creado_en : timestamp
+    --
+    + findByUsuario(idUser) : array
+    + marcar(idNotif) : void
+    + marcarTodas(idUser) : void
+  }
+}
+
+Model <|-- Usuario
+Model <|-- Estudiante
+Model <|-- Profesor
+Model <|-- Materia
+Model <|-- Material
+Model <|-- Actividad
+Model <|-- Entrega
+Model <|-- Foro
+Model <|-- Mensaje
+Model <|-- Asistencia
+Model <|-- Notificacion
+
+Estudiante  --> Usuario   : idUsuario
+Profesor    --> Usuario   : idUsuario
+Entrega     --> Actividad : idActividad
+Entrega     --> Estudiante : idEstudiante
+Mensaje     --> Foro      : idForo
+Mensaje     --> Usuario   : idUsuario
+Mensaje     --> Mensaje   : idPadre
+Notificacion --> Usuario  : idUsuario
+Asistencia  --> Materia   : idMateria
+Asistencia  --> Estudiante : idEstudiante
+@enduml
+
+' ────────────────────────────────────────────────────────────────
+'  DIAGRAMA 3 — Clases: Capa de Controladores (API REST)
+' ────────────────────────────────────────────────────────────────
+@startuml Diagrama_3_Clases_Controllers
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam classHeaderBackgroundColor #0D1F4E
+skinparam classHeaderFontColor #FFFFFF
+skinparam classBorderColor #2462B0
+skinparam classBackgroundColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classAttributeFontSize 10
+skinparam ArrowColor #2462B0
+skinparam ArrowThickness 1.5
+skinparam packageBorderColor #D4A843
+
+title <b>UNI-VIRTUAL v8 — Diagrama de Clases\nCapa de Controladores REST (MVC — C)</b>
+
+package "api/v1/" #EEF3FB {
+
+  abstract class Controller {
+    + {abstract} handle() : void
+    # requireAuth(rol) : array
+    # ok(data, msg) : void
+    # error(msg, code) : void
+    # getBody() : array
+    # method() : string
+    --
+    <b>Admin siempre pasa requireAuth</b>
+    <b>Admin accede a cualquier endpoint</b>
+  }
+
+  class StatsController {
+    + handle() : void
+    - dashboard() : void
+    - facultad() : void
+    --
+    GET ?action=dashboard
+    GET ?action=facultad&idFacultad=1
+  }
+
+  class UsuarioController {
+    - modelo : Usuario
+    + handle() : void
+    - getAll() : void
+    - getOne(id) : void
+    - crear() : void
+    - actualizar(id) : void
+    - eliminar(id) : void
+    - profesoresFacultad() : void
+    - estudiantesFacultad() : void
+    --
+    GET · POST · PUT · DELETE
+    GET ?action=profesores_facultad
+    GET ?action=estudiantes_facultad
+  }
+
+  class MateriaController {
+    + handle() : void
+    - getAll() : void
+    - getProfesores() : void
+    - listarFacultad() : void
+    - crear() : void
+    - actualizar(id) : void
+    - eliminar(id) : void
+    --
+    GET · POST · PUT · DELETE
+    GET ?action=profesores
+    GET ?action=listar_facultad
+  }
+
+  class InscripcionesController {
+    + handle() : void
+    - getInscripciones() : void
+    - inscribir() : void
+    - desinscribir() : void
+    --
+    GET ?idMateria=1 (inscritos)
+    GET ?disponibles=1&idMateria=1
+    <b>FIX: NOT IN excluye ya inscritos</b>
+    POST {idEstudiante, idMateria}
+    <b>FIX: valida creditos_minimos</b>
+    DELETE ?idEstudiante&idMateria
+  }
+
+  class ProfesorController {
+    - idProfesor : int
+    - idUsuario : int
+    + handle() : void
+    - dashboard() : void
+    - aula() : void
+    - entregas() : void
+    - asistenciaFecha() : void
+    - notificaciones() : void
+    - subirMaterial() : void
+    - crearActividad() : void
+    - calificarEntrega() : void
+    - registrarAsistencia() : void
+    - marcarNotifs() : void
+    - actualizarPerfil() : void
+    - cambiarPassword() : void
+    --
+    <b>FIX: entregas() usa urlArchivo</b>
+    <b>FIX: asistencia ON DUPLICATE KEY</b>
+  }
+
+  class EstudianteController {
+    - idEstudiante : int
+    - idUsuario : int
+    + handle() : void
+    - dashboard() : void
+    - aula() : void
+    - notas() : void
+    - notificaciones() : void
+    - publicarMensaje() : void
+    - entregar() : void
+    - marcarNotifs() : void
+    --
+    GET: dashboard|aula|notas
+    GET: notificaciones (polling 30s)
+    POST: publicar_mensaje|entregar
+  }
+
+  class VideoLlamadaController {
+    <<procedimental>>
+    + handle() : void
+    --
+    GET ?action=lista[&idMateria]
+    GET ?action=activa&idMateria
+    POST action=crear
+    POST action=finalizar
+    POST action=eliminar
+    <b>FIX 400: lee action del JSON body</b>
+    $_jsonBody = json_decode(input)
+    $action = GET ?? POST ?? body
+  }
+
+  class ReportesController {
+    + handle() : void
+    - notasPDF() : void
+    - notasCSV() : void
+    - asistenciaPDF() : void
+    --
+    GET ?idMateria&formato=pdf|csv|xlsx
+  }
+}
+
+Controller <|-- StatsController
+Controller <|-- UsuarioController
+Controller <|-- MateriaController
+Controller <|-- InscripcionesController
+Controller <|-- ProfesorController
+Controller <|-- EstudianteController
+Controller <|-- ReportesController
+
+note bottom of VideoLlamadaController
+  No hereda de Controller.
+  Script procedimental con
+  helpers propios ok() y err().
+end note
+@enduml
+
+' ────────────────────────────────────────────────────────────────
+'  DIAGRAMA 4 — Clases: Capa de Vistas PHP
+' ────────────────────────────────────────────────────────────────
+@startuml Diagrama_4_Clases_Views
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam classHeaderBackgroundColor #0D1F4E
+skinparam classHeaderFontColor #FFFFFF
+skinparam classBorderColor #2462B0
+skinparam classBackgroundColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classAttributeFontSize 10
+skinparam ArrowColor #2462B0
+skinparam ArrowThickness 1.5
+skinparam packageBorderColor #D4A843
+
+title <b>UNI-VIRTUAL v8 — Diagrama de Clases\nCapa de Vistas PHP (MVC — V)</b>
+
+package "pages/auth/" #FFF0E8 {
+  class LoginView {
+    - error : string
+    + render() : void
+    --
+    Soporta 4 roles: admin
+    directivo · profesor · estudiante
+    Timing constante ~250ms
+    Hash dummy anti timing-attack
+    Redirige según $_SESSION['rol']
+  }
+  class LogoutView {
+    + render() : void
+    --
+    session_unset()
+    session_destroy()
+    Elimina cookie PHPSESSID
+  }
+}
+
+package "pages/admin/" #EEF3FB {
+  class AdminView {
+    - nombre : string
+    - initials : string
+    + __construct()
+    + render() : void
+    --
+    requireLogin('admin')
+    Inyecta window.__S = {sesión}
+    React SPA — Nav v8:
+    dashboard · usuarios · materias
+    inscripciones · reportes
+    notificaciones · configuración
+    Componentes: Dashboard, Usuarios
+    Materias, Inscripciones, Reportes
+    NotificacionesAdmin, Configuracion
+  }
+}
+
+package "pages/directivo/" #FFF8E1 {
+  class DirectivoView {
+    - nombre : string
+    - initials : string
+    - idDirectivo : int
+    - idFacultad : int
+    + __construct()
+    + render() : void
+    --
+    requireLogin('directivo')
+    React SPA — Tabs v8:
+    resumen · profesores · estudiantes
+    APIs: stats(facultad)
+    profesores_facultad
+    estudiantes_facultad
+    materias(listar_facultad)
+    <b>FIX: pestañas separadas</b>
+    <b>FIX: React key corregidas</b>
+  }
+}
+
+package "pages/profesor/" #E8F5EE {
+  class ProfesorView {
+    - nombre : string
+    - initials : string
+    - idProf : int
+    + __construct()
+    + render() : void
+    --
+    requireLogin('profesor')
+    React SPA — Nav v8:
+    dashboard · calificar · reportes
+    notificaciones · configuración
+    <b>FIX: + materias en nav</b>
+    Aula con tabs:
+    Materiales · Actividades
+    Foros · Asistencia · Videollamadas
+    <b>FIX: asistencia selector fecha</b>
+    <b>FIX: accesos rápidos funcionales</b>
+    Polling notifs: setInterval(30s)
+  }
+}
+
+package "pages/estudiante/" #F3E8FF {
+  class EstudianteView {
+    - nombre : string
+    - initials : string
+    - idEst : int
+    + __construct()
+    + render() : void
+    --
+    requireLogin('estudiante')
+    React SPA — Nav:
+    dashboard · materias · tareas
+    calificaciones · notificaciones
+    <b>FIX: foro estado por foro</b>
+    <b>FIX: notif clic navega url</b>
+    <b>FIX: notas.php → SPA (no 404)</b>
+    Polling notifs: setInterval(30s)
+  }
+}
+
+LoginView ..> AdminView      : "redirect admin"
+LoginView ..> DirectivoView  : "redirect directivo"
+LoginView ..> ProfesorView   : "redirect profesor"
+LoginView ..> EstudianteView : "redirect estudiante"
+LogoutView  ..> LoginView    : "redirect"
+@enduml
+
+' ────────────────────────────────────────────────────────────────
+'  DIAGRAMA 5 — Casos de Uso
+' ────────────────────────────────────────────────────────────────
+@startuml Diagrama_5_Casos_Uso
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam ActorBorderColor #0D1F4E
+skinparam ActorBackgroundColor #EEF3FB
+skinparam ActorFontColor #0D1F4E
+skinparam ActorFontStyle bold
+skinparam UsecaseBorderColor #2462B0
+skinparam UsecaseBackgroundColor #FFFFFF
+skinparam UsecaseFontColor #0D1F4E
+skinparam ArrowColor #2462B0
+skinparam packageBorderColor #D4A843
+skinparam packageFontColor #7A5C00
+skinparam packageFontStyle bold
+
+title <b>UNI-VIRTUAL v8 — Diagrama de Casos de Uso</b>
+
+left to right direction
+
+actor "Administrador" as ADM
+actor "Directivo"     as DIR
+actor "Profesor"      as PRO
+actor "Estudiante"    as EST
+
+rectangle "UNI-VIRTUAL v8" {
+
+  package "Sistema (Todos)" {
+    usecase "Iniciar sesión\n(timing constante)" as UC_LOGIN
+    usecase "Cerrar sesión" as UC_LOGOUT
+    usecase "Ver notificaciones\n(polling 30 s)" as UC_NOTIF
+    usecase "Configurar perfil\n(nombre, contraseña)" as UC_PERFIL
+  }
+
+  package "Administración" {
+    usecase "Gestionar usuarios\n(CRUD + roles)" as UC_USR
+    usecase "Gestionar materias\n(créditos mínimos)" as UC_MAT
+    usecase "Gestionar inscripciones\n(validar créditos)" as UC_INSC
+    usecase "Ver reportes globales" as UC_RPT
+    usecase "Configurar sistema\n(semestre activo)" as UC_CFG
+    usecase "Revisar videollamadas\nfinalizadas" as UC_VL_ADM
+  }
+
+  package "Gestión de Facultad" {
+    usecase "Ver estadísticas\nde facultad" as UC_STATS
+    usecase "Ver profesores\nde facultad" as UC_PROFS
+    usecase "Ver estudiantes\nde facultad" as UC_ESTS
+    usecase "Ver materias\nde facultad" as UC_MATS_FAC
+  }
+
+  package "Gestión Académica" {
+    usecase "Publicar materiales" as UC_MAT_PUB
+    usecase "Crear actividades" as UC_ACT
+    usecase "Calificar entregas" as UC_CALIF
+    usecase "Registrar asistencia\npor fecha" as UC_ASIST
+    usecase "Crear foros" as UC_FORO_P
+    usecase "Programar videollamada\n(Jitsi Meet)" as UC_VL
+    usecase "Ver reportes\nde materia" as UC_RPT_P
+  }
+
+  package "Actividades Académicas" {
+    usecase "Ver materiales" as UC_VER_MAT
+    usecase "Entregar actividades" as UC_ENT
+    usecase "Ver notas\ny calificaciones" as UC_NOTAS
+    usecase "Participar en foros" as UC_FORO_E
+    usecase "Unirse a\nvideollamada" as UC_JOIN_VL
+    usecase "Ver asistencia\npropia" as UC_ASIST_E
+  }
+}
+
+' Sistema
+ADM --> UC_LOGIN
+DIR --> UC_LOGIN
+PRO --> UC_LOGIN
+EST --> UC_LOGIN
+ADM --> UC_LOGOUT
+DIR --> UC_LOGOUT
+PRO --> UC_LOGOUT
+EST --> UC_LOGOUT
+ADM --> UC_NOTIF
+DIR --> UC_NOTIF
+PRO --> UC_NOTIF
+EST --> UC_NOTIF
+ADM --> UC_PERFIL
+DIR --> UC_PERFIL
+PRO --> UC_PERFIL
+EST --> UC_PERFIL
+
+' Admin
+ADM --> UC_USR
+ADM --> UC_MAT
+ADM --> UC_INSC
+ADM --> UC_RPT
+ADM --> UC_CFG
+ADM --> UC_VL_ADM
+
+' Directivo
+DIR --> UC_STATS
+DIR --> UC_PROFS
+DIR --> UC_ESTS
+DIR --> UC_MATS_FAC
+
+' Profesor
+PRO --> UC_MAT_PUB
+PRO --> UC_ACT
+PRO --> UC_CALIF
+PRO --> UC_ASIST
+PRO --> UC_FORO_P
+PRO --> UC_VL
+PRO --> UC_RPT_P
+
+' Estudiante
+EST --> UC_VER_MAT
+EST --> UC_ENT
+EST --> UC_NOTAS
+EST --> UC_FORO_E
+EST --> UC_JOIN_VL
+EST --> UC_ASIST_E
+@enduml
+
+' ────────────────────────────────────────────────────────────────
+'  DIAGRAMA 6 — Entidad-Relación MySQL
+' ────────────────────────────────────────────────────────────────
+@startuml Diagrama_6_ER_Database
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+skinparam classHeaderBackgroundColor #0D1F4E
+skinparam classHeaderFontColor #FFFFFF
+skinparam classBorderColor #2462B0
+skinparam classBackgroundColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classAttributeFontSize 9
+skinparam ArrowColor #2462B0
+skinparam ArrowThickness 1.5
+skinparam packageBorderColor #D4A843
+skinparam linetype ortho
+
+title <b>UNI-VIRTUAL v8 — Diagrama Entidad-Relación\nBase de Datos MySQL (17 tablas)</b>
+
+entity "usuarios" as U {
+  * idUsuario : INT <<PK>>
+  --
+  nombre : VARCHAR(100)
+  email : VARCHAR(100) <<UNIQUE>>
+  password : VARCHAR(255) <<bcrypt>>
+  rol : ENUM(estudiante|profesor|directivo|admin)
+  activo : TINYINT(1)
+  creado_en : TIMESTAMP
+}
+
+entity "facultades" as FAC {
+  * idFacultad : INT <<PK>>
+  --
+  nombre : VARCHAR(150)
+  codigo : VARCHAR(20) <<UNIQUE>>
+  activa : TINYINT(1)
+}
+
+entity "carreras" as CAR {
+  * idCarrera : INT <<PK>>
+  --
+  idFacultad : INT <<FK>>
+  nombre : VARCHAR(150)
+  codigo : VARCHAR(20) <<UNIQUE>>
+  creditos_total : INT
+}
+
+entity "directivos" as DIR {
+  * idDirectivo : INT <<PK>>
+  --
+  idUsuario : INT <<FK>>
+  idFacultad : INT <<FK>>
+  cargo : VARCHAR(100)
+}
+
+entity "estudiantes" as EST {
+  * idEstudiante : INT <<PK>>
+  --
+  idUsuario : INT <<FK>>
+  idCarrera : INT <<FK>>
+  codigoEst : VARCHAR(20) <<UNIQUE>>
+  semestre : INT
+  creditos_aprobados : INT
+}
+
+entity "profesores" as PRO {
+  * idProfesor : INT <<PK>>
+  --
+  idUsuario : INT <<FK>>
+  idFacultad : INT <<FK>>
+  codigoProf : VARCHAR(20) <<UNIQUE>>
+  departamento : VARCHAR(100)
+}
+
+entity "materias" as MAT {
+  * idMateria : INT <<PK>>
+  --
+  idProfesor : INT <<FK>>
+  idCarrera : INT <<FK>>
+  nombre : VARCHAR(150)
+  codigo : VARCHAR(20) <<UNIQUE>>
+  creditos : INT
+  creditos_minimos : INT
+  color : VARCHAR(7)
+  activa : TINYINT(1)
+}
+
+entity "inscripciones" as INS {
+  * idInscripcion : INT <<PK>>
+  --
+  idEstudiante : INT <<FK>>
+  idMateria : INT <<FK>>
+  inscrito_en : TIMESTAMP
+  nota_parcial1 : DECIMAL(3,2)
+  nota_parcial2 : DECIMAL(3,2)
+  nota_talleres : DECIMAL(3,2)
+  nota_final : DECIMAL(3,2)
+  --
+  <<UNIQUE>> idEstudiante+idMateria
+}
+
+entity "aulas_virtuales" as AV {
+  * idAula : INT <<PK>>
+  --
+  idMateria : INT <<FK>>
+  creada_en : TIMESTAMP
+  --
+  <<UNIQUE>> idMateria
+}
+
+entity "materiales" as MATL {
+  * idMaterial : INT <<PK>>
+  --
+  idAula : INT <<FK>>
+  idProfesor : INT <<FK>>
+  titulo : VARCHAR(150)
+  tipo : ENUM(pdf|video|presentacion|otro)
+  urlArchivo : VARCHAR(500)
+  nombreOriginal : VARCHAR(255)
+  descargas : INT
+}
+
+entity "actividades" as ACT {
+  * idActividad : INT <<PK>>
+  --
+  idAula : INT <<FK>>
+  titulo : VARCHAR(150)
+  fechaEntrega : DATETIME
+  puntaje_max : DECIMAL(4,2)
+}
+
+entity "entregas" as ENT {
+  * idEntrega : INT <<PK>>
+  --
+  idActividad : INT <<FK>>
+  idEstudiante : INT <<FK>>
+  urlArchivo : VARCHAR(500)
+  nota : DECIMAL(3,2)
+  feedback : TEXT
+  entregado_en : TIMESTAMP
+  --
+  <<UNIQUE>> idActividad+idEstudiante
+}
+
+entity "foros" as FOR {
+  * idForo : INT <<PK>>
+  --
+  idAula : INT <<FK>>
+  titulo : VARCHAR(150)
+  abierto : TINYINT(1)
+}
+
+entity "mensajes" as MSG {
+  * idMensaje : INT <<PK>>
+  --
+  idForo : INT <<FK>>
+  idUsuario : INT <<FK>>
+  idPadre : INT <<FK, nullable>>
+  contenido : TEXT
+  publicado_en : TIMESTAMP
+}
+
+entity "asistencia" as ASI {
+  * idAsistencia : INT <<PK>>
+  --
+  idMateria : INT <<FK>>
+  idEstudiante : INT <<FK>>
+  fecha : DATE
+  asistio : TINYINT(1)
+  --
+  <<UNIQUE>> idMateria+idEstudiante+fecha
+}
+
+entity "notificaciones" as NOT {
+  * idNotif : INT <<PK>>
+  --
+  idUsuario : INT <<FK>>
+  titulo : VARCHAR(150)
+  tipo : ENUM(info|tarea|nota|foro|material|videollamada)
+  url : VARCHAR(500)
+  leida : TINYINT(1)
+  creado_en : TIMESTAMP
+}
+
+entity "videollamadas" as VL {
+  * idVideoLlamada : INT <<PK>>
+  --
+  idMateria : INT <<FK>>
+  idProfesor : INT <<FK>>
+  titulo : VARCHAR(200)
+  roomName : VARCHAR(200) <<UNIQUE>>
+  programada_en : DATETIME
+  duracion_min : INT
+  estado : ENUM(programada|en_curso|finalizada)
+  activa : TINYINT(1)
+}
+
+entity "configuracion" as CFG {
+  * clave : VARCHAR(80) <<PK>>
+  --
+  valor : TEXT
+  tipo : ENUM(texto|numero|booleano|json)
+  descripcion : VARCHAR(200)
+}
+
+U ||--o| EST   : "is a"
+U ||--o| PRO   : "is a"
+U ||--o| DIR   : "is a"
+
+FAC ||--|{ CAR  : "contiene"
+FAC ||--|{ PRO  : "pertenece"
+DIR }o--|| FAC  : "gestiona"
+
+CAR |o--|{ EST  : "cursa"
+CAR |o--|{ MAT  : "pertenece"
+MAT }|--|| PRO  : "imparte"
+
+INS }o--|| EST  : "inscribe"
+INS }o--|| MAT  : "en"
+
+MAT ||--|| AV   : "tiene"
+AV  ||--|{ MATL : "contiene"
+AV  ||--|{ ACT  : "contiene"
+AV  ||--|{ FOR  : "contiene"
+
+ACT ||--|{ ENT  : "recibe"
+EST ||--|{ ENT  : "envía"
+
+FOR ||--|{ MSG  : "contiene"
+U   ||--|{ MSG  : "publica"
+MSG |o--o| MSG  : "responde"
+
+U   ||--|{ NOT  : "recibe"
+MAT ||--|{ VL   : "tiene"
+PRO ||--|{ VL   : "crea"
+MAT ||--|{ ASI  : "registra"
+EST ||--|{ ASI  : "de"
+@enduml
