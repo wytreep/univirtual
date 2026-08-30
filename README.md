@@ -11,7 +11,7 @@
 | Nombre | Rol Scrum | GitHub |
 |--------|-----------|--------|
 | James Medina | Product Owner | @james-medina |
-| Edwin Carabali | Developer | @edwin-carabali |
+| Edwin Carabali | Developer | wytreep |
 | Angel Angulo | Scrum Master | @angel-angulo |
 
 ---
