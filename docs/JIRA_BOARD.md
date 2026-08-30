@@ -10,8 +10,8 @@
 | Autenticación y Seguridad | UV-EP1 | ✅ Completada |
 | Paneles de Usuario | UV-EP2 | ✅ Completada |
 | Gestión Académica | UV-EP3 | ✅ Completada |
-| Jerarquía y Roles | UV-EP4 | 🔄 En progreso |
-| Comunicación en Tiempo Real | UV-EP5 | 🔄 En progreso |
+| Jerarquía y Roles | UV-EP4 | ✅ Completada |
+| Comunicación en Tiempo Real | UV-EP5 | ✅ Completada |
 | Videollamadas | UV-EP6 | ✅ Completada |
 | Reportes y Exportación | UV-EP7 | ✅ Completada |
 
@@ -37,7 +37,7 @@
 | UV-112 | Fix: inscripciones — filtrar estudiantes ya inscritos | 3 | Edwin |
 | UV-113 | Notificaciones del profesor con polling y clic-to-navigate | 3 | Edwin |
 
-### 🔄 IN PROGRESS
+### ✅ Completada
 
 | ID | Historia | Puntos | Responsable |
 |----|----------|--------|-------------|
