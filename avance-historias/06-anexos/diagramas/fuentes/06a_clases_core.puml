@@ -1,0 +1,62 @@
+@startuml
+!include common.iuml
+title Diagrama de clases - Núcleo del backend (Core)
+skinparam classAttributeIconSize 0
+
+class Database <<Singleton>> {
+  - instancia : Database
+  - pdo : PDO
+  + getConexion() : PDO
+}
+class Request {
+  + metodo() : string
+  + ruta() : string
+  + cuerpoJson() : array
+  + archivo(nombre) : array
+}
+class Response {
+  + json(datos, codigo) : void
+}
+class Router {
+  + get(ruta, handler) : void
+  + post(ruta, handler) : void
+  + put(ruta, handler) : void
+  + delete(ruta, handler) : void
+  + despachar(request) : void
+}
+class Auth {
+  + iniciarSesion(usuario) : void
+  + cerrarSesion() : void
+  + usuarioActual() : array
+  + requerirRol(roles) : void
+  + generarCsrf() : string
+  + validarCsrf(token) : bool
+}
+abstract class Model {
+  # db : PDO
+  + buscarPorId(id) : array
+  + listar(filtros) : array
+  + crear(datos) : int
+  + actualizar(id, datos) : bool
+  + eliminar(id) : bool
+}
+abstract class Controller {
+  # request : Request
+  # response : Response
+  # auth : Auth
+  + validar(reglas) : array
+  + responder(datos, codigo) : void
+}
+class ReportePdf {
+  + generar(datos) : string
+}
+
+Router ..> Request
+Router ..> Controller : despacha
+Controller ..> Request
+Controller ..> Response
+Controller ..> Auth
+Controller ..> Model : usa
+Model ..> Database
+Controller ..> ReportePdf
+@enduml

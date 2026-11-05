@@ -1,0 +1,14 @@
+@startuml
+!include common.iuml
+title Diagrama de estados - Videollamada
+state "En curso" as EnCurso
+state "Con grabación" as ConGrabacion
+[*] --> Programada : el profesor crea la sala
+Programada --> EnCurso : llega la hora o primer ingreso
+Programada --> Cancelada : el profesor cancela
+EnCurso --> Finalizada : termina la sesión
+Finalizada --> ConGrabacion : el profesor sube el .mp4
+Finalizada --> [*]
+ConGrabacion --> [*]
+Cancelada --> [*]
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+!include common.iuml
+title Diagrama de secuencia - Inicio de sesión con redirección por rol
+autonumber
+actor "Usuario" as U
+participant "React\nLoginPage" as UI
+participant "ApiClient" as API
+participant "AuthController" as AC
+participant "UsuarioModel" as UM
+participant "Auth\n(sesión)" as AU
+database "MySQL 8" as DB
+
+U -> UI : Ingresa correo y contraseña
+UI -> API : login(correo, password)
+API -> AC : POST /api/auth/login
+AC -> UM : buscarPorCorreo(correo)
+UM -> DB : SELECT ... WHERE correo = ? (PDO preparada)
+DB --> UM : fila de usuario
+UM --> AC : Usuario | null
+alt credenciales válidas (password_verify)
+  AC -> AU : iniciarSesion(usuario)
+  note right of AU : session_regenerate_id()\ncookie HttpOnly
+  AC --> API : 200 { rol, csrfToken }
+  API --> UI : datos de sesión
+  UI -> UI : redirigir al dashboard según el rol
+else credenciales inválidas
+  AC --> API : 401 { mensaje }
+  API --> UI : error
+  UI --> U : muestra "Correo o contraseña incorrectos"
+end
+@enduml

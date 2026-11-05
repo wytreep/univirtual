@@ -1,0 +1,133 @@
+@startuml
+!include common.iuml
+hide circle
+title Modelo entidad-relación - UNI-VIRTUAL (MySQL 8, 3FN)
+
+entity "roles" as roles {
+  * id_rol : TINYINT <<PK>>
+  --
+  * nombre : VARCHAR(20) <<UK>>
+}
+entity "usuarios" as usuarios {
+  * id_usuario : INT <<PK>>
+  --
+  * id_rol : TINYINT <<FK>>
+  * nombre : VARCHAR(80)
+  * correo : VARCHAR(120) <<UK>>
+  * password_hash : VARCHAR(255)
+  * estado : ENUM
+  * creado_en : DATETIME
+}
+entity "estudiantes" as estudiantes {
+  * id_estudiante : INT <<PK>>
+  --
+  * id_usuario : INT <<FK, UK>>
+  * codigo_estudiante : VARCHAR(20) <<UK>>
+  programa : VARCHAR(80)
+}
+entity "profesores" as profesores {
+  * id_profesor : INT <<PK>>
+  --
+  * id_usuario : INT <<FK, UK>>
+  * codigo_prof : VARCHAR(20) <<UK>>
+}
+entity "materias" as materias {
+  * id_materia : INT <<PK>>
+  --
+  * id_profesor : INT <<FK>>
+  * codigo : VARCHAR(20) <<UK>>
+  * nombre : VARCHAR(100)
+  * creditos : TINYINT
+  * periodo : VARCHAR(10)
+}
+entity "inscripciones" as inscripciones {
+  * id_inscripcion : INT <<PK>>
+  --
+  * id_estudiante : INT <<FK>>
+  * id_materia : INT <<FK>>
+  * fecha_inscripcion : DATETIME
+  * estado : ENUM
+  (UK: id_estudiante + id_materia)
+}
+entity "tareas" as tareas {
+  * id_tarea : INT <<PK>>
+  --
+  * id_materia : INT <<FK>>
+  * titulo : VARCHAR(120)
+  descripcion : TEXT
+  * fecha_limite : DATETIME
+}
+entity "entregas" as entregas {
+  * id_entrega : INT <<PK>>
+  --
+  * id_tarea : INT <<FK>>
+  * id_estudiante : INT <<FK>>
+  * archivo_ruta : VARCHAR(255)
+  * fecha_entrega : DATETIME
+  * estado : ENUM
+}
+entity "calificaciones" as calificaciones {
+  * id_calificacion : INT <<PK>>
+  --
+  * id_entrega : INT <<FK, UK>>
+  * id_profesor : INT <<FK>>
+  * nota : DECIMAL(3,1)
+  retroalimentacion : TEXT
+  * calificado_en : DATETIME
+}
+entity "videollamadas" as videollamadas {
+  * id_videollamada : INT <<PK>>
+  --
+  * id_materia : INT <<FK>>
+  * id_profesor : INT <<FK>>
+  * titulo : VARCHAR(120)
+  * fecha_hora : DATETIME
+  * enlace_jitsi : VARCHAR(255)
+  * estado : ENUM
+}
+entity "grabaciones" as grabaciones {
+  * id_grabacion : INT <<PK>>
+  --
+  * id_videollamada : INT <<FK>>
+  * archivo_ruta : VARCHAR(255)
+  * tamano_mb : DECIMAL(6,1)
+  * subido_en : DATETIME
+}
+entity "asistencias" as asistencias {
+  * id_asistencia : INT <<PK>>
+  --
+  * id_videollamada : INT <<FK>>
+  * id_estudiante : INT <<FK>>
+  * unido_en : DATETIME
+}
+entity "notificaciones" as notificaciones {
+  * id_notif : INT <<PK>>
+  --
+  * id_usuario_destino : INT <<FK>>
+  id_usuario_remitente : INT <<FK>>
+  * tipo : ENUM
+  * titulo : VARCHAR(120)
+  * mensaje : TEXT
+  * leida : BOOLEAN
+  * creada_en : DATETIME
+}
+
+roles ||--o{ usuarios : "tiene"
+usuarios ||--o| estudiantes : "es"
+usuarios ||--o| profesores : "es"
+profesores ||--o{ materias : "dicta"
+estudiantes ||--o{ inscripciones : "realiza"
+materias ||--o{ inscripciones : "recibe"
+materias ||--o{ tareas : "define"
+tareas ||--o{ entregas : "recibe"
+estudiantes ||--o{ entregas : "sube"
+entregas ||--o| calificaciones : "obtiene"
+profesores ||--o{ calificaciones : "emite"
+materias ||--o{ videollamadas : "programa"
+profesores ||--o{ videollamadas : "crea"
+videollamadas ||--o{ grabaciones : "genera"
+videollamadas ||--o{ asistencias : "registra"
+estudiantes ||--o{ asistencias : "asiste"
+usuarios ||--o{ notificaciones : "recibe"
+usuarios |o--o{ notificaciones : "envía"
+@enduml

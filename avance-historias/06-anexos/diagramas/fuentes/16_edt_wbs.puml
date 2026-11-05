@@ -1,0 +1,40 @@
+@startmindmap
+title Estructura de desglose del trabajo (EDT) - UNI-VIRTUAL
+* UNI-VIRTUAL
+** UV-1 Autenticación y usuarios
+*** UV-8 Login con redirección por rol
+*** UV-9 CRUD de usuarios (Admin)
+** UV-2 Dashboards por rol
+*** UV-30 Layout base React
+*** UV-10 Dashboard Estudiante
+*** UV-11 Dashboard Profesor
+*** UV-31 Dashboard Directivo
+** UV-3 Gestión académica
+*** UV-12 Inscripción a materias
+*** UV-13 Registro de notas
+** UV-4 Entregables y calificaciones
+*** UV-14 Subida de entregables
+*** UV-15 Calificación y retroalimentación
+** UV-5 Videollamadas
+*** UV-16 Crear y lanzar videollamada
+*** UV-17 Grabaciones
+left side
+** UV-6 Notificaciones
+*** UV-18 Notificaciones internas
+*** UV-19 Mensajes del Directivo
+** UV-7 Reportes
+*** UV-20 Reporte de rendimiento
+*** UV-21 Exportación a PDF
+** UV-22 Documentación y gobierno
+*** UV-25 PRD y SRS
+*** UV-26 Arquitectura y ADRs
+*** UV-27 Repositorio y entorno
+*** UV-35 Documentación final
+** UV-23 Base de datos y núcleo backend
+*** UV-28 Modelo ER y script SQL
+*** UV-29 Estructura base del backend
+** UV-24 Calidad y seguridad
+*** UV-32 Plan de pruebas
+*** UV-33 Pruebas E2E (Selenium)
+*** UV-34 Revisión de seguridad OWASP
+@endmindmap

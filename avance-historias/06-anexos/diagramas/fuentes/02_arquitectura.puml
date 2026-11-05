@@ -1,0 +1,34 @@
+@startuml
+!include common.iuml
+title Arquitectura lógica - UNI-VIRTUAL (SPA React + API JSON en PHP)
+skinparam componentStyle rectangle
+actor "Usuario\n(Estudiante / Profesor /\nDirectivo / Administrador)" as U
+
+rectangle "Navegador web" as BR {
+  component "React 18 (CDN)\nVistas por rol y\ncomponentes compartidos" as REACT
+  component "Cliente API\nfetch + manejo de sesión" as CLIENT
+}
+
+rectangle "Servidor web (Apache + PHP 8)" as SRV {
+  component "Router / Front controller\n(index.php)" as ROUTER
+  component "Middleware de seguridad\nSesión · CSRF · Roles" as SEC
+  component "Controllers\nAuth · Usuario · Materia · Inscripción\nEntrega · Calificación · Videollamada\nNotificación · Reporte" as CTRL
+  component "Models (PDO)\nSentencias preparadas" as MODEL
+  component "Generador de reportes\n(FPDF)" as PDF
+  folder "Almacenamiento de archivos\nentregables y grabaciones .mp4" as FILES
+}
+
+database "MySQL 8" as DB
+cloud "Jitsi Meet\n(meet.jit.si)" as JITSI
+
+U --> REACT
+REACT --> CLIENT
+CLIENT --> ROUTER : HTTP + JSON
+ROUTER --> SEC
+SEC --> CTRL
+CTRL --> MODEL
+CTRL --> PDF
+CTRL --> FILES
+MODEL --> DB : PDO / SQL
+REACT ..> JITSI : enlace externo\n(nueva pestaña)
+@enduml

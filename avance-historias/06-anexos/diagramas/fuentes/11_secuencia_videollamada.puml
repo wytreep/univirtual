@@ -1,0 +1,35 @@
+@startuml
+!include common.iuml
+title Diagrama de secuencia - Creación y acceso a una videollamada
+autonumber
+actor "Profesor" as P
+actor "Estudiante" as E
+participant "React" as UI
+participant "VideollamadaController" as VC
+participant "VideollamadaModel" as VM
+participant "NotificacionModel" as NM
+database "MySQL 8" as DB
+participant "Jitsi Meet\n(meet.jit.si)" as J
+
+== Creación ==
+P -> UI : Define materia, título y fecha/hora
+UI -> VC : POST /api/videollamadas
+VC -> VC : genera el nombre de sala y el enlace Jitsi
+VC -> VM : crear(materia, profesor, fechaHora, enlace)
+VM -> DB : INSERT INTO videollamadas (estado = programada)
+VC -> NM : notificarInscritos(materia, tipo = "videollamada")
+NM -> DB : INSERT INTO notificaciones (uno por inscrito)
+VC --> UI : 201 { videollamada }
+
+== Acceso ==
+E -> UI : Abre su dashboard
+UI -> VC : GET /api/videollamadas/proximas
+VC -> VM : proximasDelEstudiante(id_estudiante)
+VM -> DB : SELECT ...
+VC --> UI : lista de videollamadas con enlace
+E -> UI : Pulsa "Unirse"
+UI -> VC : POST /api/videollamadas/{id}/asistencia
+VC -> DB : INSERT INTO asistencias
+UI -> J : abre el enlace en una nueva pestaña
+J --> E : sala de videollamada
+@enduml

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNI-VIRTUAL — Galería de diagramas del avance</title>
+<style>
+  :root {
+    --azul: #0d1f4e;
+    --azul2: #2462b0;
+    --dorado: #d4a843;
+    --fondo: #f4f6fa;
+    --texto: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, var(--azul), var(--azul2));
+    color: #fff;
+    padding: 36px 24px 28px;
+  }
+  header h1 { margin: 0 0 8px; font-size: 28px; }
+  header p { margin: 4px 0; color: #dbe6ff; max-width: 980px; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.35);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+  main { max-width: 1180px; margin: 0 auto; padding: 28px 20px 60px; }
+  .intro {
+    background: #fff;
+    border-left: 5px solid var(--dorado);
+    padding: 16px 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(13,31,78,.06);
+    margin-bottom: 24px;
+  }
+  .intro strong { color: var(--azul); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 14px rgba(13,31,78,.08);
+    display: flex;
+    flex-direction: column;
+  }
+  .card img {
+    width: 100%;
+    height: 230px;
+    object-fit: contain;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px;
+    cursor: zoom-in;
+  }
+  .card .body { padding: 14px 16px 16px; flex: 1; }
+  .card h2 { margin: 0 0 4px; font-size: 17px; color: var(--azul); }
+  .card .tag {
+    display: inline-block;
+    background: #eef3fb;
+    color: var(--azul2);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .card p { margin: 6px 0; font-size: 14px; }
+  .card .say {
+    background: #f8fafc;
+    border-left: 3px solid var(--azul2);
+    padding: 8px 10px;
+    font-size: 13.5px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 10px;
+  }
+  .note {
+    background: #fff8e1;
+    border: 1px solid #f0d48a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 26px 0;
+    font-size: 14px;
+  }
+  .note strong { color: #7a5c00; }
+  footer {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 12, 30, .88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+    cursor: zoom-out;
+  }
+  #overlay img {
+    max-width: 96vw;
+    max-height: 92vh;
+    background: #fff;
+    border-radius: 6px;
+    padding: 10px;
+  }
+  @media print {
+    header { background: var(--azul); }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+    .card img { height: 260px; cursor: default; }
+    #overlay { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>UNI-VIRTUAL — Diagramas del avance</h1>
+  <p><span class="badge">Corte: 4 nov 2026</span><span class="badge">HUs vencidas + próximas a vencer</span></p>
+  <p>Guía visual para explicar el avance en equipo. Haz clic en una imagen para ampliarla.</p>
+</header>
+
+<main>
+  <div class="intro">
+    <strong>Alcance real:</strong> esta entrega no cubre todos los sprints completos. Cubre las <strong>13 HUs vencidas</strong> (Sprint 1 y 2) y las <strong>4 HUs próximas a vencer</strong> (Sprint 3, 13 nov), con su avance real.
+  </div>
+
+  <div class="grid">
+    <article class="card">
+      <img src="Figura_01_casos_de_uso.png" alt="Casos de uso" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">1 · Visión general</span>
+        <h2>Casos de uso</h2>
+        <p>Muestra los cuatro actores y los flujos que el sistema ya cubre: login, dashboards, inscripción, entregas, notas, videollamadas y notificaciones.</p>
+        <div class="say">“El alcance está delimitado por roles y flujos verificables”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_02_arquitectura.png" alt="Arquitectura" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">2 · Arquitectura</span>
+        <h2>Arquitectura del sistema</h2>
+        <p>React 18 por CDN consume una API JSON en PHP; Apache sirve el front controller; los modelos usan PDO y MySQL guarda los datos.</p>
+        <div class="say">“Hay capas y una sola fuente de datos, no páginas sueltas”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_04_modelo_er.png" alt="Modelo entidad-relación" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">3 · Datos</span>
+        <h2>Modelo entidad-relación</h2>
+        <p>Base relacional en 3FN. En v8 son 19 tablas: usuarios, facultades, carreras, materias, aulas, actividades, entregas, videollamadas y más.</p>
+        <div class="say">“El esquema soporta el flujo completo y ya incluye tablas del Sprint 3”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_09_secuencia_login.png" alt="Secuencia de login" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">4 · UV-8</span>
+        <h2>Secuencia de login</h2>
+        <p>Consulta preparada, verificación de hash, regeneración de sesión y redirección por rol. En v8 se agrega tiempo constante.</p>
+        <div class="say">“El login autentica y además controla el acceso cruzado entre roles”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_10_secuencia_inscripcion.png" alt="Secuencia de inscripción" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">5 · UV-12</span>
+        <h2>Secuencia de inscripción</h2>
+        <p>Valida que la materia exista, que no haya duplicado y que el estudiante cumpla los créditos mínimos antes de insertar.</p>
+        <div class="say">“La regla de créditos vive en el backend, no solo en la interfaz”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_11_secuencia_entrega_calificacion.png" alt="Entrega y calificación" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">6 · UV-11 y UV-13</span>
+        <h2>Entrega y calificación</h2>
+        <p>El estudiante sube el archivo dentro del plazo; el profesor califica y se notifica al estudiante. En la copia se usa <code>urlArchivo</code>.</p>
+        <div class="say">“El ciclo académico cierra con nota, retroalimentación y notificación”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_12_secuencia_videollamada.png" alt="Videollamada" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">7 · UV-16 (próxima)</span>
+        <h2>Secuencia de videollamada</h2>
+        <p>El profesor programa la sala de Jitsi, se notifica a los inscritos, el estudiante registra asistencia y entra a la sala.</p>
+        <div class="say">“También mostramos lo que vence el 13 de noviembre y ya tiene base funcional”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_16_gantt_sprints.png" alt="Gantt de sprints" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">8 · Gestión</span>
+        <h2>Gantt de sprints</h2>
+        <p>Ubica los cuatro sprints y las fechas de cierre. El corte se concentra en las HUs vencidas y próximas, no en todos los compromisos.</p>
+        <div class="say">“El alcance es por historia y por fecha, no por sprint completo”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_03_despliegue.png" alt="Despliegue" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">Apoyo · Demo</span>
+        <h2>Despliegue</h2>
+        <p>Navegador, Apache + PHP, MySQL en 3307, carpeta <code>uploads/</code>, CDN y Jitsi. Explica cómo se ejecuta la copia.</p>
+        <div class="say">“Se abre por Apache en http://localhost/univirtual-avance/”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_05_clases_dominio.png" alt="Clases de dominio" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">Apoyo · Técnico</span>
+        <h2>Clases de dominio</h2>
+        <p>Relación entre Usuario, Estudiante, Profesor, Materia, Inscripción, Actividad, Entrega y Videollamada.</p>
+        <div class="say">“Sirve si preguntan cómo se relaciona el modelo con el código”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_08_componentes_frontend.png" alt="Componentes frontend" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">Apoyo · Frontend</span>
+        <h2>Componentes frontend</h2>
+        <p>Vistas por rol, componentes compartidos y cliente API. Explica la reutilización del layout React.</p>
+        <div class="say">“El layout se comparte y cada rol monta su dashboard”.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img src="Figura_17_edt_wbs.png" alt="EDT / WBS" onclick="zoom(this.src)">
+      <div class="body">
+        <span class="tag">Apoyo · Planificación</span>
+        <h2>EDT / WBS</h2>
+        <p>Desglose del trabajo por épicas y HUs. Útil para mostrar que el avance está planificado y no es improvisado.</p>
+        <div class="say">“Cada historia pertenece a una épica y tiene entregables claros”.</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="note">
+    <strong>Ojo con los nombres:</strong> los PNG son diagramas conceptuales de una versión anterior. Para defender nombres exactos del código, usar las fuentes v8: <code>fuentes/diagrama_v8.puml</code>, <code>fuentes/secuencia_login_v8.puml</code> y <code>fuentes/diagramas_grupo_f.puml</code>. En v8, <code>roles</code> pasa a <code>usuarios.rol</code>, <code>tareas</code> a <code>actividades</code> y <code>calificaciones</code> a <code>entregas.nota</code> / <code>inscripciones.nota_*</code>.
+  </div>
+
+  <div class="intro">
+    <strong>Guion completo:</strong> abrir <code>../guion-diagramas.md</code> para el texto de cada diapositiva, la versión express de 3 minutos y las preguntas probables.
+  </div>
+</main>
+
+<footer>
+  UNI-VIRTUAL · Institución Universitaria Antonio José Camacho · Grupo F · Documento de avance académico.
+</footer>
+
+<div id="overlay" onclick="this.style.display='none'"><img id="overlayImg" src="" alt="Diagrama ampliado"></div>
+<script>
+  function zoom(src) {
+    document.getElementById('overlayImg').src = src;
+    document.getElementById('overlay').style.display = 'flex';
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.getElementById('overlay').style.display = 'none';
+  });
+</script>
+</body>
+</html>

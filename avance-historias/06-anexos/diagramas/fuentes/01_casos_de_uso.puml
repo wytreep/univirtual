@@ -1,0 +1,84 @@
+@startuml
+!include common.iuml
+left to right direction
+title Diagrama de casos de uso - UNI-VIRTUAL
+actor "Estudiante" as EST
+actor "Profesor" as PROF
+actor "Directivo" as DIR
+actor "Administrador" as ADM
+actor "Jitsi Meet\n(sistema externo)" as JIT
+
+rectangle "UNI-VIRTUAL" {
+  rectangle "Acceso y perfil" as G1 {
+    usecase "Iniciar sesión" as UC1
+    usecase "Configurar perfil" as UC2
+    usecase "Ver dashboard por rol" as UC3
+  }
+  rectangle "Administración" as G2 {
+    usecase "Gestionar usuarios (CRUD)" as UC4
+    usecase "Gestionar materias" as UC5
+  }
+  rectangle "Gestión académica" as G3 {
+    usecase "Inscribirse a materias" as UC6
+    usecase "Subir entregable" as UC7
+    usecase "Calificar entrega y\nretroalimentar" as UC8
+    usecase "Registrar y actualizar notas" as UC9
+    usecase "Consultar notas" as UC10
+  }
+  rectangle "Videollamadas" as G4 {
+    usecase "Crear videollamada" as UC11
+    usecase "Unirse a videollamada" as UC12
+    usecase "Subir grabación" as UC13
+    usecase "Ver grabaciones" as UC14
+  }
+  rectangle "Comunicación y reportes" as G5 {
+    usecase "Ver notificaciones" as UC15
+    usecase "Enviar mensaje a estudiantes\ny profesores" as UC16
+    usecase "Ver reportes y estadísticas" as UC17
+    usecase "Exportar reporte a PDF" as UC18
+  }
+}
+
+EST --> UC1
+EST --> UC2
+EST --> UC3
+EST --> UC6
+EST --> UC7
+EST --> UC10
+EST --> UC12
+EST --> UC14
+EST --> UC15
+
+PROF --> UC1
+PROF --> UC2
+PROF --> UC3
+PROF --> UC8
+PROF --> UC9
+PROF --> UC11
+PROF --> UC12
+PROF --> UC13
+PROF --> UC15
+
+DIR --> UC1
+DIR --> UC2
+DIR --> UC3
+DIR --> UC15
+DIR --> UC16
+DIR --> UC17
+
+ADM --> UC1
+ADM --> UC3
+ADM --> UC4
+ADM --> UC5
+ADM --> UC17
+
+UC11 -- JIT
+UC12 -- JIT
+UC18 .> UC17 : <<extend>>
+UC8 .> UC9 : <<include>>
+
+note bottom of G1
+  Todos los casos de uso, excepto "Iniciar sesión",
+  requieren una sesión activa y el rol adecuado.
+end note
+@enduml

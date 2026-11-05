@@ -1,0 +1,29 @@
+@startuml
+!include common.iuml
+title Diagrama de actividades - Ciclo de entrega y calificación
+|Profesor|
+start
+:Publica la tarea con fecha límite;
+|Sistema|
+:Registra la tarea;
+:Notifica a los estudiantes inscritos;
+|Estudiante|
+:Consulta la tarea en su dashboard;
+repeat
+  :Sube el entregable;
+  |Sistema|
+  :Valida tipo, tamaño y plazo;
+  |Estudiante|
+repeat while (¿Validación fallida?) is (sí) not (no)
+|Sistema|
+:Guarda la entrega (estado = entregada);
+|Profesor|
+:Revisa la entrega;
+:Registra nota y retroalimentación;
+|Sistema|
+:Guarda la calificación (estado = calificada);
+:Notifica al estudiante;
+|Estudiante|
+:Consulta nota y retroalimentación;
+stop
+@enduml

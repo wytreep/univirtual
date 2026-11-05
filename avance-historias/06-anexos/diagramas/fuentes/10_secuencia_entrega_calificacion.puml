@@ -1,0 +1,42 @@
+@startuml
+!include common.iuml
+title Diagrama de secuencia - Entrega y calificación de una tarea
+autonumber
+actor "Estudiante" as E
+actor "Profesor" as P
+participant "React" as UI
+participant "EntregaController" as EC
+participant "CalificacionController" as CC
+participant "EntregaModel" as EM
+participant "CalificacionModel" as CM
+participant "NotificacionModel" as NM
+database "MySQL 8" as DB
+participant "uploads/\n(archivos)" as FS
+
+== Entrega del estudiante ==
+E -> UI : Elige la tarea y adjunta el archivo
+UI -> EC : POST /api/entregas (multipart: id_tarea, archivo)
+EC -> EC : valida tipo, tamaño y fecha límite
+alt archivo válido y dentro del plazo
+  EC -> FS : guarda el archivo
+  EC -> EM : crear(id_tarea, id_estudiante, ruta)
+  EM -> DB : INSERT INTO entregas (estado = entregada)
+  EC --> UI : 201 { entrega }
+  UI --> E : "Entrega registrada"
+else inválido o fuera de plazo
+  EC --> UI : 422 { motivo }
+  UI --> E : muestra el motivo
+end
+
+== Calificación del profesor ==
+P -> UI : Abre la entrega y registra nota y retroalimentación
+UI -> CC : PUT /api/calificaciones { id_entrega, nota, retroalimentacion }
+CC -> CC : verifica que el profesor dicte la materia
+CC -> CM : guardar(id_entrega, nota, retroalimentacion)
+CM -> DB : INSERT / UPDATE calificaciones
+CC -> EM : actualizarEstado(id_entrega, "calificada")
+CC -> NM : crear(estudiante, tipo = "calificacion")
+NM -> DB : INSERT INTO notificaciones
+CC --> UI : 200 { calificación }
+UI --> P : "Calificación guardada"
+@enduml

@@ -11,8 +11,11 @@
 | Nombre | Rol Scrum | GitHub |
 |--------|-----------|--------|
 | James Medina | Product Owner | @james-medina |
-| Edwin Carabali | Developer | wytreep |
 | Angel Angulo | Scrum Master | @angel-angulo |
+| Edwin Carabali | Developer | wytreep |
+| Alexander Pineda | Developer | — |
+| Sebastián Chang | Developer | — |
+| Yeison Montaño | Developer | — |
 
 ---
 
@@ -21,7 +24,7 @@
 ```
 Backend   PHP 8 POO — Arquitectura MVC de tres capas
           Patrón Singleton (PDO), Template Method, Composite
-Database  MySQL 8 — 13 tablas, FK constraints, índices
+Database  MySQL 8 - 19 tablas, FK constraints, índices
 Frontend  React 18 SPA embebido en PHP (sin build step)
           Chart.js 4.4 para gráficas
 Reports   FPDF 1.86 para PDF nativos / HTML imprimible como fallback

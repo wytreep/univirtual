@@ -1,0 +1,29 @@
+@startuml
+!include common.iuml
+title Diagrama de despliegue - UNI-VIRTUAL
+
+node "Equipo del usuario" as PC {
+  artifact "Navegador web\nReact 18 (por CDN)" as BR
+}
+node "Servidor de aplicación (XAMPP)" as XAMPP {
+  node "Apache 2.4" as APACHE {
+    artifact "Aplicación PHP 8\nAPI JSON + front controller" as APP
+  }
+  database "MySQL 8\npuerto 3307" as DB
+  folder "uploads/\nentregables y grabaciones" as UP
+}
+node "Estación de QA" as QA {
+  artifact "Selenium 4 + Python\npruebas E2E" as SEL
+}
+cloud "Internet" as NET {
+  node "meet.jit.si\nvideollamadas" as JITSI
+  node "cdnjs / jsDelivr\nlibrerías JS" as CDN
+}
+
+BR --> APP : HTTP/HTTPS\nJSON
+APP --> DB : PDO (TCP 3307)
+APP --> UP : lectura / escritura
+BR ..> CDN : carga de librerías
+BR ..> JITSI : videollamada\n(nueva pestaña)
+SEL ..> BR : automatiza\nflujos por rol
+@enduml

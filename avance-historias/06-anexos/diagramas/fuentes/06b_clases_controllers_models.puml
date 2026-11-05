@@ -1,0 +1,65 @@
+@startuml
+!include common.iuml
+left to right direction
+title Diagrama de clases - Controladores y modelos (relaciones de uso)
+skinparam classAttributeIconSize 0
+
+abstract class Controller
+abstract class Model
+
+class AuthController
+class UsuarioController
+class MateriaController
+class InscripcionController
+class EntregaController
+class CalificacionController
+class VideollamadaController
+class NotificacionController
+class ReporteController
+
+class UsuarioModel
+class MateriaModel
+class InscripcionModel
+class TareaModel
+class EntregaModel
+class CalificacionModel
+class VideollamadaModel
+class GrabacionModel
+class NotificacionModel
+class ReportePdf
+
+Controller <|-- AuthController
+Controller <|-- UsuarioController
+Controller <|-- MateriaController
+Controller <|-- InscripcionController
+Controller <|-- EntregaController
+Controller <|-- CalificacionController
+Controller <|-- VideollamadaController
+Controller <|-- NotificacionController
+Controller <|-- ReporteController
+
+AuthController ..> UsuarioModel
+UsuarioController ..> UsuarioModel
+MateriaController ..> MateriaModel
+InscripcionController ..> InscripcionModel
+EntregaController ..> EntregaModel
+EntregaController ..> TareaModel
+CalificacionController ..> CalificacionModel
+CalificacionController ..> NotificacionModel
+VideollamadaController ..> VideollamadaModel
+VideollamadaController ..> GrabacionModel
+VideollamadaController ..> NotificacionModel
+NotificacionController ..> NotificacionModel
+ReporteController ..> CalificacionModel
+ReporteController ..> ReportePdf
+
+UsuarioModel --|> Model
+MateriaModel --|> Model
+InscripcionModel --|> Model
+TareaModel --|> Model
+EntregaModel --|> Model
+CalificacionModel --|> Model
+VideollamadaModel --|> Model
+GrabacionModel --|> Model
+NotificacionModel --|> Model
+@enduml

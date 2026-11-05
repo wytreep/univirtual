@@ -158,5 +158,8 @@ python tests_selenium_v8.py --headless   # Sin ventana (CI/CD)
 | Product Owner | James Medina |
 | Scrum Master | Ángel Angulo |
 | Developer | Edwin Carabali |
+| Developer | Alexander Pineda |
+| Developer | Sebastián Chang |
+| Developer | Yeison Montaño |
 
 **Jira:** https://medinajames666.atlassian.net/jira/software/projects/SCRUM/boards

@@ -1,0 +1,12 @@
+@startuml
+!include common.iuml
+title Diagrama de estados - Entrega
+[*] --> Pendiente : tarea publicada
+Pendiente --> Entregada : el estudiante sube el archivo\n[dentro del plazo]
+Pendiente --> Vencida : fecha límite superada\nsin entrega
+Entregada --> Entregada : reemplaza el archivo\n[antes del plazo]
+Entregada --> Calificada : el profesor registra la nota
+Calificada --> Calificada : el profesor actualiza la nota
+Calificada --> [*]
+Vencida --> [*]
+@enduml

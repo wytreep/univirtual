@@ -1,0 +1,75 @@
+@startuml UNI-VIRTUAL v8
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam classBorderColor #2462B0
+skinparam classHeaderBackgroundColor #0D1F4E
+skinparam classHeaderFontColor #FFFFFF
+skinparam arrowColor #2462B0
+skinparam fontName "Arial"
+title UNI-VIRTUAL v8 — Modelo de Dominio
+
+package "Autenticacion" {
+  class Usuario {
+    +idUsuario: int
+    +nombre: string
+    +email: string
+    +password: string
+    +rol: admin|directivo|profesor|estudiante
+    +activo: bool
+  }
+}
+package "Estructura" {
+  class Facultad { +idFacultad: int; +nombre: string; +codigo: string }
+  class Carrera { +idCarrera: int; +nombre: string; +creditos_total: int }
+  class Directivo { +idDirectivo: int; +cargo: string }
+}
+package "Actores" {
+  class Estudiante { +idEstudiante: int; +semestre: int; +creditos_aprobados: int }
+  class Profesor { +idProfesor: int; +departamento: string }
+}
+package "Academico" {
+  class Materia { +idMateria: int; +creditos: int; +creditos_minimos: int }
+  class Inscripcion { +nota_parcial1..nota_final: decimal }
+  class AulaVirtual { +idAula: int }
+  class Material { +tipo: pdf|video|presentacion|otro }
+  class Actividad { +fechaEntrega: datetime; +puntaje_max: decimal }
+  class Entrega { +nota: decimal; +feedback: text }
+  class Asistencia { +fecha: date; +asistio: bool }
+}
+package "Comunicacion" {
+  class Foro { +titulo: string; +abierto: bool }
+  class Mensaje { +contenido: text; +idPadre: int }
+  class Notificacion { +tipo: string; +url: string; +leida: bool }
+}
+package "Videollamadas" {
+  class Videollamada { +roomName: string; +estado: programada|en_curso|finalizada }
+  class Grabacion { +urlGrabacion: string; +duracion_seg: int }
+}
+class Configuracion { +clave: string; +valor: text; +tipo: string }
+
+Usuario "1" --> "0..1" Estudiante
+Usuario "1" --> "0..1" Profesor
+Usuario "1" --> "0..1" Directivo
+Directivo "1" --> "1" Facultad
+Profesor --> "0..1" Facultad
+Carrera --> "1" Facultad
+Estudiante --> "0..1" Carrera
+Materia --> "0..1" Carrera
+Materia --> "1" Profesor
+Inscripcion --> "1" Estudiante
+Inscripcion --> "1" Materia
+Asistencia --> "1" Estudiante
+Asistencia --> "1" Materia
+AulaVirtual "1" -- "1" Materia
+Material --> "1" AulaVirtual
+Actividad --> "1" AulaVirtual
+Entrega --> "1" Actividad
+Entrega --> "1" Estudiante
+Foro --> "1" AulaVirtual
+Mensaje --> "1" Foro
+Mensaje --> "1" Usuario
+Mensaje --> "0..1" Mensaje
+Notificacion --> "1" Usuario
+Videollamada --> "1" Materia
+Grabacion --> "1" Videollamada
+@enduml

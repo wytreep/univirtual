@@ -1,0 +1,38 @@
+@startuml
+!include common.iuml
+title Diagrama de secuencia - Inscripción a una materia
+autonumber
+actor "Estudiante" as E
+participant "React\nDashboardEstudiante" as UI
+participant "InscripcionController" as IC
+participant "Auth" as AU
+participant "MateriaModel" as MM
+participant "InscripcionModel" as IM
+database "MySQL 8" as DB
+
+E -> UI : Selecciona una materia y pulsa "Inscribirme"
+UI -> IC : POST /api/inscripciones { id_materia } + token CSRF
+IC -> AU : requerirRol("estudiante") y validarCsrf()
+AU --> IC : autorizado
+IC -> MM : buscarPorId(id_materia)
+MM -> DB : SELECT ... WHERE id_materia = ?
+DB --> MM : materia
+MM --> IC : Materia | null
+alt la materia existe
+  IC -> IM : existe(id_estudiante, id_materia)
+  IM -> DB : SELECT ... (UK estudiante + materia)
+  DB --> IM : resultado
+  alt aún no está inscrito
+    IC -> IM : crear(id_estudiante, id_materia)
+    IM -> DB : INSERT INTO inscripciones
+    DB --> IM : id_inscripcion
+    IC --> UI : 201 { inscripción }
+    UI --> E : materia agregada a "Mis materias"
+  else ya inscrito
+    IC --> UI : 409 { mensaje }
+    UI --> E : "Ya estás inscrito en esta materia"
+  end
+else no existe
+  IC --> UI : 404 { mensaje }
+end
+@enduml

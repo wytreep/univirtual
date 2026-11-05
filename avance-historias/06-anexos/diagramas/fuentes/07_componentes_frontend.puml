@@ -1,0 +1,37 @@
+@startuml
+!include common.iuml
+title Componentes del frontend - React 18 (CDN)
+skinparam componentStyle rectangle
+
+component "App" as APP
+component "AuthProvider\ncontexto de sesión" as AUTH
+component "Router por rol" as RT
+component "Layout\nNavbar · Sidebar · Footer" as LAY
+component "ApiClient\nfetch + CSRF + errores" as API
+
+package "Páginas" as PAG {
+  component "LoginPage" as P1
+  component "DashboardEstudiante" as P2
+  component "DashboardProfesor" as P3
+  component "DashboardDirectivo" as P4
+  component "DashboardAdmin" as P5
+  component "PerfilPage" as P6
+}
+package "Componentes compartidos" as COM {
+  component "Tabla" as C1
+  component "Tarjeta" as C2
+  component "Formulario" as C3
+  component "Modal" as C4
+  component "Alerta" as C5
+  component "TarjetaVideollamada" as C6
+  component "ListaNotificaciones" as C7
+}
+
+APP --> AUTH
+AUTH --> RT
+RT --> LAY
+LAY --> PAG
+PAG --> COM
+PAG --> API
+AUTH --> API
+@enduml

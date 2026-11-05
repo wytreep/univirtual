@@ -1,0 +1,22 @@
+@startgantt
+title Cronograma por sprints - UNI-VIRTUAL
+skinparam dpi 220
+printscale weekly
+Project starts 2026-10-05
+saturday are closed
+sunday are closed
+2026-10-12 is closed
+2026-11-02 is closed
+2026-11-16 is closed
+-- Sprints --
+[Sprint 1 - Base y fundamentos] starts 2026-10-05 and ends 2026-10-16
+[Sprint 2 - Acceso y estructura académica] starts 2026-10-19 and ends 2026-10-30
+[Sprint 3 - Núcleo funcional] starts 2026-11-02 and ends 2026-11-13
+[Sprint 4 - Cierre y estabilización] starts 2026-11-16 and ends 2026-11-27
+-- Hitos --
+[SQL del modelo de datos listo] happens 2026-10-09
+[Congelamiento de funcionalidades] happens 2026-11-20
+[Fin del desarrollo] happens 2026-11-27
+-- Implantación --
+[Capacitación al usuario final] starts 2026-11-30 and ends 2026-12-09
+@endgantt

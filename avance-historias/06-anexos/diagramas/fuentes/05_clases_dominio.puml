@@ -1,0 +1,128 @@
+@startuml
+!include common.iuml
+title Diagrama de clases del dominio - UNI-VIRTUAL
+skinparam classAttributeIconSize 0
+
+enum Rol {
+  ESTUDIANTE
+  PROFESOR
+  DIRECTIVO
+  ADMIN
+}
+class Usuario {
+  - idUsuario : int
+  - nombre : string
+  - correo : string
+  - passwordHash : string
+  - rol : Rol
+  - estado : string
+  + autenticar(password) : bool
+  + cambiarPassword(nueva) : void
+}
+class Estudiante {
+  - codigoEstudiante : string
+  - programa : string
+  + inscribirse(materia) : Inscripcion
+  + entregar(tarea, archivo) : Entrega
+}
+class Profesor {
+  - codigoProf : string
+  + crearVideollamada(materia, fechaHora) : Videollamada
+  + calificar(entrega, nota, retro) : Calificacion
+  + subirGrabacion(videollamada, archivo) : Grabacion
+}
+class Directivo {
+  + enviarMensaje(destinatarios, texto) : Notificacion
+  + consultarReportes() : Reporte
+}
+class Administrador {
+  + gestionarUsuarios() : void
+  + gestionarMaterias() : void
+}
+class Materia {
+  - idMateria : int
+  - codigo : string
+  - nombre : string
+  - creditos : int
+  - periodo : string
+}
+class Inscripcion {
+  - idInscripcion : int
+  - fechaInscripcion : datetime
+  - estado : string
+}
+class Tarea {
+  - idTarea : int
+  - titulo : string
+  - descripcion : string
+  - fechaLimite : datetime
+  + estaVencida() : bool
+}
+class Entrega {
+  - idEntrega : int
+  - archivoRuta : string
+  - fechaEntrega : datetime
+  - estado : string
+}
+class Calificacion {
+  - idCalificacion : int
+  - nota : decimal
+  - retroalimentacion : string
+  - calificadoEn : datetime
+}
+class Videollamada {
+  - idVideollamada : int
+  - titulo : string
+  - fechaHora : datetime
+  - enlaceJitsi : string
+  - estado : string
+  + generarEnlace() : string
+}
+class Grabacion {
+  - idGrabacion : int
+  - archivoRuta : string
+  - tamanoMb : decimal
+  - subidoEn : datetime
+}
+class Asistencia {
+  - idAsistencia : int
+  - unidoEn : datetime
+}
+class Notificacion {
+  - idNotif : int
+  - tipo : string
+  - titulo : string
+  - mensaje : string
+  - leida : bool
+  - creadaEn : datetime
+  + marcarLeida() : void
+}
+class Reporte {
+  + rendimientoPorMateria(materia) : array
+  + asistenciaPorMateria(materia) : array
+  + exportarPdf() : string
+}
+
+Usuario <|-- Estudiante
+Usuario <|-- Profesor
+Usuario <|-- Directivo
+Usuario <|-- Administrador
+Usuario --> Rol
+
+Profesor "1" -- "0..*" Materia : dicta
+Estudiante "1" -- "0..*" Inscripcion : realiza
+Materia "1" -- "0..*" Inscripcion : recibe
+Materia "1" *-- "0..*" Tarea : define
+Tarea "1" -- "0..*" Entrega : recibe
+Estudiante "1" -- "0..*" Entrega : sube
+Entrega "1" -- "0..1" Calificacion : obtiene
+Profesor "1" -- "0..*" Calificacion : emite
+Materia "1" -- "0..*" Videollamada : programa
+Profesor "1" -- "0..*" Videollamada : crea
+Videollamada "1" *-- "0..*" Grabacion : genera
+Videollamada "1" -- "0..*" Asistencia : registra
+Estudiante "1" -- "0..*" Asistencia : asiste
+Usuario "1" -- "0..*" Notificacion : recibe
+Reporte ..> Calificacion
+Reporte ..> Asistencia
+@enduml
