@@ -214,7 +214,7 @@ Si el docente pregunta por la diferencia, responder:
 
 ### 9.1 Reparto equitativo (6 integrantes)
 
-Cada persona expone **dos bloques** y todos quedan entre **1:55 y 2:10**:
+Todos exponen al menos un diagrama y todos quedan entre **1:55 y 2:10**:
 
 | Integrante | Bloques | Tiempo | Demo que opera | Respaldo |
 |---|---|---:|---|---|
