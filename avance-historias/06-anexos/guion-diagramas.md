@@ -212,63 +212,81 @@ Si el docente pregunta por la diferencia, responder:
 
 > **Aclaración:** la matriz de historias no asigna responsables individuales por diagrama; la asignación oficial vive en Jira. El reparto de abajo es **operativo para la sustentación** y se apoya en las responsabilidades del cronograma, no en una atribución histórica del tablero.
 
-### 9.1 Equipo de 6 — reparto completo
+### 9.1 Reparto equitativo (6 integrantes)
 
-| # | Bloque | Expone | Por qué | Tiempo | Demo | Respaldo |
-|---|---|---|---|---:|---|---|
-| 0 | Apertura y alcance | James | El PO define el alcance | 0:45 | — | Angel |
-| 1 | Casos de uso | Sebastián | Perfiló interfaz y módulos del prototipo | 1:10 | — | James |
-| 2 | Arquitectura | Edwin | Diseñó la arquitectura de tres capas | 1:10 | — | Alexander |
-| 3 | Modelo ER | Yeison | Diseño y acceso a datos | 1:10 | — | Edwin |
-| 4 | Login (UV-8) | Alexander | Módulo de gestión de usuarios | 1:25 | Login con los 4 roles | Edwin |
-| 5 | Inscripción (UV-12) | Angel | Alcance y criterios de aceptación | 1:25 | Bloqueo por créditos | James |
-| 6 | Entrega de actividad (UV-11) | Alexander | Codificación del flujo | 0:55 | Subir archivo | Edwin |
-| 7 | Calificación y notificación (UV-13) | Edwin | Corrección de `urlArchivo` y permisos | 0:55 | Calificar entrega | Alexander |
-| 8 | Videollamada (UV-16) | Sebastián | Interfaz e integración Jitsi | 0:55 | Sala Jitsi o captura | Yeison |
-| 9 | Gantt y fechas | James | Priorización y fechas | 0:55 | — | Angel |
-| 10 | Estados de las 17 HUs | Angel | Verificación de evidencias y proceso | 0:50 | Matriz de historias | James |
-| 11 | Cierre | James conduce; una frase por integrante | Compromiso del equipo | 1:00 | — | — |
+Cada persona expone **dos bloques** y todos quedan entre **1:55 y 2:10**:
 
-**Carga por integrante:** James 2:45 · Alexander 2:20 · Angel 2:15 · Edwin 2:05 · Sebastián 2:05 · Yeison 1:50.
+| Integrante | Bloques | Tiempo | Demo que opera | Respaldo |
+|---|---|---:|---|---|
+| James | Apertura y alcance (0:45) + Gantt y estados (0:55) + cierre (0:30) | 2:10 | — | Angel |
+| Sebastián | Casos de uso (1:10) + Videollamada (0:55) | 2:05 | Sala Jitsi | Yeison |
+| Edwin | Arquitectura (1:10) + Calificación (0:55) | 2:05 | Calificar entrega | Alexander |
+| Yeison | Modelo ER (1:10) + Entrega de actividad (0:55) | 2:05 | Subir archivo | Edwin |
+| Alexander | Login (1:25) + demo (0:30) | 1:55 | Login con los 4 roles | Edwin |
+| Angel | Inscripción (1:25) + demo (0:30) | 1:55 | Bloqueo por créditos | James |
 
-**Total:** ~13:30 con transiciones. Cada bloque tiene respaldo: si alguien no puede asistir, su respaldo lo cubre con el mismo diagrama.
+**Diferencia máxima:** 15 segundos entre el que más y el que menos expone.
+**Total:** 12:15 de contenido + 0:30 de frases de cierre + transiciones ≈ **13:15**.
+
+**Por qué así:**
+
+- James abre y cierra porque es el PO, y el Gantt vuelve a ser alcance: no repite tema.
+- Alexander y Angel tienen los dos bloques más largos (login e inscripción) y por eso no llevan un segundo diagrama.
+- Yeison toma la entrega porque explica dónde se guarda el archivo y cómo se consulta; Edwin cierra el ciclo con la calificación, que es donde estuvo la corrección.
+- Sebastián une los dos frentes de interfaz: casos de uso y videollamada.
+
+### 9.2 Orden de intervención
+
+| # | Bloque | Expone | Tiempo |
+|---|---|---|---:|
+| 1 | Apertura y alcance | James | 0:45 |
+| 2 | Casos de uso | Sebastián | 1:10 |
+| 3 | Arquitectura | Edwin | 1:10 |
+| 4 | Modelo ER | Yeison | 1:10 |
+| 5 | Login (UV-8) + demo | Alexander | 1:55 |
+| 6 | Inscripción (UV-12) + demo | Angel | 1:55 |
+| 7 | Entrega de actividad (UV-11) | Yeison | 0:55 |
+| 8 | Calificación y notificación (UV-13) | Edwin | 0:55 |
+| 9 | Videollamada (UV-16) | Sebastián | 0:55 |
+| 10 | Gantt y estados de las 17 HUs | James | 0:55 |
+| 11 | Cierre | James conduce; 5 s por integrante | 1:00 |
+
+Ningún expositor repite seguido: la secuencia rota James → Sebastián → Edwin → Yeison → Alexander → Angel → Yeison → Edwin → Sebastián → James.
 
 **Regla de transición:** quien termina dice “te dejo con…”, entrega el teclado y se queda al lado para responder preguntas de su bloque.
 
-**Reparto de demos (4):** login (Alexander), créditos (Angel), subida (Alexander), calificación (Edwin). Si el tiempo aprieta, se conservan solo login y calificación.
+### 9.3 Versión de 10 minutos
 
-### 9.2 Versión de 10 minutos
+Si el docente limita el tiempo, se recorta proporcionalmente (unos 20 s por bloque) y se mantiene el reparto:
 
-Si el docente limita el tiempo, se recortan los bloques 6 y 8 (entrega y videollamada) y se fusionan en el bloque 7:
-
-| Bloque | Expone | Tiempo |
+| Integrante | Bloques | Tiempo |
 |---|---|---:|
-| Apertura | James | 0:40 |
-| Casos de uso | Sebastián | 1:00 |
-| Arquitectura | Edwin | 1:00 |
-| Modelo ER | Yeison | 1:00 |
-| Login + demo | Alexander | 1:30 |
-| Inscripción + demo | Angel | 1:30 |
-| Entrega, calificación y videollamada | Edwin | 1:20 |
-| Gantt y estados | James | 1:00 |
-| Cierre (una frase cada uno) | Todos | 1:00 |
+| James | Apertura (0:40) + Gantt y estados (0:45) + cierre (0:25) | 1:50 |
+| Sebastián | Casos de uso (1:00) + Videollamada (0:40) | 1:40 |
+| Edwin | Arquitectura (1:00) + Calificación (0:40) | 1:40 |
+| Yeison | Modelo ER (1:00) + Entrega (0:40) | 1:40 |
+| Alexander | Login (1:05) + demo (0:20) | 1:25 |
+| Angel | Inscripción (1:05) + demo (0:20) | 1:25 |
 
-**Total:** ~10:00. Yeison y Sebastián conservan su bloque; Edwin absorbe el de calificación y videollamada.
+**Total:** ~9:40. Se conservan los seis con su bloque; solo se acortan las demos y las explicaciones, no se elimina a nadie.
 
-### 9.3 Quién responde qué
+### 9.4 Quién responde qué
 
 | Área de preguntas | Responde | Respaldo |
 |---|---|---|
 | Alcance, fechas y priorización | James | Angel |
 | Proceso, evidencias y criterios de aceptación | Angel | James |
 | Arquitectura, API y código | Edwin | Alexander |
+| Calificación, permisos y `urlArchivo` | Edwin | Alexander |
 | Base de datos, tablas y diccionario | Yeison | Edwin |
+| Almacenamiento de entregas y materiales | Yeison | Edwin |
 | Interfaz, React y experiencia | Sebastián | Edwin |
+| Videollamadas y Jitsi | Sebastián | Yeison |
 | Usuarios, roles y sesiones | Alexander | Edwin |
 | Cronometrar y avisar los tiempos | Angel | — |
 | Tener a mano matriz, resultados y ZIP | Angel | Sebastián |
 
-### 9.4 Todos saben todo (mínimo común)
+### 9.5 Todos saben todo (mínimo común)
 
 Que todos expongan no significa que cada uno sepa solo su parte. Antes de la exposición, los seis deben poder responder sin leer:
 
@@ -281,7 +299,7 @@ Que todos expongan no significa que cada uno sepa solo su parte. Antes de la exp
 
 Las respuestas cortas están en la sección 6 de este documento.
 
-### 9.5 Checklist 10 minutos antes
+### 9.6 Checklist 10 minutos antes
 
 1. Apache y MySQL arriba; `http://localhost/univirtual-avance/` responde.
 2. Sesión cerrada y pestañas listas: login, estudiante, profesor, directivo.

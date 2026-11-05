@@ -27,12 +27,14 @@ Todos los integrantes participan en la sustentación. El reparto de bloques, dem
 
 | Integrante | Bloques de la exposición | Área de preguntas |
 |---|---|---|
-| James Medina | Apertura, Gantt, cierre | Alcance y fechas |
-| Angel Angulo | Inscripción, estados de las HUs | Proceso y evidencias |
+| James Medina | Apertura, Gantt y estados, cierre | Alcance y fechas |
+| Angel Angulo | Inscripción + demo | Proceso y evidencias |
 | Edwin Carabali | Arquitectura, calificación | Técnica y código |
-| Alexander Pineda | Login, entrega de actividad | Usuarios y sesiones |
+| Alexander Pineda | Login + demo | Usuarios y sesiones |
 | Sebastián Chang | Casos de uso, videollamada | Interfaz y React |
-| Yeison Montaño | Modelo ER | Base de datos |
+| Yeison Montaño | Modelo ER, entrega de actividad | Base de datos |
+
+**Equidad:** cada integrante expone entre 1:55 y 2:10; la diferencia máxima es de 15 segundos. El detalle y el orden están en `06-anexos/guion-diagramas.md`, sección 9.
 
 ---
 
