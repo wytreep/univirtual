@@ -67,6 +67,7 @@ avance-historias/
     ├── trazabilidad.md               ← HU → RF → código → prueba
     ├── inventario-evidencias.md      ← archivos y rutas verificadas
     ├── guion-diagramas.md            ← guion para explicar los diagramas
+    ├── guion-james.md                ← guion completo de apertura, Gantt y cierre
     ├── diagramas/                    ← PNG, fuentes PlantUML y galería
     └── glosario.md                   ← términos del dominio y técnicos
 ```
