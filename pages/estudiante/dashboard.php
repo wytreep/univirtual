@@ -284,7 +284,24 @@ class EstudianteView extends View
         const Tareas = () => {
           const [data, setData] = useState(null); const [tab, setTab] = useState('pendientes'); const [modal, setModal] = useState(null); const [file, setFile] = useState(null); const [comment, setComment] = useState(''); const [saving, setSaving] = useState(false); const [alerta, setAlerta] = useState(null); const { idEst } = window.__S;
           useEffect(() => { api.get(`/estudiante.php?action=tareas&idEst=${idEst}`).then(r => r.status === 'ok' && setData(r.data)); }, []);
-          const entregar = async () => { if (!file) return setAlerta({ type: 'err', msg: 'Selecciona un archivo' }); const fd = new FormData(); fd.append('action', 'entregar'); fd.append('idActividad', modal.idActividad); fd.append('idEst', idEst); fd.append('comentario', comment); fd.append('archivo', file); setSaving(true); const r = await api.post('/estudiante.php', fd, true); setSaving(false); if (r.status === 'ok') { setModal(null); setFile(null); setComment(''); setAlerta({ type: 'ok', msg: '¡Entrega realizada!' }); api.get(`/estudiante.php?action=tareas&idEst=${idEst}`).then(r2 => r2.status === 'ok' && setData(r2.data)); } else setAlerta({ type: 'err', msg: r.mensaje }); };
+          const entregar = async () => {
+            if (!file) return setAlerta({ type: 'err', msg: 'Selecciona un archivo' });
+            if (file.size > 200 * 1024 * 1024) return setAlerta({ type: 'err', msg: 'El archivo supera el límite de 200 MB' });
+            const fd = new FormData();
+            fd.append('action', 'entregar'); fd.append('idActividad', modal.idActividad); fd.append('idEst', idEst);
+            fd.append('comentario', comment); fd.append('archivo', file);
+            setSaving(true);
+            try {
+              const r = await api.post('/estudiante.php', fd, true);
+              if (r.status === 'ok') {
+                setModal(null); setFile(null); setComment('');
+                setAlerta({ type: 'ok', msg: r.mensaje || '¡Entrega realizada!' });
+                api.get(`/estudiante.php?action=tareas&idEst=${idEst}`).then(r2 => r2.status === 'ok' && setData(r2.data));
+              } else setAlerta({ type: 'err', msg: r.mensaje || 'No se pudo subir la entrega' });
+            } catch (e) {
+              setAlerta({ type: 'err', msg: 'No se pudo subir el archivo. Revisa el tamaño o la conexión.' });
+            } finally { setSaving(false); }
+          };
           if (!data) return <Spinner />;
           const { pendientes = [], entregadas = [], vencidas = [] } = data;
           const curr = tab === 'pendientes' ? pendientes : tab === 'entregadas' ? entregadas : vencidas;
@@ -381,7 +398,23 @@ class EstudianteView extends View
               .then(r => r.json()).then(r => r.status === 'ok' && setVlLista(r.data || []));
           }, [materia]);
           useEffect(() => { if (tab === 'videollamadas') cargarVL(); }, [tab, cargarVL]);
-          const entregar = async (act) => { if (!file) return setAlerta({ type: 'err', msg: 'Selecciona archivo' }); const fd = new FormData(); fd.append('action', 'entregar'); fd.append('idActividad', act.idActividad); fd.append('idEst', idEst); fd.append('comentario', comment); fd.append('archivo', file); setSaving(true); const r = await api.post('/estudiante.php', fd, true); setSaving(false); if (r.status === 'ok') { setModal(null); setFile(null); setComment(''); cargar(); setAlerta({ type: 'ok', msg: 'Entrega enviada' }); } else setAlerta({ type: 'err', msg: r.mensaje }); };
+          const entregar = async (act) => {
+            if (!file) return setAlerta({ type: 'err', msg: 'Selecciona un archivo' });
+            if (file.size > 200 * 1024 * 1024) return setAlerta({ type: 'err', msg: 'El archivo supera el límite de 200 MB' });
+            const fd = new FormData();
+            fd.append('action', 'entregar'); fd.append('idActividad', act.idActividad); fd.append('idEst', idEst);
+            fd.append('comentario', comment); fd.append('archivo', file);
+            setSaving(true);
+            try {
+              const r = await api.post('/estudiante.php', fd, true);
+              if (r.status === 'ok') {
+                setModal(null); setFile(null); setComment(''); cargar();
+                setAlerta({ type: 'ok', msg: r.mensaje || 'Entrega enviada' });
+              } else setAlerta({ type: 'err', msg: r.mensaje || 'No se pudo subir la entrega' });
+            } catch (e) {
+              setAlerta({ type: 'err', msg: 'No se pudo subir el archivo. Revisa el tamaño o la conexión.' });
+            } finally { setSaving(false); }
+          };
           const pubMsg = async (idForo) => {
             const texto = (msgs[idForo] || '').trim();
             if (!texto) return;

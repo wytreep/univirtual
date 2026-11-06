@@ -1,7 +1,7 @@
 # 00 — Resumen ejecutivo del avance
 
 **Proyecto:** UNI-VIRTUAL  
-**Corte:** 31 de octubre de 2026  
+**Corte:** 31 de octubre de 2026 · **Actualizado:** 6 de noviembre de 2026  
 **Alcance:** HU vencidas (sprints 1 y 2) y HU próximas a vencer (Sprint 3)  
 **Preparado para:** entrega de avance académico y revisión del Product Owner
 
@@ -36,6 +36,7 @@ Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (
 | Endpoints API principales | 12 controladores |
 | Suites de prueba disponibles | 3 (Selenium/unittest, API, E2E) |
 | Última ejecución Selenium registrada | 23/23 aprobadas (24 abr 2026) |
+| Fallos de la demo corregidos y verificados | 5 (original y copia) |
 
 > El porcentaje de cumplimiento funcional se reporta por historia (ver `01-gestion/matriz-historias.md`) y no se redondea: cada HU muestra su avance real, lo logrado y lo pendiente.
 
@@ -84,6 +85,7 @@ Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (
 6. **Núcleo académico operativo.** Inscripciones con validación de créditos mínimos, registro de notas por parciales y notificaciones automáticas.
 7. **Cultura de pruebas.** Suite Selenium con 23 pruebas aprobadas y suites de API/E2E preparadas para la siguiente fase.
 8. **Avance anticipado del Sprint 3.** Videollamadas (Jitsi), notificaciones con polling de 30s y dashboard del directivo ya avanzaron sin haberse comprometido formalmente; se documentan como muestra del ritmo del equipo y del avance real.
+9. **Corrección de los cinco fallos de la demo.** Zona horaria, `creado_en`, sala única, `urlArchivo` y columnas inexistentes quedaron corregidos y probados en original y copia; el detalle está en `06-anexos/correcciones-demo.md`.
 
 ---
 
@@ -92,10 +94,11 @@ Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (
 | # | Hallazgo | Severidad | Impacto | Referencia |
 |---|---|---|---|---|
 | H-01 | El formulario de usuarios envía `codigoEst` y el controlador espera `codigo`; además intenta insertar `programa`, columna que no existe en v8. | 🔴 Alta | La creación de estudiantes y profesores falla; UV-9 no se puede aceptar. | `03-historias/UV-09-crud-usuarios.md` |
-| H-02 | El código usa `archivoEntrega` en entregas, pero el esquema v8 define `urlArchivo`. | 🟠 Media | El listado y la subida de entregas pueden fallar; afecta UV-11 y UV-13. | `05-entrega/riesgos-y-deuda.md` |
+| H-02 | El código usaba `archivoEntrega` en entregas, pero el esquema v8 define `urlArchivo`. | 🟠 Media | ✅ Corregido y probado en original y copia; afectaba UV-11 y UV-13. | `06-anexos/correcciones-demo.md` |
 | H-03 | `config.example.php` y `fix_passwords_v8.sql` están referenciados pero no existen en el repositorio. | 🟠 Media | Un clon nuevo no puede configurarse siguiendo el README. | `05-entrega/plantillas/` |
 | H-04 | El semestre y la semana académica están fijos a `2026-I` y `2026-01-19` en el dashboard del estudiante. | 🟡 Baja | Las métricas de avance no corresponden al corte de octubre de 2026. | `03-historias/UV-10-dashboard-estudiante.md` |
 | H-05 | Cada dashboard redefine sus propios componentes React; no hay carpeta de componentes compartidos. | 🟡 Baja | Duplicación y mayor costo de mantenimiento. | `03-historias/UV-30-frontend.md` |
+| H-06 | Cinco fallos de integración vistos en la demo: hora, `creada_en`, `roomName` duplicado, `archivoEntrega` y columnas de subida. | 🔴 Alta | ✅ Corregidos y verificados el 6 nov 2026 en original y copia. | `06-anexos/correcciones-demo.md` |
 
 El detalle, la causa raíz y el parche propuesto de cada hallazgo están en `05-entrega/riesgos-y-deuda.md`.
 
@@ -106,9 +109,10 @@ El detalle, la causa raíz y el parche propuesto de cada hallazgo están en `05-
 **Entregar el avance con salvedades documentadas.** La base es sólida y demuestra el avance de las historias vencidas (sprints 1 y 2) más el avance anticipado de las próximas (Sprint 3). Antes de la demo se recomienda:
 
 1. Propagar el parche de UV-9 al repositorio original (30–45 min); ya está aplicado y verificado en la copia ejecutable.
-2. Para el entorno de demo: la base `univirtual_sprints12` ya está importada; si se monta el ZIP en otro equipo, importar `config/database_v8.sql` y `config/fix_passwords.sql`.
+2. Para el entorno de demo: la base `univirtual_sprints12` ya está importada y tiene la entrega pendiente de Laura para demostrar la calificación. Si se monta el ZIP en otro equipo, importar `config/database_v8.sql` y `config/fix_passwords.sql`.
 3. Re-ejecutar la suite Selenium y anexar el reporte actualizado.
-4. Usar el guion de demo actualizado, que incluye la creación de usuarios en la copia ejecutable y el recorrido por los avances del Sprint 3 (UV-16, UV-18, UV-31, salvedad de UV-19).
+4. Usar el guion de demo actualizado, que incluye la creación de usuarios en la copia ejecutable, la calificación en vivo y el recorrido por UV-16, UV-18 y UV-31, con la salvedad de UV-19.
+5. Los cinco fallos de la demo ya están cerrados; no se presentan como pendientes.
 
 Si el docente exige el 100% de las historias cerradas, el único bloqueo real es UV-9. Los demás hallazgos son deuda técnica que no impide sustentar el avance.
 

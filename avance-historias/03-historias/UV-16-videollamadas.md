@@ -37,6 +37,9 @@
 | Pieza | Archivo | Lo que ya hace |
 |---|---|---|
 | API de videollamadas | `api/v1/videollamadas.php` | Endpoints `lista`, `activa`, `crear`, `finalizar`, `eliminar` y `subir_grabacion`. |
+| Permisos | `api/v1/videollamadas.php` | Solo el profesor dueño de la materia crea, finaliza, elimina y sube grabación; el admin solo monitorea. |
+| Disponibilidad | `api/v1/videollamadas.php` | `estadoCalculado` y `puedeUnirse`; la sala abre 10 minutos antes y cierra al terminar la duración. |
+| Notificación | `api/v1/videollamadas.php` + `notificaciones` | Avisa a los inscritos al crear la clase, con `creado_en`. |
 | Radio de profesor | `profesor.php::resolverIdProfesor` | Resuelve `idProfesor` a partir del usuario autenticado. |
 | Jitsi en el panel del profesor | `pages/profesor/dashboard.php` | Sección "Clases Virtuales - Jitsi Meet" con SDK `external_api.js`. |
 | Jitsi en el panel del estudiante | `pages/estudiante/dashboard.php` | Consulta `action=lista` por materia y muestra las sesiones. |
@@ -50,10 +53,12 @@
 - API completa de videollamadas (crear, listar, activar, finalizar, eliminar).
 - Integración con Jitsi Meet en los dos dashboards principales.
 - Persistencia de sesiones con datos semilla.
+- Permisos por profesor, sala única (`-2`, `-3`), notificación a inscritos y ventana de disponibilidad.
+- Hora unificada en `America/Bogota` y estado calculado con `NOW()` de MySQL.
 
 **Pendiente**
 - Casos formales de aceptación en `04-pruebas/casos-aceptacion.md`.
-- Prueba con dos sesiones abiertos simultáneos (profesor + estudiante).
+- Prueba con dos sesiones abiertas simultáneas (profesor + estudiante).
 - Estabilidad del enlace directo de Jitsi (sin iframe).
 
 ---
@@ -62,10 +67,12 @@
 
 1. Ingresar como profesor (`james@univirtual.edu.co`).
 2. Abrir una materia → pestaña "Clases Virtuales - Jitsi Meet".
-3. Mostrar que la lista proviene de `api/v1/videollamadas.php?action=lista`.
+3. Programar una clase para dentro de 10 minutos y mostrar que aparece disponible.
+4. Entrar como estudiante (`edwin@univirtual.edu.co`) y ver la notificación y el botón “Unirse a la clase”.
+5. Entrar como admin e intentar crear una clase: la API responde 403 y el panel solo permite monitorear.
 
 ---
 
 ## 6. Avance
 
-**85%.** La API y la integración de Jitsi están construidas y operativas; lo que falta es la formalización de pruebas, que corresponde al Sprint 3. La parte de grabaciones queda en UV-17 (Sprint 4).
+**85%.** La API y la integración de Jitsi están construidas y operativas; los fallos de hora, notificación y sala duplicada se corrigieron y verificaron el 6 nov 2026. Lo que falta es la formalización de pruebas, que corresponde al Sprint 3. La parte de grabaciones queda en UV-17 (Sprint 4).

@@ -13,9 +13,10 @@ Entregar una **copia independiente y ejecutable** del proyecto que demuestre el 
 
 La copia se abre directamente por Apache, igual que el proyecto original, y conserva los parches de los bloqueos detectados:
 
-- creación de usuarios de los cuatro roles (UV-9);
+- creación de usuarios de los cuatro roles (UV-9, **solo en la copia**);
 - gestión y calificación de entregas con `urlArchivo` (UV-11 y UV-13);
-- validación de propiedad de la materia en notas y entregas.
+- validación de propiedad de la materia en notas y entregas;
+- correcciones post-demo: zona horaria, `creado_en`, sala única, `urlArchivo` y columnas de subida (aplicadas en copia **y** original).
 
 ---
 
@@ -67,8 +68,15 @@ No hay lanzadores ni archivos `.bat`.
 | 8 | Verificación de que la entrega/inscripción pertenece al profesor. | `api/v1/profesor.php` |
 | 9 | URLs con el prefijo `/univirtual-avance`. | `pages/*/dashboard.php` |
 | 10 | Configuración y base separadas del proyecto original. | `config/config.php` |
+| 11 | Zona horaria `America/Bogota` en PHP, igual que MySQL. | `config/config.php` |
+| 12 | Notificación con `creado_en` y alta en transacción. | `api/v1/videollamadas.php` |
+| 13 | `roomName` único con sufijo `-2`, `-3`… | `api/v1/videollamadas.php` |
+| 14 | Videollamadas: solo el profesor dueño crea, finaliza y sube grabación; el admin monitorea. | `api/v1/videollamadas.php`, dashboards |
+| 15 | Materiales y grabaciones sin columnas inexistentes; descarga con `filesize()`. | `api/v1/profesor.php`, `api/v1/videollamadas.php`, `api/descargar.php` |
+| 16 | Matrícula con tope de 20 créditos y motivo explícito. | `api/v1/inscripciones.php`, `pages/admin/dashboard.php` |
+| 17 | Subidas de 200 MB y bloqueo de PHP en `uploads/`. | `.htaccess`, `uploads/.htaccess` |
 
-El proyecto original **no se modificó**.
+Las correcciones 1–6 (UV-9) se aplicaron **solo en la copia**. Las correcciones 7–17 se aplicaron en la copia **y** en el proyecto original, y se verificaron en ambos.
 
 ---
 
@@ -93,6 +101,13 @@ El proyecto original **no se modificó**.
 | Listado de entregas | ✅ devuelve `urlArchivo` |
 | Calificación de entrega | ✅ persiste y notifica |
 | Calificación de entrega ajena | ✅ 403 |
+| Videollamada: hora, disponibilidad y notificación | ✅ 200, `puedeUnirse = 1`, fila en `notificaciones` |
+| Videollamada: admin no crea | ✅ 403 |
+| Videollamada: sala duplicada | ✅ 200 con sufijo `-2` |
+| Subida de material | ✅ 200, fila en `materiales` |
+| Descarga de entrega | ✅ 200 `application/pdf` |
+| Matrícula sobre 20 créditos | ✅ 400 con motivo |
+| Límite de subida | ✅ `200M / 210M` |
 | Health check | ✅ `{"app":"UNIVIRTUAL_SPRINTS12","db":"ok"}` |
 
 ---
@@ -106,7 +121,8 @@ El proyecto original **no se modificó**.
 | Servidor | Apache de XAMPP | Apache de XAMPP |
 | URL | `http://localhost/univirtual` | `http://localhost/univirtual-avance` |
 | UV-9 | En corrección | Corregido |
-| Entregas | `archivoEntrega` | `urlArchivo` |
+| Entregas | `archivoEntrega` + `urlArchivo` | Solo `urlArchivo` |
+| Correcciones post-demo | Aplicadas | Aplicadas |
 | Uso | Desarrollo | Demostración del avance |
 
 ---
@@ -117,6 +133,8 @@ El proyecto original **no se modificó**.
 - Requiere Apache y MySQL activos en el panel de XAMPP.
 - MySQL debe usar el puerto 3307, igual que el proyecto original.
 - Requiere conexión a internet para los CDN de React y Chart.js.
+- Las subidas están limitadas a 200 MB por archivo (post de 210 MB) en `.htaccess`.
+- La demo de calificación depende de la entrega de Laura en el Taller 2; si se califica en el ensayo, hay que reiniciarla con el SQL de `06-anexos/guion-edwin.md`.
 - Las historias del Sprint 3 se muestran solo como avance anticipado (videollamadas, notificaciones, panel del directivo); la mensajería del directivo (UV-19) no tiene pantalla y el Sprint 4 no está incluido.
 - Si se mueve a otro equipo, hay que importar `config/database_v8.sql` y `config/fix_passwords.sql` en la base `univirtual_sprints12`.
 

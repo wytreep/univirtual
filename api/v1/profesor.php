@@ -297,7 +297,7 @@ class ProfesorController extends Controller {
 
         $stmt = $db->prepare(
             "SELECT e.idEntrega, e.nota, e.feedback, e.entregado_en,
-                    e.nombreOriginal, e.archivoEntrega, e.comentario,
+                    e.nombreOriginal, e.urlArchivo, e.comentario,
                     u.nombre AS estudiante, est.codigoEst, est.idEstudiante,
                     act.titulo AS actividad, act.puntaje_max, act.idActividad
              FROM entregas e
@@ -515,15 +515,23 @@ class ProfesorController extends Controller {
 
         $urlArchivo     = '';
         $nombreOriginal = '';
-        $tamano         = 0;
 
         if ($tipo === 'enlace') {
             if (!$enlace) $this->error('El enlace es requerido para tipo enlace');
             $urlArchivo = $enlace;
         } else {
             if (empty($_FILES['archivo']['name'])) $this->error('Archivo requerido');
-            if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
-                $this->error('Error en la subida: código ' . $_FILES['archivo']['error']);
+            if (($_FILES['archivo']['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+                $codigo = (int)$_FILES['archivo']['error'];
+                $mensajes = [
+                    UPLOAD_ERR_INI_SIZE   => 'El archivo supera el límite del servidor (' . ini_get('upload_max_filesize') . ').',
+                    UPLOAD_ERR_FORM_SIZE  => 'El archivo supera el tamaño permitido por el formulario.',
+                    UPLOAD_ERR_PARTIAL    => 'La subida se interrumpió. Intenta de nuevo.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'El servidor no tiene directorio temporal configurado.',
+                    UPLOAD_ERR_CANT_WRITE => 'El servidor no pudo escribir el archivo. Revisa permisos de uploads.',
+                    UPLOAD_ERR_EXTENSION  => 'Una extensión de PHP bloqueó la subida.',
+                ];
+                $this->error($mensajes[$codigo] ?? "Error en la subida (código $codigo)");
             }
 
             // Whitelist de extensiones por tipo
@@ -545,25 +553,30 @@ class ProfesorController extends Controller {
             }
 
             $uploadDir = BASE_PATH . '/uploads/materiales/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+                $this->error('No existe la carpeta uploads/materiales y no se pudo crear', 500);
+            }
+            if (!is_writable($uploadDir)) {
+                $this->error('La carpeta uploads/materiales no tiene permisos de escritura', 500);
+            }
 
             // Nombre único — preserva extensión original
             $nombreArchivo  = 'mat_' . $idAula . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
             $urlArchivo     = 'uploads/materiales/' . $nombreArchivo;
             $nombreOriginal = $_FILES['archivo']['name'];
-            $tamano         = (int)$_FILES['archivo']['size'];
 
             if (!move_uploaded_file($_FILES['archivo']['tmp_name'], BASE_PATH . '/' . $urlArchivo)) {
-                $this->error('No se pudo guardar el archivo en el servidor');
+                $this->error('No se pudo guardar el archivo en el servidor. Revisa permisos y espacio en disco.', 500);
             }
         }
 
+        // La tabla materiales no tiene columna `tamano`. No incluirla.
         $db->prepare(
             "INSERT INTO materiales
-             (idAula, idProfesor, titulo, descripcion, tipo, urlArchivo, nombreOriginal, tamano)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+             (idAula, idProfesor, titulo, descripcion, tipo, urlArchivo, nombreOriginal)
+             VALUES (?, ?, ?, ?, ?, ?, ?)"
         )->execute([$idAula, $this->idProf, $titulo, $descripcion, $tipoEnum,
-                    $urlArchivo, $nombreOriginal, $tamano]);
+                    $urlArchivo, $nombreOriginal]);
 
         $idMaterial = (int)$db->lastInsertId();
 
@@ -702,12 +715,14 @@ class ProfesorController extends Controller {
         $check->execute([$idActividad, $this->idProf]);
         if (!$check->fetch()) $this->error('Actividad no encontrada o sin permiso', 403);
 
-        // Eliminar archivos de entregas asociadas
-        $entregas = $db->prepare("SELECT archivoEntrega FROM entregas WHERE idActividad = ?");
+        // Eliminar archivos de entregas asociadas (urlArchivo o legado archivoEntrega)
+        $entregas = $db->prepare("SELECT urlArchivo, archivoEntrega FROM entregas WHERE idActividad = ?");
         $entregas->execute([$idActividad]);
         foreach ($entregas->fetchAll() as $e) {
-            if ($e['archivoEntrega']) {
-                $ruta = BASE_PATH . '/' . $e['archivoEntrega'];
+            $rutaRel = trim((string)($e['urlArchivo'] ?? ''));
+            if ($rutaRel === '') $rutaRel = trim((string)($e['archivoEntrega'] ?? ''));
+            if ($rutaRel !== '') {
+                $ruta = BASE_PATH . '/' . ltrim($rutaRel, '/');
                 if (file_exists($ruta)) unlink($ruta);
             }
         }

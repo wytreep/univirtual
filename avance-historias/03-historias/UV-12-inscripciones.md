@@ -126,7 +126,8 @@ Cumple el criterio funcional, aunque el texto puede acortarse a “El estudiante
 - [x] Notificar al estudiante.
 - [x] Listar inscritos y disponibles.
 - [x] Restricción única en BD.
-- [x] Interfaz administrativa.
+- [x] Tope de 20 créditos por semestre con motivo explícito.
+- [x] Interfaz administrativa con botón deshabilitado cuando no cumple.
 
 ---
 
@@ -136,8 +137,8 @@ Cumple el criterio funcional, aunque el texto puede acortarse a “El estudiante
 |---|---|---|---|
 | 1 | La validación de duplicado y el INSERT no están en una transacción. | Bajo: la restricción única evita duplicados, pero el mensaje sería genérico. | Envolver en transacción y capturar `1062`. |
 | 2 | El mensaje no coincide literalmente con el criterio. | Bajo. | Ajustar el texto. |
-| 3 | No se valida el cupo máximo ni el máximo de créditos del semestre (`creditos_max_semestre`). | Medio. | Añadir validación en el refactor. |
-| 4 | No se valida que la materia esté activa. | Bajo. | Añadir `AND activa = 1`. |
+| 3 | ~~No se valida el cupo máximo ni el máximo de créditos del semestre (`creditos_max_semestre`).~~ | ✅ Corregido: tope de 20 créditos, `creditos_inscritos`, `creditos_disponibles` y `motivo` por estudiante. | Verificado el 6 nov 2026. |
+| 4 | ~~No se valida que la materia esté activa.~~ | ✅ Corregido: se rechaza materia inactiva y el listado de disponibles lo explica. | Verificado en original y copia. |
 | 5 | El endpoint exige rol admin; un directivo no puede inscribir. | Decisión de negocio. | Documentar o ampliar roles. |
 
 ---
@@ -146,4 +147,4 @@ Cumple el criterio funcional, aunque el texto puede acortarse a “El estudiante
 
 **Avance: 100%.**
 
-**Cumple.** La inscripción con validación de créditos es una de las funcionalidades mejor cerradas del avance. Las observaciones son de robustez y reglas de negocio adicionales.
+**Cumple.** La inscripción con validación de créditos es una de las funcionalidades mejor cerradas del avance. Además del requisito de créditos aprobados, la copia y el original limitan la carga a **20 créditos por semestre** y explican el motivo cuando no se puede inscribir. Las observaciones restantes son de robustez (transacción y captura de `1062`).

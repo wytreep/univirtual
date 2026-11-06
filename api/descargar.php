@@ -63,7 +63,7 @@ if ($tipo === 'material') {
         'titulo'          => $row['titulo'],
         'nombreOriginal'  => $row['nombreOriginal'] ?: basename($ruta),
         'ruta'            => $ruta,
-        'tamano'          => (int)$row['tamano'],
+        'tamano'          => file_exists($ruta) ? (int)filesize($ruta) : 0,
         'materia'         => $row['nombreMateria'] . ' (' . $row['codigo'] . ')',
         'profesor'        => $row['nombreProfesor'],
         'tipo_archivo'    => $row['tipo'],
@@ -94,7 +94,10 @@ if ($tipo === 'entrega') {
     if (!$row || (int)$row['idProfesor'] !== (int)$_SESSION['idEspecifico']) {
         http_response_code(403); die('Sin acceso.');
     }
-    $ruta = BASE_PATH . '/' . ltrim($row['archivoEntrega'], '/');
+    // Compatibilidad: las entregas nuevas usan urlArchivo; las antiguas archivoEntrega.
+    $rutaRel = trim((string)($row['urlArchivo'] ?? ''));
+    if ($rutaRel === '') $rutaRel = trim((string)($row['archivoEntrega'] ?? ''));
+    $ruta = BASE_PATH . '/' . ltrim($rutaRel, '/');
     $meta = [
         'titulo'         => 'Entrega: ' . $row['tituloActividad'],
         'nombreOriginal' => $row['nombreOriginal'] ?: basename($ruta),

@@ -519,13 +519,14 @@ const VideollamadasAdmin=()=>{
         <tbody>
           {vlLista.length===0&&<tr><td colSpan="5" style={{textAlign:'center',padding:24,color:'var(--muted)'}}>No hay videollamadas registradas</td></tr>}
           {vlLista.map(v=>{
+            const est=v.estadoCalculado||v.estado||'finalizada';
             const estado={en_curso:<span className="tag tag-ok" style={{background:'#e8f5ee',color:'#1a7a48'}}>En curso</span>, programada:<span className="tag tag-blue">Programada</span>, finalizada:<span className="tag tag-err" style={{background:'#f4f5f8',color:'#6b7a99'}}>Finalizada</span>};
             return <tr key={v.idVideoLlamada}>
-              <td><div style={{fontWeight:600}}>{v.materia}</div><code style={{fontSize:11}}>{v.codigo}</code></td>
-              <td>{v.nombreProfesor}</td>
+              <td><div style={{fontWeight:600}}>{v.materia}</div><code style={{fontSize:11}}>{v.codigoMateria||v.codigo}</code></td>
+              <td>{v.profesor||v.nombreProfesor}</td>
               <td>{v.titulo}</td>
-              <td style={{fontSize:12,color:'var(--muted)'}}>{v.programada_en.slice(0,16).replace('T',' ')}<br/>{v.duracion_min} min</td>
-              <td>{estado[v.estado]||<span className="tag tag-err" style={{background:'#f4f5f8',color:'#6b7a99'}}>Finalizada</span>}</td>
+              <td style={{fontSize:12,color:'var(--muted)'}}>{String(v.programada_en).slice(0,16).replace('T',' ')}<br/>{v.duracion_min} min</td>
+              <td>{estado[est]||<span className="tag tag-err" style={{background:'#f4f5f8',color:'#6b7a99'}}>Finalizada</span>}</td>
             </tr>;
           })}
         </tbody>

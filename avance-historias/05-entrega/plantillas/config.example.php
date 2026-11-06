@@ -10,6 +10,11 @@
  * Requisitos: PHP 8.x, MySQL 8, Apache (XAMPP).
  */
 
+// --- Zona horaria ---------------------------------------------------------
+// Debe coincidir con la de MySQL (America/Bogota). Si no, las videollamadas
+// y las notificaciones comparan fechas con horas distintas.
+date_default_timezone_set('America/Bogota');
+
 // --- Conexión MySQL -------------------------------------------------------
 define('DB_HOST', '127.0.0.1');
 define('DB_PORT', '3307');        // XAMPP suele usar 3307; si tu MySQL usa 3306, cámbialo

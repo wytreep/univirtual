@@ -136,7 +136,7 @@ $estado   = $nota === null ? 'en_curso' : ($nota >= 3.0 ? 'aprobado' : 'reproban
 - [x] Consultar notas con promedio.
 - [x] Calcular estado por materia.
 - [x] Calificar entrega con feedback.
-- [ ] Listar entregas con el esquema v8.
+- [x] Listar entregas con el esquema v8 (`urlArchivo`).
 
 ---
 
@@ -145,18 +145,18 @@ $estado   = $nota === null ? 'en_curso' : ($nota >= 3.0 ? 'aprobado' : 'reproban
 | # | Observación | Impacto | Recomendación |
 |---|---|---|---|
 | 1 | `guardarNota()` declara `$campo` y `$nota` dos veces (líneas 393–394 y 405–406). | Bajo: código redundante. | Eliminar duplicados. |
-| 2 | No se valida que el profesor sea dueño de la materia/inscripción. | Alto: un profesor podría modificar notas de otra materia conociendo IDs. | Verificar `materias.idProfesor = idProfesorSesion`. |
-| 3 | La calificación de entregas usa `entregas.nota`, pero el listado de entregas usa `archivoEntrega`. | El tab Calificar puede fallar antes de calificar. | Unificar `urlArchivo`. |
+| 2 | ~~No se valida que el profesor sea dueño de la materia/inscripción.~~ | ✅ Corregido: `guardarNota` y `calificarEntrega` filtran por `idProfesor`; prueba con profesor ajeno devuelve 403. | Verificado el 6 nov 2026. |
+| 3 | ~~La calificación de entregas usa `entregas.nota`, pero el listado de entregas usa `archivoEntrega`.~~ | ✅ Corregido: listado, calificación y descarga usan `urlArchivo`, con respaldo para datos antiguos. | Verificado en original y copia. |
 | 4 | `nota_final` no se calcula automáticamente. | El profesor debe ingresarla. | Calcular o sugerir con ponderación configurable. |
 | 5 | No hay historial de cambios de nota. | Bajo para el alcance; alto para auditoría. | Añadir tabla de auditoría en el futuro. |
 | 6 | El promedio del estudiante no pondera créditos. | Indicador aproximado. | Documentar o ponderar. |
 
-> La observación 2 es la más importante: hoy la seguridad se apoya en que el frontend solo muestra las materias del profesor, pero la API no verifica la pertenencia en `guardarNota`. Debe corregirse en el refactor.
+> Las observaciones 2 y 3 quedaron corregidas y probadas el 6 de noviembre de 2026: la API valida la propiedad de la materia y la calificación de entregas usa `urlArchivo`. El detalle está en `06-anexos/correcciones-demo.md`.
 
 ---
 
 ## 6. Avance
 
-**Avance: 85%.** El registro, la consulta y el bloqueo de créditos están verificados en la copia ejecutable (nota persiste, nota sobre materia ajena responde 403).
+**Avance: 85%.** El registro, la consulta y la calificación de entregas están verificados en original y copia: la nota persiste, se genera la notificación y una entrega de otro profesor responde 403.
 
-**Cumple parcialmente.** El registro, la actualización y la consulta de notas funcionan. La calificación de entregas y la autorización por materia requieren corrección antes de considerar la historia totalmente cerrada.
+**Cumple parcialmente.** El registro, la actualización, la consulta y la calificación de entregas funcionan. Queda como deuda el cálculo automático de `nota_final`, el historial de cambios y la suite E2E.

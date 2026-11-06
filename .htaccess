@@ -1,0 +1,17 @@
+# UNI-VIRTUAL — límites de subida para materiales, entregas y grabaciones.
+# XAMPP carga PHP como mod_php (php_module).
+<IfModule php_module>
+    php_value upload_max_filesize 200M
+    php_value post_max_size 210M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+<IfModule mod_php.c>
+    php_value upload_max_filesize 200M
+    php_value post_max_size 210M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+
+# Evitar listados de directorios
+Options -Indexes

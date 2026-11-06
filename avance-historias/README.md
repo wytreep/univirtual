@@ -5,7 +5,7 @@
 **Corte:** 31 de octubre de 2026  
 **Alcance:** las historias de usuario **ya vencidas** (sprints 1 y 2, cerrados al 30 oct) y las **próximas a vencer** (Sprint 3, vence el 13 nov)  
 **Historias cubiertas:** 17 — vencidas: UV-8, UV-25, UV-26, UV-27, UV-28, UV-29, UV-30, UV-9, UV-10, UV-11, UV-12, UV-13, UV-32 · próximas: UV-16, UV-18, UV-19, UV-31  
-**Versión del documento:** 2.0
+**Versión del documento:** 2.1 (correcciones post-demo del 6 de noviembre)
 
 > **Importante:** esta entrega no declara los sprints 1 y 2 como completos ni cubre todas sus historias. Se enfoca en las **HUs que ya vencieron** y en las que **vencen pronto** (Sprint 3, 13 nov), para mostrar el avance real de esas historias.
 
@@ -68,6 +68,8 @@ avance-historias/
     ├── inventario-evidencias.md      ← archivos y rutas verificadas
     ├── guion-diagramas.md            ← guion para explicar los diagramas
     ├── guion-james.md                ← guion completo de apertura, Gantt y cierre
+    ├── guion-edwin.md                ← arquitectura, calificación y anexo de fallos
+    ├── correcciones-demo.md          ← los 5 fallos de la demo: causa, arreglo y prueba
     ├── diagramas/                    ← PNG, fuentes PlantUML y galería
     └── glosario.md                   ← términos del dominio y técnicos
 ```
@@ -87,7 +89,8 @@ avance-historias/
 - **Cobertura documental:** 17/17 HU con ficha, criterios y evidencia.
 - **Cobertura funcional:** de las 13 vencidas, 12/13 con implementación verificable en el repositorio (92%); de las 4 próximas, 3/4 con flujo verificable (75%).
 - **Bloqueo identificado:** la creación de usuarios desde el panel admin (UV-9) no completa el flujo por una incompatibilidad entre el formulario, el controlador y el esquema v8. El diagnóstico y el parche propuesto están en [`03-historias/UV-09-crud-usuarios.md`](03-historias/UV-09-crud-usuarios.md).
-- **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026).
+- **Correcciones post-demo (6 nov 2026):** se corrigieron y verificaron en el proyecto original y en la copia los cinco fallos observados en clase: zona horaria, columna `creado_en`, `roomName` duplicado, `archivoEntrega` frente a `urlArchivo` y columnas inexistentes en materiales/grabaciones. El detalle está en [`06-anexos/correcciones-demo.md`](06-anexos/correcciones-demo.md).
+- **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026); los archivos corregidos se volvieron a validar el 6 nov 2026.
 - **Pruebas automatizadas:** última ejecución registrada 23/23 aprobadas (24 abr 2026, Selenium). La re-ejecución contra el estado actual está pendiente y se describe en [`04-pruebas/resultados.md`](04-pruebas/resultados.md).
 
 > **Lectura recomendada para la entrega:** primero este README, luego `00-resumen-ejecutivo.md`, después `01-gestion/matriz-historias.md` y finalmente las fichas de las HU que se van a demostrar.
@@ -165,4 +168,4 @@ Estas historias no se declaran cerradas: se entrega el **avance anticipado** con
 
 ## 7. Nota de transparencia
 
-El repositorio contiene una base funcional heredada (v8) sobre la que se montan las historias de este avance. Durante la auditoría se encontraron **inconsistencias de esquema** entre el código y `config/database_v8.sql` (por ejemplo `programa` vs `idCarrera`, `archivoEntrega` vs `urlArchivo`). Se documentan con severidad y propuesta de corrección en `05-entrega/riesgos-y-deuda.md`. No se ocultaron: forman parte del avance y son la entrada natural al refactor solicitado.
+El repositorio contiene una base funcional heredada (v8) sobre la que se montan las historias de este avance. Durante la auditoría se encontraron **inconsistencias de esquema** entre el código y `config/database_v8.sql` (por ejemplo `programa` vs `idCarrera`, `archivoEntrega` vs `urlArchivo`). Varias se manifestaron en la demo de clase y ya están corregidas y probadas en el original y en la copia; el resto se documenta con severidad y propuesta en `05-entrega/riesgos-y-deuda.md`. No se ocultaron: forman parte del avance y son la entrada natural al refactor solicitado.

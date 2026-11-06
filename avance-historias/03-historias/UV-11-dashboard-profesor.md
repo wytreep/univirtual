@@ -129,7 +129,7 @@ ORDER BY m.nombre
 - [x] Entregas sin calificar.
 - [x] Aula virtual con tabs.
 - [x] Acceso restringido por rol.
-- [ ] Listado de entregas compatible con el esquema v8.
+- [x] Listado de entregas compatible con el esquema v8 (`urlArchivo`).
 
 ---
 
@@ -137,16 +137,16 @@ ORDER BY m.nombre
 
 | # | Observación | Impacto | Recomendación |
 |---|---|---|---|
-| 1 | `entregas()` selecciona `e.archivoEntrega`, pero v8 define `urlArchivo`. | El tab Calificar falla al listar entregas. | Renombrar la columna en la consulta. |
-| 2 | `eliminarActividad()` también consulta `archivoEntrega` para borrar archivos. | No elimina los archivos físicos correctamente. | Usar `urlArchivo`. |
+| 1 | ~~`entregas()` selecciona `e.archivoEntrega`, pero v8 define `urlArchivo`.~~ | ✅ Corregido: el listado usa `urlArchivo` y la calificación funciona. | Verificado el 6 nov 2026. |
+| 2 | ~~`eliminarActividad()` también consulta `archivoEntrega` para borrar archivos.~~ | ✅ Corregido: usa `urlArchivo` con respaldo para datos antiguos. | Verificado en original y copia. |
 | 3 | El dashboard no muestra un gráfico de progreso; solo tarjetas. | Menor riqueza visual. | Añadir Chart.js en Sprint 4. |
-| 4 | El profesor puede ver materias de otros si conoce el `idAula`; `aula()` valida pertenencia, `entregas()` no lo hace explícitamente. | Riesgo de acceso a datos ajenos. | Validar `idProfesor` en `entregas()`. |
+| 4 | ~~El profesor puede ver materias de otros si conoce el `idAula`; `entregas()` no lo hace explícitamente.~~ | ✅ Corregido: `entregas()` valida `idProfesor` y responde 403. | Verificado el 6 nov 2026. |
 | 5 | El tab Reportes apunta a endpoints que pueden depender de FPDF. | Puede fallar si FPDF no está instalado. | Verificar fallback HTML. |
 
 ---
 
 ## 6. Avance
 
-**Avance: 90%.** Verificado también en la copia ejecutable, donde la lista de entregas ya responde con `urlArchivo`.
+**Avance: 90%.** Verificado en original y copia: la lista de entregas responde con `urlArchivo`, la descarga funciona y el profesor solo ve sus materias.
 
-**Cumple parcialmente.** El dashboard y el aula son funcionales; el listado de entregas arrastra la incompatibilidad de columna. Corregir `archivoEntrega → urlArchivo` cierra la observación y habilita la calificación de entregas.
+**Cumple parcialmente.** El dashboard y el aula son funcionales; las observaciones 1, 2 y 4 quedaron corregidas. La deuda restante es visual (Chart.js) y la suite E2E.

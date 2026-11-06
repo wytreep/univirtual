@@ -1,5 +1,7 @@
 # Resultados de pruebas — corte 31 de octubre de 2026
 
+> **Estado vigente (6 nov 2026):** este documento conserva la corrida del corte. Los fallos de integración que afectaban CP-13 y CP-25 ya están corregidos y verificados en original y copia; ver **§9**. Las suites Selenium/API siguen pendientes de re-ejecución.
+
 | Campo | Valor |
 |---|---|
 | Fecha del corte | 31 de octubre de 2026 |
@@ -196,3 +198,35 @@ El detalle está en `05-entrega/ejecutable.md`.
 ## 8. Conclusión
 
 El sistema sostiene 27 de 30 criterios con evidencia de código o historial. Los tres restantes no son fallos difusos: tienen causa identificada, archivo y línea, y un parche propuesto. La entrega es honesta al declarar que la corrida completa queda pendiente por el entorno detenido.
+
+---
+
+## 9. Verificación post-demo — 6 de noviembre de 2026
+
+Con Apache y MySQL activos se repitieron los flujos que fallaron en la demo de clase, **en el proyecto original y en la copia ejecutable**. El detalle de causa y arreglo está en `06-anexos/correcciones-demo.md`.
+
+| Prueba | Original | Copia | Evidencia |
+|---|---|---|---|
+| `health.php` | — (no existe) | ✅ | HTTP 200 en la copia |
+| Crear videollamada como profesor | ✅ 200 | ✅ 200 | Fila en `videollamadas` |
+| Crear videollamada como admin | ✅ 403 | ✅ 403 | Mensaje de permisos |
+| Segunda sala a la misma hora | ✅ 200 | ✅ 200 | `roomName` con sufijo `-2` |
+| Notificación al inscrito | ✅ | ✅ | Fila con `creado_en` |
+| Profesor ajeno finaliza | ✅ 403 | ✅ 403 | Sin cambios en la fila |
+| Disponibilidad 10 min antes | ✅ | ✅ | `puedeUnirse = 1` |
+| Subir material | ✅ 200 | ✅ 200 | Fila en `materiales` |
+| Subir entrega | ✅ 200 | ✅ 200 | Fila con `urlArchivo` |
+| Descargar entrega | ✅ 200 PDF | ✅ 200 PDF | `application/pdf` |
+| Inscripción sobre 20 créditos | ✅ 400 | ✅ 400 | Motivo explícito |
+| Límite de subida | ✅ 200M/210M | ✅ 200M/210M | `.htaccess` |
+
+**Casos actualizados:**
+
+| Caso | Antes | Ahora |
+|---|---|---|
+| CP-13 Dashboard profesor | 🟡 por `archivoEntrega` | ✅ listado y calificación con `urlArchivo` |
+| CP-25 Calificar entrega | ⛔ bloqueado | ✅ califica, descarga y notifica |
+| CP-19 Créditos mínimos | ✅ | ✅ + tope de 20 créditos y motivo |
+| CP-16 Videollamadas | ✅ historial | ✅ verificado en vivo, con permisos y sala única |
+
+**Lo que sigue pendiente:** re-ejecutar `test_univirtual.py`, `test_refactor_api.py` y `test_refactor_e2e.py`; CP-06 y CP-07 siguen fallando **solo en el original** porque el parche de UV-9 no se replicó allí.

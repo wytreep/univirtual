@@ -215,7 +215,28 @@ const Aula=({materia,onBack})=>{
       .then(r=>{if(r.status==='ok'){const m={};(r.data||[]).forEach(a=>m[a.idEstudiante]=a.asistio);setAsistenciaFecha(m);}});
   },[materia,fechaAsist]);
   useEffect(()=>{if(tab==='asistencia')cargarAsistFecha();},[tab,cargarAsistFecha]);
-  const subirMat=async()=>{const inp=document.getElementById('mat-file');if(!inp?.files[0]||!fmMat.titulo)return setAlerta({type:'err',msg:'Título y archivo requeridos'});const fd=new FormData();fd.append('action','subir_material');fd.append('idAula',materia.idAula);fd.append('idProf',idProf);fd.append('titulo',fmMat.titulo);fd.append('tipo',fmMat.tipo);fd.append('descripcion',fmMat.descripcion);fd.append('archivo',inp.files[0]);setSaving(true);const r=await api.post('/profesor.php',fd,true);setSaving(false);if(r.status==='ok'){setModalMat(false);cargar();setAlerta({type:'ok',msg:'Material publicado'});}else setAlerta({type:'err',msg:r.mensaje});};
+  const subirMat=async()=>{
+    const inp=document.getElementById('mat-file');
+    const file=inp?.files?.[0];
+    if(!file||!fmMat.titulo)return setAlerta({type:'err',msg:'Título y archivo requeridos'});
+    if(file.size>200*1024*1024)return setAlerta({type:'err',msg:'El archivo supera el límite de 200 MB'});
+    const fd=new FormData();
+    fd.append('action','subir_material');fd.append('idAula',materia.idAula);fd.append('idProf',idProf);
+    fd.append('titulo',fmMat.titulo);fd.append('tipo',fmMat.tipo);fd.append('descripcion',fmMat.descripcion);
+    fd.append('archivo',file);
+    setSaving(true);
+    try{
+      const r=await api.post('/profesor.php',fd,true);
+      if(r.status==='ok'){
+        setModalMat(false);cargar();setAlerta({type:'ok',msg:'Material publicado correctamente'});
+        if(inp)inp.value='';
+      }else setAlerta({type:'err',msg:r.mensaje||'No se pudo publicar el material'});
+    }catch(e){
+      setAlerta({type:'err',msg:'No se pudo subir el archivo. Revisa el tamaño o la conexión.'});
+    }finally{
+      setSaving(false);
+    }
+  };
   const crearAct=async()=>{if(!fmAct.titulo||!fmAct.fechaEntrega)return setAlerta({type:'err',msg:'Título y fecha requeridos'});setSaving(true);const r=await api.post('/profesor.php',{action:'crear_actividad',idAula:materia.idAula,idProf,...fmAct});setSaving(false);if(r.status==='ok'){setModalAct(false);cargar();setAlerta({type:'ok',msg:'Actividad creada'});}else setAlerta({type:'err',msg:r.mensaje});};
   const crearForo=async()=>{if(!fmForo.titulo)return;setSaving(true);const r=await api.post('/profesor.php',{action:'crear_foro',idAula:materia.idAula,idProf,...fmForo});setSaving(false);if(r.status==='ok'){setModalForo(false);cargar();setAlerta({type:'ok',msg:'Foro creado'});}else setAlerta({type:'err',msg:r.mensaje});};
   const pubMsg=async(idForo)=>{const msg=fmMsg[idForo];if(!msg?.trim())return;await api.post('/profesor.php',{action:'publicar_mensaje',idForo,contenido:msg,idProf});setFmMsg({...fmMsg,[idForo]:''});cargar();};
@@ -593,7 +614,7 @@ const Aula=({materia,onBack})=>{
     {modalCalif&&<Modal title={`📝 Calificar: ${modalCalif.estudiante}`} onClose={()=>setModalCalif(null)} footer={<><button className="btn btn-outline" onClick={()=>setModalCalif(null)}>Cancelar</button><button className="btn btn-primary" onClick={califEntrega} disabled={saving}>{saving?'Guardando...':'💾 Guardar Nota'}</button></>}>
       <div className="form-group"><label className="form-label">Nota (0–{modalCalif.puntaje_max||5})</label><input type="number" className="form-input" min={0} max={modalCalif.puntaje_max||5} step={0.1} value={fmCalif.nota} onChange={e=>setFmCalif({...fmCalif,nota:e.target.value})}/></div>
       <div className="form-group"><label className="form-label">Retroalimentación</label><textarea className="form-input" rows={3} value={fmCalif.feedback} onChange={e=>setFmCalif({...fmCalif,feedback:e.target.value})}/></div>
-      {modalCalif.archivoEntrega&&<a href={`/univirtual/api/descargar.php?id=${modalCalif.idEntrega}&tipo=entrega&preview=1`} className="btn btn-outline btn-sm" target="_blank">📄 Ver entrega</a>}
+      {modalCalif.urlArchivo&&<a href={`/univirtual/api/descargar.php?id=${modalCalif.idEntrega}&tipo=entrega&preview=1`} className="btn btn-outline btn-sm" target="_blank">📄 Ver entrega</a>}
     </Modal>}
   </div>;
 };

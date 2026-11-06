@@ -42,6 +42,7 @@
 | Evento: nota guardada | `api/v1/profesor.php` (430) | Notifica la materia y el campo de nota. |
 | Evento: nuevo material | `api/v1/profesor.php` (583) | Notifica a los inscritos de la materia. |
 | Evento: actividad | `api/v1/profesor.php` (674) | Notifica sobre la actividad del aula. |
+| Evento: videollamada | `api/v1/videollamadas.php` | Notifica a los inscritos al programar la clase, con `creado_en`. |
 | Lectura y marcado | `api/v1/estudiante.php` | `action=notificaciones` y `mark_notifs` con URL de destino. |
 | Polling | `pages/*/dashboard.php` | `setInterval` de 30 segundos en estudiante, profesor y directivo. |
 | Clic → navega | dashboards | La notificación abre su `url` asociada. |
@@ -51,9 +52,10 @@
 ## 4. Lo logrado / Pendiente
 
 **Lo logrado**
-- 5 eventos académicos ya emiten notificación real.
+- 6 eventos académicos ya emiten notificación real, incluido videollamada.
 - Polling de 30s en los tres paneles; sin recarga de página.
 - Clic en la notificación navega al contenido (URL de destino).
+- El `INSERT` usa la columna real `creado_en` y la creación de la clase es transaccional.
 
 **Pendiente**
 - Eventos de foro y mensajería (depende de UV-19).
@@ -72,4 +74,4 @@
 
 ## 6. Avance
 
-**85%.** El núcleo de notificaciones por evento está operativo con cinco tipos de evento más polling. Lo que resta del alcance del Sprint 3 es extender eventos (foros, mensajería) y tests.
+**85%.** El núcleo de notificaciones por evento está operativo con seis tipos de evento más polling; el fallo de `creada_en` se corrigió y se verificó el 6 nov 2026. Lo que resta del alcance del Sprint 3 es extender eventos (foros, mensajería) y tests.

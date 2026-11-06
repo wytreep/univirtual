@@ -29,6 +29,11 @@
 | D-18 | Trazabilidad | D | `06-anexos/trazabilidad.md` | ✅ |
 | D-19 | Inventario | D | `06-anexos/inventario-evidencias.md` | ✅ |
 | D-20 | Glosario | D | `06-anexos/glosario.md` | ✅ |
+| D-21 | Guion de James | D | `06-anexos/guion-james.md` | ✅ |
+| D-22 | Guion de Edwin | D | `06-anexos/guion-edwin.md` | ✅ |
+| D-23 | Correcciones post-demo | D | `06-anexos/correcciones-demo.md` | ✅ |
+| D-24 | Guía de la copia ejecutable | D | `05-entrega/ejecutable.md` | ✅ |
+| D-25 | Guion de diagramas | D | `06-anexos/guion-diagramas.md` | ✅ |
 
 ---
 
@@ -97,6 +102,8 @@
 | P-07 | Plan de pruebas | D | `04-pruebas/plan-pruebas.md` | ✅ |
 | P-08 | Casos CP-01..CP-30 | D | `04-pruebas/casos-aceptacion.md` | ✅ |
 | P-09 | Resultados del corte | D | `04-pruebas/resultados.md` | ✅ |
+| P-10 | Verificación post-demo en original y copia | P | `04-pruebas/resultados.md` §9 | ✅ |
+| P-11 | Datos de demo de calificación | S | `uploads/entregas/t2_is201_laura.pdf` + `entregas` id 8 | ✅ |
 
 ---
 
@@ -128,7 +135,7 @@
 
 | # | Evidencia | Motivo | Acción |
 |---|---|---|---|
-| 1 | Capturas de la demo | Apache/MySQL detenidos | Tomar al re-ejecutar. |
+| 1 | Capturas de la demo | Pendientes de tomar en el ensayo | Tomar el 6 nov antes de exponer. |
 | 2 | Salida de `pytest` del corte | Entorno detenido | Adjuntar log. |
 | 3 | Cobertura | No medida | Añadir `pytest-cov`. |
 | 4 | Prueba de creación de usuario | UV-9 con parche aplicado solo en la copia ejecutable | Añadir al original tras propagar el parche. |

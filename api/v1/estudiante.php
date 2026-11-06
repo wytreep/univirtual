@@ -337,39 +337,77 @@ public function handle(): void {
         $ya->execute([$idActividad, $this->idEst]);
         if ($ya->fetch()) $this->error('Ya has entregado esta actividad');
 
-        // Verificar fecha límite
+        // Fecha límite: la entrega se registra aunque sea extemporánea,
+        // para no perder el trabajo del estudiante. El profesor ve la fecha real.
         $act = $db->prepare("SELECT fechaEntrega FROM actividades WHERE idActividad = ?");
         $act->execute([$idActividad]);
         $actividad = $act->fetch();
         if (!$actividad) $this->error('Actividad no encontrada', 404);
-        if (strtotime($actividad['fechaEntrega']) < time()) {
-            $this->error('La fecha límite de entrega ha pasado');
+        $extemporanea = strtotime($actividad['fechaEntrega']) < time();
+
+        if (empty($_FILES['archivo']['name'])) {
+            $this->error('Selecciona un archivo para entregar');
         }
 
-        $archivoPath    = '';
-        $nombreOriginal = '';
+        $file = $_FILES['archivo'];
+        $codigoError = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+        if ($codigoError !== UPLOAD_ERR_OK) {
+            $mensajes = [
+                UPLOAD_ERR_INI_SIZE   => 'El archivo supera el límite del servidor (' . ini_get('upload_max_filesize') . ').',
+                UPLOAD_ERR_FORM_SIZE  => 'El archivo supera el tamaño permitido por el formulario.',
+                UPLOAD_ERR_PARTIAL    => 'La subida se interrumpió. Intenta de nuevo.',
+                UPLOAD_ERR_NO_FILE    => 'Selecciona un archivo para entregar.',
+                UPLOAD_ERR_NO_TMP_DIR => 'El servidor no tiene directorio temporal configurado.',
+                UPLOAD_ERR_CANT_WRITE => 'El servidor no pudo escribir el archivo. Revisa permisos de uploads.',
+                UPLOAD_ERR_EXTENSION  => 'Una extensión de PHP bloqueó la subida.',
+            ];
+            $this->error($mensajes[$codigoError] ?? "Error en la subida (código $codigoError)", 422);
+            return;
+        }
 
-        // Manejar archivo si viene
-        if (!empty($_FILES['archivo']['name'])) {
-            $uploadDir = BASE_PATH . '/uploads/entregas/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        $maxMB = 200;
+        if ($file['size'] > $maxMB * 1024 * 1024) {
+            $this->error("El archivo supera el límite de {$maxMB} MB", 422);
+            return;
+        }
 
-            $ext            = pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
-            $nombreArchivo  = 'entrega_' . $this->idEst . '_' . $idActividad . '_' . time() . '.' . $ext;
-            $archivoPath    = 'uploads/entregas/' . $nombreArchivo;
-            $nombreOriginal = $_FILES['archivo']['name'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['pdf','doc','docx','xls','xlsx','ppt','pptx','odp','txt','csv',
+                       'sql','zip','rar','7z','png','jpg','jpeg','gif','webp','mp4','webm'];
+        if (!in_array($ext, $permitidas, true)) {
+            $this->error("La extensión .$ext no está permitida", 422);
+            return;
+        }
 
-            if (!move_uploaded_file($_FILES['archivo']['tmp_name'], BASE_PATH . '/' . $archivoPath)) {
-                $this->error('Error al guardar el archivo');
-            }
+        $uploadDir = BASE_PATH . '/uploads/entregas/';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+            $this->error('No existe la carpeta uploads/entregas y no se pudo crear', 500);
+            return;
+        }
+        if (!is_writable($uploadDir)) {
+            $this->error('La carpeta uploads/entregas no tiene permisos de escritura', 500);
+            return;
+        }
+
+        $nombreArchivo  = 'entrega_' . $this->idEst . '_' . $idActividad . '_' . time()
+                        . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $archivoPath    = 'uploads/entregas/' . $nombreArchivo;
+        $nombreOriginal = basename($file['name']);
+
+        if (!move_uploaded_file($file['tmp_name'], BASE_PATH . '/' . $archivoPath)) {
+            $this->error('No se pudo guardar el archivo. Revisa los permisos de uploads/entregas.', 500);
+            return;
         }
 
         $db->prepare(
-            "INSERT INTO entregas (idActividad, idEstudiante, archivoEntrega, nombreOriginal, comentario)
+            "INSERT INTO entregas (idActividad, idEstudiante, urlArchivo, nombreOriginal, comentario)
              VALUES (?, ?, ?, ?, ?)"
         )->execute([$idActividad, $this->idEst, $archivoPath, $nombreOriginal, $comentario]);
 
-        $this->ok(['idEntrega' => (int)$db->lastInsertId()], 'Actividad entregada exitosamente');
+        $this->ok(
+            ['idEntrega' => (int)$db->lastInsertId(), 'extemporanea' => $extemporanea],
+            $extemporanea ? 'Entrega registrada fuera de plazo' : 'Actividad entregada exitosamente'
+        );
     }
 
     // ── POST publicar_mensaje ─────────────────────────────────────────────────

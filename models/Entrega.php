@@ -13,7 +13,7 @@ class Entrega extends Model {
     public int    $idEntrega;
     public int    $idActividad;
     public int    $idEstudiante;
-    public string $archivoEntrega;
+    public string $urlArchivo;
     public string $nombreOriginal;
     public ?string $comentario;
     public ?float  $nota;
@@ -24,17 +24,17 @@ class Entrega extends Model {
      * Registra una nueva entrega (o actualiza si ya existe — ON DUPLICATE KEY).
      */
     public function crear(int $idActividad, int $idEstudiante,
-                          string $archivoEntrega, string $nombreOriginal, ?string $comentario): int {
+                          string $urlArchivo, string $nombreOriginal, ?string $comentario): int {
         $stmt = $this->db->prepare(
-            "INSERT INTO entregas (idActividad, idEstudiante, archivoEntrega, nombreOriginal, comentario)
+            "INSERT INTO entregas (idActividad, idEstudiante, urlArchivo, nombreOriginal, comentario)
              VALUES (?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE
-               archivoEntrega = VALUES(archivoEntrega),
+               urlArchivo = VALUES(urlArchivo),
                nombreOriginal = VALUES(nombreOriginal),
                comentario     = VALUES(comentario),
                entregado_en   = CURRENT_TIMESTAMP"
         );
-        $stmt->execute([$idActividad, $idEstudiante, $archivoEntrega, $nombreOriginal, $comentario]);
+        $stmt->execute([$idActividad, $idEstudiante, $urlArchivo, $nombreOriginal, $comentario]);
         return (int)$this->db->lastInsertId();
     }
 
