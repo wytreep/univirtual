@@ -29,11 +29,11 @@ class AdminView extends View {
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="/univirtual/assets/css/panel.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/panel.css">
 </head>
 <body>
 <div id="root"></div>
-<script>window.__S=<?= $s ?>;window.API='/univirtual/api/v1';window.BASE='/univirtual';</script>
+<script>window.__S=<?= $s ?>;window.API='<?= BASE_URL ?>/api/v1';window.BASE='<?= BASE_URL ?>';</script>
 <script type="text/babel">
 const{useState,useEffect,useCallback,useRef}=React;
 const api={
@@ -134,10 +134,10 @@ const Dashboard=()=>{
 
 // ── USUARIOS ──────────────────────────────────────────────────────────────
 const Usuarios=()=>{
-  const[users,setUsers]=useState([]);const[loading,setLoading]=useState(true);const[buscar,setBuscar]=useState('');const[filtroRol,setFiltroRol]=useState('');const[modal,setModal]=useState(null);const[form,setForm]=useState({});const[alerta,setAlerta]=useState(null);const[saving,setSaving]=useState(false);
+  const[users,setUsers]=useState([]);const[loading,setLoading]=useState(true);const[buscar,setBuscar]=useState('');const[filtroRol,setFiltroRol]=useState('');const[modal,setModal]=useState(null);const[form,setForm]=useState({});const[alerta,setAlerta]=useState(null);const[saving,setSaving]=useState(false);const[catalogos,setCatalogos]=useState({carreras:[],facultades:[]});
   const cargar=useCallback(()=>{setLoading(true);api.get('/usuarios.php').then(r=>{if(r.status==='ok')setUsers(r.data);setLoading(false);});},[]);
-  useEffect(()=>cargar(),[cargar]);
-  const guardar=async()=>{if(!form.nombre||!form.email)return setAlerta({type:'err',msg:'Nombre y email requeridos'});setSaving(true);const res=modal==='nuevo'?await api.post('/usuarios.php',form):await api.put(`/usuarios.php?id=${form.idUsuario}`,form);setSaving(false);if(res.status==='ok'){setModal(null);cargar();setAlerta({type:'ok',msg:modal==='nuevo'?'Usuario creado':'Actualizado'});}else setAlerta({type:'err',msg:res.mensaje});};
+  useEffect(()=>{cargar();api.get('/usuarios.php?action=catalogos').then(r=>{if(r.status==='ok')setCatalogos(r.data);});},[cargar]);
+  const guardar=async()=>{if(!form.nombre||!form.email)return setAlerta({type:'err',msg:'Nombre y email requeridos'});const payload={...form,codigo:form.codigo||form.codigoEst||form.codigoProf||''};setSaving(true);const res=modal==='nuevo'?await api.post('/usuarios.php',payload):await api.put(`/usuarios.php?id=${form.idUsuario}`,payload);setSaving(false);if(res.status==='ok'){setModal(null);cargar();setAlerta({type:'ok',msg:modal==='nuevo'?'Usuario creado':'Actualizado'});}else setAlerta({type:'err',msg:res.mensaje});};
   const toggle=async u=>{await api.put(`/usuarios.php?id=${u.idUsuario}`,{...u,activo:u.activo?0:1});cargar();};
   const eliminar=async id=>{if(!confirm('¿Eliminar?'))return;const r=await api.del(`/usuarios.php?id=${id}`);if(r.status==='ok'){cargar();setAlerta({type:'ok',msg:'Eliminado'});}else setAlerta({type:'err',msg:r.mensaje});};
   const filtrados=users.filter(u=>{const q=buscar.toLowerCase();return(u.nombre.toLowerCase().includes(q)||u.email.toLowerCase().includes(q))&&(!filtroRol||u.rol===filtroRol);});
@@ -151,14 +151,14 @@ const Usuarios=()=>{
       <input className="search-input" placeholder="Buscar por nombre o email..." value={buscar} onChange={e=>setBuscar(e.target.value)}/>
       <select className="form-input form-select" style={{width:160}} value={filtroRol} onChange={e=>setFiltroRol(e.target.value)}><option value="">Todos</option><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="admin">Admin</option></select>
       <button className="btn btn-success btn-sm" onClick={()=>exportCSV(filtrados,'usuarios')}>⬇ CSV</button>
-      <button className="btn btn-primary" onClick={()=>{setForm({nombre:'',email:'',password:'',rol:'estudiante',activo:1});setModal('nuevo');}}>➕ Nuevo</button>
+      <button className="btn btn-primary" onClick={()=>{setForm({nombre:'',email:'',password:'',rol:'estudiante',activo:1,codigo:'',idCarrera:catalogos.carreras[0]?.idCarrera||'',idFacultad:catalogos.facultades[0]?.idFacultad||''});setModal('nuevo');}}>➕ Nuevo</button>
     </div>
     {loading?<Spinner/>:<div className="card">
       <div className="card-header"><span className="card-title">👥 Usuarios ({filtrados.length})</span></div>
       <table className="tbl"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Código/Depto</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>{filtrados.map(u=><tr key={u.idUsuario}>
         <td style={{fontWeight:600}}>{u.nombre}</td><td style={{fontSize:13,color:'var(--muted)'}}>{u.email}</td><td>{rolBadge(u.rol)}</td>
-        <td style={{fontFamily:'monospace',fontSize:12}}>{u.codigoEst||u.departamento||'—'}</td>
+        <td style={{fontFamily:'monospace',fontSize:12}}>{u.codigoEst||u.codigoProf||u.departamento||'—'}</td>
         <td><span className={`bdg ${u.activo?'bdg-on':'bdg-off'}`} style={{cursor:'pointer'}} onClick={()=>toggle(u)}>{u.activo?'Activo':'Inactivo'}</span></td>
         <td><div style={{display:'flex',gap:5}}><button className="btn btn-sm btn-outline" onClick={()=>{setForm({...u});setModal('editar');}}>✏️</button><button className="btn btn-sm btn-danger" onClick={()=>eliminar(u.idUsuario)}>🗑</button></div></td>
       </tr>)}{filtrados.length===0&&<tr><td colSpan={6} style={{textAlign:'center',padding:24,color:'var(--muted)'}}>Sin resultados</td></tr>}</tbody></table>
@@ -166,9 +166,12 @@ const Usuarios=()=>{
     {(modal==='nuevo'||modal==='editar')&&<Modal title={modal==='nuevo'?'➕ Nuevo Usuario':'✏️ Editar'} onClose={()=>setModal(null)} footer={<><button className="btn btn-outline" onClick={()=>setModal(null)}>Cancelar</button><button className="btn btn-primary" onClick={guardar} disabled={saving}>{saving?'Guardando...':'💾 Guardar'}</button></>}>
       <div className="form-grid"><div className="form-group"><label className="form-label">Nombre</label><input className="form-input" value={form.nombre||''} onChange={e=>setForm({...form,nombre:e.target.value})}/></div><div className="form-group"><label className="form-label">Email</label><input type="email" className="form-input" value={form.email||''} onChange={e=>setForm({...form,email:e.target.value})}/></div></div>
       {modal==='nuevo'&&<div className="form-group"><label className="form-label">Contraseña</label><input type="password" className="form-input" onChange={e=>setForm({...form,password:e.target.value})}/></div>}
-      <div className="form-grid"><div className="form-group"><label className="form-label">Rol</label><select className="form-input form-select" value={form.rol||'estudiante'} onChange={e=>setForm({...form,rol:e.target.value})}><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="admin">Admin</option></select></div><div className="form-group"><label className="form-label">Estado</label><select className="form-input form-select" value={form.activo??1} onChange={e=>setForm({...form,activo:+e.target.value})}><option value={1}>Activo</option><option value={0}>Inactivo</option></select></div></div>
-      {form.rol==='estudiante'&&<div className="form-grid"><div className="form-group"><label className="form-label">Código</label><input className="form-input" value={form.codigoEst||''} onChange={e=>setForm({...form,codigoEst:e.target.value})} placeholder="EST-2026-001"/></div><div className="form-group"><label className="form-label">Semestre</label><select className="form-input form-select" value={form.semestre||1} onChange={e=>setForm({...form,semestre:+e.target.value})}>{[1,2,3,4,5,6,7,8,9,10].map(s=><option key={s} value={s}>{s}</option>)}</select></div></div>}
-      {form.rol==='profesor'&&<div className="form-group"><label className="form-label">Departamento</label><input className="form-input" value={form.departamento||''} onChange={e=>setForm({...form,departamento:e.target.value})}/></div>}
+      <div className="form-grid"><div className="form-group"><label className="form-label">Rol</label><select className="form-input form-select" value={form.rol||'estudiante'} onChange={e=>setForm({...form,rol:e.target.value})}><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="directivo">Directivo</option><option value="admin">Admin</option></select></div><div className="form-group"><label className="form-label">Estado</label><select className="form-input form-select" value={form.activo??1} onChange={e=>setForm({...form,activo:+e.target.value})}><option value={1}>Activo</option><option value={0}>Inactivo</option></select></div></div>
+      {form.rol==='estudiante'&&<div className="form-grid"><div className="form-group"><label className="form-label">Código</label><input className="form-input" value={form.codigo||''} onChange={e=>setForm({...form,codigo:e.target.value})} placeholder="EST-2026-001"/></div><div className="form-group"><label className="form-label">Semestre</label><select className="form-input form-select" value={form.semestre||1} onChange={e=>setForm({...form,semestre:+e.target.value})}>{[1,2,3,4,5,6,7,8,9,10].map(s=><option key={s} value={s}>{s}</option>)}</select></div></div>}
+      {form.rol==='estudiante'&&<div className="form-group"><label className="form-label">Carrera</label><select className="form-input form-select" value={form.idCarrera||''} onChange={e=>setForm({...form,idCarrera:+e.target.value})}><option value="">Selecciona una carrera</option>{catalogos.carreras.map(c=><option key={c.idCarrera} value={c.idCarrera}>{c.nombre}</option>)}</select></div>}
+      {form.rol==='profesor'&&<div className="form-grid"><div className="form-group"><label className="form-label">Código</label><input className="form-input" value={form.codigo||''} onChange={e=>setForm({...form,codigo:e.target.value})} placeholder="Se genera si se deja vacío"/></div><div className="form-group"><label className="form-label">Departamento</label><input className="form-input" value={form.departamento||''} onChange={e=>setForm({...form,departamento:e.target.value})}/></div></div>}
+      {form.rol==='profesor'&&<div className="form-group"><label className="form-label">Facultad</label><select className="form-input form-select" value={form.idFacultad||''} onChange={e=>setForm({...form,idFacultad:+e.target.value})}><option value="">Selecciona una facultad</option>{catalogos.facultades.map(f=><option key={f.idFacultad} value={f.idFacultad}>{f.nombre}</option>)}</select></div>}
+      {form.rol==='directivo'&&<div className="form-grid"><div className="form-group"><label className="form-label">Facultad</label><select className="form-input form-select" value={form.idFacultad||''} onChange={e=>setForm({...form,idFacultad:+e.target.value})}><option value="">Selecciona una facultad</option>{catalogos.facultades.map(f=><option key={f.idFacultad} value={f.idFacultad}>{f.nombre}</option>)}</select></div><div className="form-group"><label className="form-label">Cargo</label><input className="form-input" value={form.cargo||'Decano'} onChange={e=>setForm({...form,cargo:e.target.value})}/></div></div>}
     </Modal>}
   </div>;
 };
@@ -247,13 +250,12 @@ const Inscripciones=()=>{
     setLoading(false);
   };
 
-  const inscribir=async(id,creditosEst)=>{
-    // Validación de créditos mínimos en el frontend
-    if(sel.creditos_minimos>0 && creditosEst<sel.creditos_minimos){
-      return setAlerta({type:'err',msg:`El estudiante necesita ${sel.creditos_minimos} créditos aprobados para esta materia (tiene ${creditosEst}).`});
+  const inscribir=async(est)=>{
+    if(!Number(est.puede_inscribirse)){
+      return setAlerta({type:'err',msg:est.motivo||'El estudiante no cumple los requisitos de matrícula.'});
     }
-    const r=await api.post('/inscripciones.php',{idMateria:sel.idMateria,idEstudiante:id});
-    if(r.status==='ok'){selMat(sel);setAlerta({type:'ok',msg:'Estudiante inscrito correctamente'});}
+    const r=await api.post('/inscripciones.php',{idMateria:sel.idMateria,idEstudiante:est.idEstudiante});
+    if(r.status==='ok'){selMat(sel);setAlerta({type:'ok',msg:`${est.nombre} inscrito. Queda con ${r.data?.creditos_semestre||'—'} créditos en el semestre.`});}
     else setAlerta({type:'err',msg:r.mensaje});
   };
 
@@ -269,8 +271,11 @@ const Inscripciones=()=>{
       <div>
         <div className="wb-label">Gestión</div>
         <div className="wb-name" style={{fontSize:22}}>Inscripciones</div>
-        {sel?.creditos_minimos>0&&<div style={{fontSize:12,color:'rgba(255,255,255,.7)',marginTop:4}}>
-          ⚠ Esta materia requiere mínimo {sel.creditos_minimos} créditos aprobados
+        <div style={{fontSize:12,color:'rgba(255,255,255,.75)',marginTop:4}}>
+          Matrícula por créditos · límite de 20 créditos por estudiante y semestre
+        </div>
+        {sel?.creditos_minimos>0&&<div style={{fontSize:12,color:'rgba(255,255,255,.75)',marginTop:2}}>
+          ⚠ {sel.nombre} exige mínimo {sel.creditos_minimos} créditos aprobados
         </div>}
       </div>
     </div>
@@ -322,12 +327,13 @@ const Inscripciones=()=>{
             ?<div className="card">
               {ins.length===0&&<div style={{padding:32,textAlign:'center',color:'var(--muted)'}}>Sin estudiantes inscritos.</div>}
               <table className="tbl"><thead><tr>
-                <th>Estudiante</th><th>Código</th><th>Créditos ap.</th><th>P1</th><th>P2</th><th>Final</th><th></th>
+                <th>Estudiante</th><th>Código</th><th>Créd. aprob.</th><th>Créd. semestre</th><th>P1</th><th>P2</th><th>Final</th><th></th>
               </tr></thead><tbody>
               {ins.map(e=><tr key={e.idEstudiante}>
                 <td style={{fontWeight:600}}>{e.nombre}</td>
                 <td><code style={{fontSize:11}}>{e.codigoEst}</code></td>
                 <td style={{textAlign:'center',fontSize:12}}>{e.creditos_aprobados||0}</td>
+                <td style={{textAlign:'center',fontSize:12,fontWeight:600,color:(e.creditos_inscritos||0)>20?'var(--red)':'var(--green)'}}>{e.creditos_inscritos||0} / 20</td>
                 <td>{e.nota_parcial1??'—'}</td>
                 <td>{e.nota_parcial2??'—'}</td>
                 <td style={{fontWeight:700,color:e.nota_final>=3?'var(--green)':e.nota_final?'var(--red)':'var(--muted)'}}>{e.nota_final??'—'}</td>
@@ -337,28 +343,33 @@ const Inscripciones=()=>{
             </div>
             :<div className="card">
               {disp.length===0&&<div style={{padding:32,textAlign:'center',color:'var(--muted)'}}>
-                Todos los estudiantes activos ya están inscritos en esta materia.
+                No hay estudiantes activos pendientes por inscribir en esta materia.
+              </div>}
+              {disp.length>0&&<div style={{padding:'10px 16px',fontSize:12,color:'var(--muted)',borderBottom:'1px solid var(--border-lt)'}}>
+                Los estudiantes que no cumplen un requisito aparecen con el motivo y el botón deshabilitado.
               </div>}
               <table className="tbl"><thead><tr>
-                <th>Estudiante</th><th>Código</th><th>Sem.</th><th>Créditos ap.</th><th>Cumple req.</th><th></th>
+                <th>Estudiante</th><th>Código</th><th>Sem.</th><th>Créd. aprob.</th><th>Créd. inscritos</th><th>Estado</th><th></th>
               </tr></thead><tbody>
               {disp.map(e=>{
-                const cumple=!sel.creditos_minimos||e.creditos_aprobados>=sel.creditos_minimos;
-                return<tr key={e.idEstudiante} style={{opacity:cumple?1:0.6}}>
+                const cumple=Number(e.puede_inscribirse)===1;
+                return<tr key={e.idEstudiante} style={{opacity:cumple?1:0.65}}>
                   <td style={{fontWeight:600}}>{e.nombre}</td>
-                  <td><code style={{fontSize:11}}>{e.codigoEst}</code></td>
+                  <td><code style={{fontSize:11}}>{e.codigoEst||'—'}</code></td>
                   <td style={{textAlign:'center'}}>{e.semestre||'—'}</td>
                   <td style={{textAlign:'center'}}>{e.creditos_aprobados||0}</td>
-                  <td style={{textAlign:'center'}}>
+                  <td style={{textAlign:'center'}}>{e.creditos_inscritos||0} / 20</td>
+                  <td>
                     {cumple
-                      ?<span style={{color:'#1a7a48',fontWeight:600}}>✅ Sí</span>
-                      :<span style={{color:'#e07b39',fontWeight:600,fontSize:11}} title={`Necesita ${sel.creditos_minimos} cred.`}>⚠ No ({e.creditos_aprobados||0}/{sel.creditos_minimos})</span>
+                      ?<span style={{color:'#1a7a48',fontWeight:600,fontSize:12}}>✅ Puede inscribirse</span>
+                      :<span style={{color:'#e07b39',fontWeight:600,fontSize:11}} title={e.motivo}>⚠ {e.motivo||'No cumple'}</span>
                     }
                   </td>
                   <td>
                     <button className={`btn btn-sm ${cumple?'btn-primary':'btn-outline'}`}
-                      onClick={()=>inscribir(e.idEstudiante,e.creditos_aprobados||0)}
-                      title={cumple?'Inscribir':'No cumple requisitos de créditos'}>
+                      disabled={!cumple}
+                      onClick={()=>inscribir(e)}
+                      title={cumple?'Inscribir':e.motivo||'No cumple requisitos'}>
                       + Inscribir
                     </button>
                   </td>
@@ -544,7 +555,7 @@ const PanelPruebas = () => {
     const [lista,   setLista]   = React.useState([]);
     const [cargando, setCargando] = React.useState(true);
  
-    const BASE = '/univirtual/api/v1/PruebasController.php';
+    const BASE = '<?= BASE_URL ?>/api/v1/PruebasController.php';
  
     const cargar = () => {
         setCargando(true);
@@ -750,7 +761,7 @@ const nav=[
           {n.badge>0&&<span style={{marginLeft:'auto',background:'#c0392b',color:'#fff',borderRadius:10,padding:'1px 6px',fontSize:10,fontWeight:700}}>{n.badge}</span>}
         </div>)}
       </nav>
-      <div className="sb-logout"><a href="/univirtual/pages/auth/logout.php" className="sb-logout-btn"><span className="sb-logout-ico">↩</span><span>Cerrar sesión</span></a></div>
+      <div className="sb-logout"><a href="<?= BASE_URL ?>/pages/auth/logout.php" className="sb-logout-btn"><span className="sb-logout-ico">↩</span><span>Cerrar sesión</span></a></div>
     </aside>
     {/* Topbar */}
     <header className="topbar">

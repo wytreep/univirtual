@@ -1,6 +1,6 @@
 # Riesgos y deuda técnica
 
-**Corte:** 31 de octubre de 2026  
+**Corte:** 31 de octubre de 2026; actualizado el 19 de noviembre de 2026  
 **Alcance:** código, datos, configuración y documentación de UNI-VIRTUAL.
 
 Este documento concentra los hallazgos que no se corrigieron en la fase documental. Es la entrada directa a la fase de refactor.
@@ -11,20 +11,22 @@ Este documento concentra los hallazgos que no se corrigieron en la fase document
 
 | # | Riesgo | Probabilidad | Impacto | Severidad | Mitigación |
 |---|---|---|---|---|---|
-| R-01 | Crear usuario desde el admin falla (UV-9). | Alta | Alto | Crítica | Aplicar parche de contrato y esquema. |
-| R-02 | Entregas no se listan ni se califican (`archivoEntrega`). | Alta | Alto | Crítica | Renombrar a `urlArchivo` en modelo y endpoints. |
-| R-03 | `getEstudiantesFacultad` rompe por tabla inexistente. | Alta | Medio | Alta | Corregir JOIN a `carreras`/`idCarrera`. |
-| R-04 | Un tercero no puede configurar el proyecto (falta `config.example.php`). | Media | Alto | Alta | Plantilla incluida en `05-entrega/plantillas/`. |
-| R-05 | Usuarios semilla no inician sesión por hash distinto. | Media | Alto | Alta | Ejecutar `fix_passwords_v8.sql`. |
+| R-01 | Crear usuario desde el admin falla (UV-9). | Alta | Alto | ✅ Resuelto | Corregido y verificado en original y copia (19 nov 2026). |
+| R-02 | Entregas no se listan ni se califican (`archivoEntrega`). | Alta | Alto | ✅ Resuelto | Renombrado a `urlArchivo` en modelo y endpoints. |
+| R-03 | `getEstudiantesFacultad` rompe por tabla inexistente. | Alta | Medio | ✅ Resuelto | JOIN a `carreras`/`idCarrera`. |
+| R-04 | Un tercero no puede configurar el proyecto (falta `config.example.php`). | Media | Alto | 🟡 Mitigado | Plantilla incluida en `05-entrega/plantillas/`. |
+| R-05 | Usuarios semilla no inician sesión por hash distinto. | Media | Alto | 🟡 Mitigado | Ejecutar `fix_passwords_v8.sql`. |
 | R-06 | Excepción no controlada devuelve HTML y rompe el contrato JSON. | Media | Medio | Media | Manejador global de excepciones. |
 | R-07 | CORS fijo en `http://localhost`. | Media | Medio | Media | Origen configurable por entorno. |
-| R-08 | URL de API hardcodeada en los cuatro dashboards. | Alta | Medio | Media | Inyectar `BASE_URL` en `window.API`. |
+| R-08 | URL de API hardcodeada en los cuatro dashboards. | Alta | Medio | 🟡 Mitigado | Los dashboards usan `BASE_URL`; quedan literales históricos por revisar. |
 | R-09 | Periodo académico fijo (`2026-I`) y semana fija. | Alta | Medio | Media | Leer de configuración o API. |
-| R-10 | `guardarNota` no verifica que la materia pertenezca al profesor. | Media | Alto | Alta | Validar propiedad antes de escribir. |
+| R-10 | `guardarNota` no verifica que la materia pertenezca al profesor. | Media | Alto | ✅ Resuelto | Validación de propiedad aplicada y probada (403). |
 | R-11 | Autoload por `glob` carga todos los modelos. | Alta | Bajo | Baja | `spl_autoload_register`. |
 | R-12 | Babel transforma JSX en el navegador. | Alta | Bajo | Baja | Precompilar o usar `htm`. |
-| R-13 | No hay migraciones incrementales. | Media | Alto | Media | Versionar migraciones. |
+| R-13 | No hay migraciones incrementales. | Media | Alto | 🟡 Parcial | Existe `config/migracion_uv19_comunicados.sql`; falta carpeta `migrations/` versionada. |
 | R-14 | No hay `LICENSE` ni `CONTRIBUTING.md`. | Baja | Bajo | Baja | Añadir si se exige. |
+
+> **UV-19 ya no es un riesgo abierto:** se cerró el 19 de noviembre de 2026 con las tablas `comunicados` y `comunicado_destinatarios`, el controlador `api/v1/comunicados.php` y la bandeja en los tres paneles.
 
 ---
 
@@ -34,10 +36,10 @@ Este documento concentra los hallazgos que no se corrigieron en la fase document
 
 | Deuda | Archivo | Acción |
 |---|---|---|
-| Columna `archivoEntrega` vs `urlArchivo`. | `models/Entrega.php`, `api/v1/estudiante.php`, `api/v1/profesor.php` | Unificar en `urlArchivo`. |
+| Columna `archivoEntrega` vs `urlArchivo`. | `models/Entrega.php`, `api/v1/estudiante.php`, `api/v1/profesor.php` | ✅ Unificado en `urlArchivo`. |
 | Tabla `pruebas` ausente. | `config/database_v8.sql`, `models/Prueba.php` | Crear tabla o retirar el modelo. |
-| JOIN a `programas_academicos`. | `api/v1/usuarios.php` | Usar `carreras`. |
-| Sin migraciones. | `config/` | Carpeta `migrations/` con orden y versión. |
+| JOIN a `programas_academicos`. | `api/v1/usuarios.php` | ✅ Corregido a `carreras`. |
+| Sin migraciones. | `config/` | 🟡 Existe la migración UV-19; falta carpeta `migrations/` con orden y versión. |
 
 ### 2.2 Backend
 
@@ -67,7 +69,7 @@ Este documento concentra los hallazgos que no se corrigieron en la fase document
 
 | Deuda | Acción |
 |---|---|
-| Conteo de tablas (13/17/19). | Unificar en 19. |
+| Conteo de tablas (13/17/21). | Unificado en 21 (19 base + 2 UV-19). |
 | URL del repositorio. | Unificar README y GIT_WORKFLOW. |
 | Archivos referenciados ausentes. | Incluir plantillas. |
 | Reporte de pruebas de abril. | Re-ejecutar y actualizar. |
@@ -78,12 +80,12 @@ Este documento concentra los hallazgos que no se corrigieron en la fase document
 
 | Fase | Objetivo | Entregable | Riesgo |
 |---|---|---|---|
-| F0 | Reparar bloqueos funcionales. | Parche UV-9 + `urlArchivo`. | Bajo, cambios acotados. |
+| F0 | Reparar bloqueos funcionales. | ✅ UV-9 y `urlArchivo` corregidos; UV-19 cerrada. | Bajo, cambios acotados. |
 | F1 | Configuración por entorno. | `config.example.php`, CORS y `BASE_URL`. | Bajo. |
 | F2 | Robustez del backend. | Manejador de errores, validación de propiedad, helpers. | Medio. |
 | F3 | Componentes de frontend. | `Layout`, `Sidebar`, `Card`, `ErrorState`. | Medio. |
 | F4 | Datos. | Migraciones y tabla `pruebas`. | Medio. |
-| F5 | Calidad. | Pruebas de UV-9, cobertura, CI. | Medio. |
+| F5 | Calidad. | Pruebas de UV-9/UV-19, cobertura, CI. | Medio. |
 | F6 | Documentación. | Unificación de conteos y URLs. | Bajo. |
 
 **Regla:** cada fase termina con `php -l`, la suite correspondiente y la matriz de historias actualizada.
@@ -135,8 +137,9 @@ Ejecutar `05-entrega/plantillas/fix_passwords_v8.sql` si el login semilla falla.
 
 ## 5. Criterio de salida del refactor
 
-- [ ] UV-9 crea los cuatro roles sin error.
-- [ ] Entregas se listan, descargan y califican.
+- [x] UV-9 crea los cuatro roles sin error.
+- [x] Entregas se listan, descargan y califican.
+- [x] UV-19 envía comunicados por facultad y notifica.
 - [ ] No hay URLs ni periodos hardcodeados.
 - [ ] Existe manejador global de errores JSON.
 - [ ] Las suites pasan en verde.

@@ -13,9 +13,9 @@
 
 UNI-VIRTUAL es una plataforma web de educación virtual para la Institución Universitaria Antonio José Camacho. El avance cubre la **fundación del producto** (autenticación, documentación, arquitectura, repositorio, base de datos, backend y layout React) y el **núcleo académico** (usuarios, dashboards de estudiante y profesor, inscripciones, notas y plan de pruebas).
 
-Al corte, **12 de las 13 historias vencidas tienen implementación verificable** en el repositorio. Una historia —UV-9, CRUD de usuarios— presenta una brecha bloqueante en el flujo de creación, originada por la convivencia de dos versiones del esquema de base de datos y por nombres de campos distintos entre el formulario y la API. La brecha es acotada, tiene parche propuesto y ya está **aplicado y verificado en la copia ejecutable**.
+Al corte, las **13 historias vencidas tienen implementación verificable** en el repositorio. UV-9 (CRUD de usuarios) presentaba una brecha bloqueante en la creación, originada por la convivencia de dos versiones del esquema y por nombres de campos distintos entre formulario y API; **quedó corregida y verificada en el original y en la copia** el 19 de noviembre de 2026.
 
-Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (próximas a vencer el 13 de noviembre): videollamadas y notificaciones ya funcionan de punta a punta en su alcance actual, el dashboard del directivo consume datos reales, y solo la mensajería del directivo está en fase inicial.
+Además, se documenta el **avance de las 4 historias del Sprint 3** (próximas a vencer el 13 de noviembre): videollamadas, notificaciones y mensajería del directivo ya funcionan de punta a punta en su alcance actual, y el dashboard del directivo consume datos reales.
 
 ---
 
@@ -24,16 +24,16 @@ Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (
 | Indicador | Valor |
 |---|---:|
 | HU vencidas evaluadas (sprints 1–2) | 13 |
-| HU vencidas con implementación y evidencia | 12 |
-| HU vencidas completamente cerradas | 7 |
+| HU vencidas con implementación y evidencia | 13 |
+| HU vencidas completamente cerradas | 8 |
 | HU vencidas con observaciones no bloqueantes | 5 |
-| HU vencidas en corrección | 1 |
-| HU próximas a vencer con avance anticipado (Sprint 3) | 4 (promedio 66%) |
+| HU vencidas en corrección | 0 |
+| HU próximas a vencer (Sprint 3) | 4 (1 completada + 3 con avance, promedio 86%) |
 | Cobertura documental | 100% (17/17 con ficha y avance) |
-| Archivos PHP con sintaxis válida | 61/61 (+52/52 en la copia ejecutable) |
+| Archivos PHP con sintaxis válida | 52/52 de aplicación (original y copia; 61 históricos con `test-files/` y `scripts/`) |
 | Roles implementados | 4 (admin, directivo, profesor, estudiante) |
-| Tablas del esquema v8 | 19 |
-| Endpoints API principales | 12 controladores |
+| Tablas de la base | 21 (19 del esquema v8 + 2 de la migración UV-19) |
+| Endpoints API principales | 13 controladores (incluye `comunicados.php`) |
 | Suites de prueba disponibles | 3 (Selenium/unittest, API, E2E) |
 | Última ejecución Selenium registrada | 23/23 aprobadas (24 abr 2026) |
 | Fallos de la demo corregidos y verificados | 5 (original y copia) |
@@ -79,7 +79,7 @@ Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (
 
 1. **Autenticación con cuatro roles y redirección automática.** Login con bcrypt, regeneración de sesión, control de cuentas activas y separación de dashboards por rol.
 2. **Documentación de producto completa.** Por primera vez el proyecto cuenta con PRD, SRS IEEE 830, arquitectura y ADRs en un mismo lugar y alineados con el código.
-3. **Base de datos normalizada y reproducible.** Esquema v8 con 19 tablas, claves foráneas, índices y datos semilla; modelo ER documentado.
+3. **Base de datos normalizada y reproducible.** Esquema v8 con 19 tablas base más 2 de la migración UV-19 (21 en ejecución), claves foráneas, índices y datos semilla; modelo ER documentado.
 4. **Backend POO con API JSON.** `db()` singleton, autoload de modelos, `Controller` abstracto, respuestas `{status, data, mensaje}` y controladores por dominio.
 5. **Dashboards React funcionales.** Estudiante y profesor consumen la API con `fetch` y `credentials: 'include'`, sobre un sistema de diseño compartido (`panel.css`).
 6. **Núcleo académico operativo.** Inscripciones con validación de créditos mínimos, registro de notas por parciales y notificaciones automáticas.
@@ -93,7 +93,7 @@ Además, se documenta el **avance anticipado de las 4 historias del Sprint 3** (
 
 | # | Hallazgo | Severidad | Impacto | Referencia |
 |---|---|---|---|---|
-| H-01 | El formulario de usuarios envía `codigoEst` y el controlador espera `codigo`; además intenta insertar `programa`, columna que no existe en v8. | 🔴 Alta | La creación de estudiantes y profesores falla; UV-9 no se puede aceptar. | `03-historias/UV-09-crud-usuarios.md` |
+| H-01 | El formulario de usuarios enviaba `codigoEst` y el controlador esperaba `codigo`; además intentaba insertar `programa`, columna que no existe en v8. | 🔴 Alta | ✅ Corregido y verificado en original y copia el 19 nov 2026; UV-9 cerrada. | `03-historias/UV-09-crud-usuarios.md` |
 | H-02 | El código usaba `archivoEntrega` en entregas, pero el esquema v8 define `urlArchivo`. | 🟠 Media | ✅ Corregido y probado en original y copia; afectaba UV-11 y UV-13. | `06-anexos/correcciones-demo.md` |
 | H-03 | `config.example.php` y `fix_passwords_v8.sql` están referenciados pero no existen en el repositorio. | 🟠 Media | Un clon nuevo no puede configurarse siguiendo el README. | `05-entrega/plantillas/` |
 | H-04 | El semestre y la semana académica están fijos a `2026-I` y `2026-01-19` en el dashboard del estudiante. | 🟡 Baja | Las métricas de avance no corresponden al corte de octubre de 2026. | `03-historias/UV-10-dashboard-estudiante.md` |
@@ -108,13 +108,12 @@ El detalle, la causa raíz y el parche propuesto de cada hallazgo están en `05-
 
 **Entregar el avance con salvedades documentadas.** La base es sólida y demuestra el avance de las historias vencidas (sprints 1 y 2) más el avance anticipado de las próximas (Sprint 3). Antes de la demo se recomienda:
 
-1. Propagar el parche de UV-9 al repositorio original (30–45 min); ya está aplicado y verificado en la copia ejecutable.
-2. Para el entorno de demo: la base `univirtual_sprints12` ya está importada y tiene la entrega pendiente de Laura para demostrar la calificación. Si se monta el ZIP en otro equipo, importar `config/database_v8.sql` y `config/fix_passwords.sql`.
-3. Re-ejecutar la suite Selenium y anexar el reporte actualizado.
-4. Usar el guion de demo actualizado, que incluye la creación de usuarios en la copia ejecutable, la calificación en vivo y el recorrido por UV-16, UV-18 y UV-31, con la salvedad de UV-19.
-5. Los cinco fallos de la demo ya están cerrados; no se presentan como pendientes.
+1. Para el entorno de demo: la base `univirtual_sprints12` ya está importada, con la migración UV-19 aplicada y la entrega pendiente de Laura para demostrar la calificación. Si se monta el ZIP en otro equipo, importar `config/database_v8.sql`, `config/migracion_uv19_comunicados.sql` y `config/fix_passwords.sql`.
+2. Re-ejecutar la suite Selenium y anexar el reporte actualizado.
+3. Usar el guion de demo actualizado, que incluye la creación de usuarios, la calificación en vivo, la mensajería del directivo y el recorrido por UV-16, UV-18 y UV-31.
+4. Los cinco fallos de la demo ya están cerrados; no se presentan como pendientes.
 
-Si el docente exige el 100% de las historias cerradas, el único bloqueo real es UV-9. Los demás hallazgos son deuda técnica que no impide sustentar el avance.
+Si el docente exige el 100% de las historias cerradas, las 13 vencidas ya están sin bloqueos funcionales. Las 3 historias restantes del Sprint 3 conservan deuda de pruebas y reportes, declarada en sus fichas.
 
 ---
 
@@ -122,8 +121,8 @@ Si el docente exige el 100% de las historias cerradas, el único bloqueo real es
 
 | Prioridad | Acción | HU relacionada |
 |---|---|---|
-| 1 | Propagar al repositorio original el parche del CRUD de usuarios (ya verificado en la copia ejecutable). | UV-9 |
-| 2 | Cerrar las 4 HU del Sprint 3: endpoint de mensajes (UV-19), segmentación por facultad (UV-31), casos CP de videollamadas y notificaciones. | UV-16, UV-18, UV-19, UV-31 |
+| 1 | Cerrar los reportes y la segmentación por facultad del panel del directivo. | UV-31 |
+| 2 | Formalizar casos CP y pruebas de videollamadas, notificaciones y mensajería. | UV-16, UV-18, UV-19 |
 | 3 | Unificar el esquema: `urlArchivo`, `idCarrera`, `creditos_aprobados`. | UV-28 / refactor |
 | 3 | Extraer componentes React compartidos y un `api` único. | UV-30 / refactor |
 | 4 | Parametrizar semestre, fechas y `BASE_URL`. | UV-10 / UV-27 |

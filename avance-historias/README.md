@@ -5,7 +5,7 @@
 **Corte:** 31 de octubre de 2026  
 **Alcance:** las historias de usuario **ya vencidas** (sprints 1 y 2, cerrados al 30 oct) y las **próximas a vencer** (Sprint 3, vence el 13 nov)  
 **Historias cubiertas:** 17 — vencidas: UV-8, UV-25, UV-26, UV-27, UV-28, UV-29, UV-30, UV-9, UV-10, UV-11, UV-12, UV-13, UV-32 · próximas: UV-16, UV-18, UV-19, UV-31  
-**Versión del documento:** 2.1 (correcciones post-demo del 6 de noviembre)
+**Versión del documento:** 2.2 (UV-19 cerrada y UV-9 propagada al original, 19 nov 2026)
 
 > **Importante:** esta entrega no declara los sprints 1 y 2 como completos ni cubre todas sus historias. Se enfoca en las **HUs que ya vencieron** y en las que **vencen pronto** (Sprint 3, 13 nov), para mostrar el avance real de esas historias.
 
@@ -42,7 +42,7 @@ avance-historias/
 │   ├── UV-13-notas.md
 │   ├── UV-16-videollamadas.md        ← Sprint 3 (avance anticipado)
 │   ├── UV-18-notificaciones.md       ← Sprint 3 (avance anticipado)
-│   ├── UV-19-mensajes-directivo.md   ← Sprint 3 (avance anticipado)
+│   ├── UV-19-mensajes-directivo.md   ← Sprint 3 (completada)
 │   ├── UV-25-documentacion.md
 │   ├── UV-26-arquitectura.md
 │   ├── UV-27-repositorio.md
@@ -80,17 +80,17 @@ avance-historias/
 
 | Estado | HU | Cantidad |
 |---|---|---:|
-| ✅ Completada (vencidas, 100%) | UV-8, UV-10, UV-12, UV-25, UV-26, UV-29, UV-32 | 7 |
+| ✅ Completada (vencidas, 100%) | UV-8, UV-9, UV-10, UV-12, UV-25, UV-26, UV-29, UV-32 | 8 |
 | 🟡 Con observaciones (85–90%) | UV-11, UV-13, UV-27, UV-28, UV-30 | 5 |
-| 🔴 En corrección (60%; corregida en la copia ejecutable) | UV-9 | 1 |
-| 🔵 Avance anticipado (Sprint 3) | UV-16 (85%), UV-18 (85%), UV-31 (75%), UV-19 (20%) | 4 |
+| 🔴 En corrección | — | 0 |
+| ✅/🔵 Sprint 3 | UV-19 (100%), UV-16 (85%), UV-18 (85%), UV-31 (75%) | 4 |
 | **Total** | | **17** |
 
 - **Cobertura documental:** 17/17 HU con ficha, criterios y evidencia.
-- **Cobertura funcional:** de las 13 vencidas, 12/13 con implementación verificable en el repositorio (92%); de las 4 próximas, 3/4 con flujo verificable (75%).
-- **Bloqueo identificado:** la creación de usuarios desde el panel admin (UV-9) no completa el flujo por una incompatibilidad entre el formulario, el controlador y el esquema v8. El diagnóstico y el parche propuesto están en [`03-historias/UV-09-crud-usuarios.md`](03-historias/UV-09-crud-usuarios.md).
+- **Cobertura funcional:** las 13 historias vencidas tienen implementación verificable (100%); de las 4 del Sprint 3, una está cerrada y las otras tres tienen flujo verificable con deuda de pruebas.
+- **UV-9 cerrada:** la creación de los cuatro roles quedó corregida y verificada el 19 de noviembre de 2026 en el proyecto original y en la copia. El diagnóstico histórico y la evidencia están en [`03-historias/UV-09-crud-usuarios.md`](03-historias/UV-09-crud-usuarios.md).
 - **Correcciones post-demo (6 nov 2026):** se corrigieron y verificaron en el proyecto original y en la copia los cinco fallos observados en clase: zona horaria, columna `creado_en`, `roomName` duplicado, `archivoEntrega` frente a `urlArchivo` y columnas inexistentes en materiales/grabaciones. El detalle está en [`06-anexos/correcciones-demo.md`](06-anexos/correcciones-demo.md).
-- **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026); los archivos corregidos se volvieron a validar el 6 nov 2026.
+- **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026); los archivos corregidos y los nuevos se validaron el 19 nov 2026.
 - **Pruebas automatizadas:** última ejecución registrada 23/23 aprobadas (24 abr 2026, Selenium). La re-ejecución contra el estado actual está pendiente y se describe en [`04-pruebas/resultados.md`](04-pruebas/resultados.md).
 
 > **Lectura recomendada para la entrega:** primero este README, luego `00-resumen-ejecutivo.md`, después `01-gestion/matriz-historias.md` y finalmente las fichas de las HU que se van a demostrar.
@@ -115,7 +115,7 @@ avance-historias/
 
 | HU | Historia | Avance |
 |---|---|---|
-| UV-9 | CRUD de usuarios por Admin | 🔴 60% (corregida en la copia ejecutable) |
+| UV-9 | CRUD de usuarios por Admin | ✅ 100% |
 | UV-10 | Dashboard del Estudiante | ✅ 100% |
 | UV-11 | Dashboard del Profesor | 🟡 90% |
 | UV-12 | Inscripción de estudiantes a materias | ✅ 100% |
@@ -124,13 +124,13 @@ avance-historias/
 
 ### Sprint 3 — inicia el 2 de noviembre de 2026 (próximas a vencer)
 
-Estas historias no se declaran cerradas: se entrega el **avance anticipado** construido durante los sprints 1 y 2.
+Estas historias se documentan con su avance real: UV-19 quedó cerrada y las otras tres conservan deuda declarada.
 
 | HU | Historia | Avance |
 |---|---|---|
 | UV-16 | Crear y lanzar videollamada por materia (Jitsi) | 🔵 85% |
 | UV-18 | Notificaciones internas por evento académico | 🔵 85% |
-| UV-19 | Mensajes del Directivo a estudiantes y profesores | 🔵 20% |
+| UV-19 | Mensajes del Directivo a estudiantes y profesores | ✅ 100% |
 | UV-31 | Dashboard del Directivo | 🔵 75% |
 
 ---

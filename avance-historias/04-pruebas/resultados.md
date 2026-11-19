@@ -1,18 +1,18 @@
 # Resultados de pruebas — corte 31 de octubre de 2026
 
-> **Estado vigente (6 nov 2026):** este documento conserva la corrida del corte. Los fallos de integración que afectaban CP-13 y CP-25 ya están corregidos y verificados en original y copia; ver **§9**. Las suites Selenium/API siguen pendientes de re-ejecución.
+> **Estado vigente (19 nov 2026):** este documento conserva la corrida del corte. Los fallos de integración que afectaban CP-13 y CP-25 ya están corregidos y verificados en original y copia; ver **§9**. UV-9 se propagó al original y UV-19 se cerró con CP-31; ver **§10**. Las suites Selenium/API siguen pendientes de re-ejecución.
 
 | Campo | Valor |
 |---|---|
 | Fecha del corte | 31 de octubre de 2026 |
 | Versión | `main` (`ef578ee`) + carpeta de avance sin commit |
 | Entorno | XAMPP local + copia ejecutable `univirtual-avance` (Apache activo) |
-| Alcance | 13 historias vencidas (sprints 1 y 2); el Sprint 3 se reporta como avance anticipado en fichas, sin casos CP |
-| Casos definidos | 30 |
+| Alcance | 13 historias vencidas (sprints 1 y 2) y las 4 del Sprint 3; UV-19 se cerró con CP-31 |
+| Casos definidos | 31 |
 | Ejecutados en el corte | 1 (lint) + verificación de la copia ejecutable |
 | Verificados por código / historial | 29 |
-| Fallos | 2 |
-| Bloqueos | 1 |
+| Fallos | 2 (históricos, corregidos) |
+| Bloqueos | 1 (histórico, corregido) |
 
 ---
 
@@ -74,8 +74,8 @@ Resultado: 61 OK, 0 errores de sintaxis
 | CP-03 | Login estudiante | ✅ | Código + historial |
 | CP-04 | Login directivo | ✅ | Código + historial |
 | CP-05 | Bloqueo cruzado | ✅ | Código + historial |
-| CP-06 | Crear estudiante | 🔴 | Código: contrato `codigoEst` vs `codigo` |
-| CP-07 | Crear profesor | 🔴 | Código: falta `codigo` y usa `programa` |
+| CP-06 | Crear estudiante | ✅ | Corregido y verificado en original y copia (19 nov 2026) |
+| CP-07 | Crear profesor | ✅ | Corregido y verificado en original y copia (19 nov 2026) |
 | CP-08 | Editar usuario | ✅ | Código |
 | CP-09 | Activar/desactivar | ✅ | Código |
 | CP-10 | Eliminar usuario | ✅ | Código (soft delete) |
@@ -93,12 +93,13 @@ Resultado: 61 OK, 0 errores de sintaxis
 | CP-22 | Consultar nota | ✅ | Código |
 | CP-23 | Promedio | ✅ | Código |
 | CP-24 | Validación de nota | ✅ | Código |
-| CP-25 | Calificar entrega | ⛔ | Bloqueado por `archivoEntrega` |
+| CP-25 | Calificar entrega | ✅ | Corregido con `urlArchivo` y verificado en original y copia |
 | CP-26 | Contrato JSON | ✅ | Código (`Controller`) |
 | CP-27 | 401 | ✅ | Código (`requireAuth`) |
 | CP-28 | 403 | ✅ | Código (`requireAuth`) |
-| CP-29 | Sintaxis PHP | ✅ | Ejecutado hoy: 61/61 |
+| CP-29 | Sintaxis PHP | ✅ | Ejecutado: 52/52 archivos de aplicación en original y copia |
 | CP-30 | Reproducibilidad | 🟡 | Faltan dos archivos referenciados |
+| CP-31 | Comunicado del directivo | ✅ | Ejecutado en original y copia (19 nov 2026) |
 
 ---
 
@@ -106,10 +107,10 @@ Resultado: 61 OK, 0 errores de sintaxis
 
 | Estado | Casos | % |
 |---|---:|---:|
-| ✅ Aprobado | 24 | 80% |
-| 🟡 Aprobado con observación | 3 | 10% |
-| 🔴 Fallido | 2 | 7% |
-| ⛔ Bloqueado | 1 | 3% |
+| ✅ Aprobado | 29 | 94% |
+| 🟡 Aprobado con observación | 2 | 6% |
+| 🔴 Fallido | 0 | 0% |
+| ⛔ Bloqueado | 0 | 0% |
 | **Total** | **30** | **100%** |
 
 **Cumplimiento funcional:** 27/30 (90%) si se cuentan como válidos los aprobados con observación.  
@@ -172,8 +173,8 @@ El 29 de octubre se construyó y ejecutó una copia independiente en `C:\xampp\h
 
 | Prueba | Resultado |
 |---|---|
-| Sintaxis PHP de la copia | 52/52 sin errores |
-| Importación del esquema | 19 tablas, 9 usuarios semilla |
+| Sintaxis PHP de la copia | 52/52 archivos de aplicación sin errores |
+| Importación del esquema | 21 tablas (19 base + 2 de UV-19), 9 usuarios semilla |
 | Login de los cuatro roles | 302 al dashboard correcto |
 | Dashboards de los cuatro roles | HTTP 200 |
 | Crear estudiante | ✅ perfil en `estudiantes` con `idCarrera` |
@@ -229,4 +230,51 @@ Con Apache y MySQL activos se repitieron los flujos que fallaron en la demo de c
 | CP-19 Créditos mínimos | ✅ | ✅ + tope de 20 créditos y motivo |
 | CP-16 Videollamadas | ✅ historial | ✅ verificado en vivo, con permisos y sala única |
 
-**Lo que sigue pendiente:** re-ejecutar `test_univirtual.py`, `test_refactor_api.py` y `test_refactor_e2e.py`; CP-06 y CP-07 siguen fallando **solo en el original** porque el parche de UV-9 no se replicó allí.
+**Lo que sigue pendiente:** re-ejecutar `test_univirtual.py`, `test_refactor_api.py` y `test_refactor_e2e.py`. CP-06 y CP-07 quedaron cerrados el 19 de noviembre al propagar UV-9 al original; ver §10.
+
+---
+
+## 10. Cierre de UV-9 y UV-19 — 19 de noviembre de 2026
+
+Con Apache y MySQL activos se verificó el cierre de las dos historias pendientes, **en el proyecto original y en la copia ejecutable**. Los datos de prueba se eliminaron al terminar.
+
+### 10.1 UV-9 — creación de usuarios en el original
+
+| Prueba | Original | Copia | Evidencia |
+|---|---|---|---|
+| `php -l` de los archivos modificados | ✅ | ✅ | 12/12 sin errores |
+| Crear estudiante con `codigo`, `idCarrera` y semestre | ✅ 200 | ✅ 200 | Fila en `estudiantes` con `idCarrera=1` |
+| Crear profesor con `codigo`, `idFacultad` y departamento | ✅ 200 | ✅ 200 | Fila en `profesores` con `idFacultad=1` |
+| Login del usuario creado | ✅ 302 a su dashboard | ✅ 302 | Sesión y rol correctos |
+| Listado con carrera/facultad | ✅ | ✅ | JOIN a `carreras` |
+| Desactivar (soft delete) | ✅ 200 | ✅ 200 | `activo = 0` |
+
+**Casos actualizados:** CP-06 y CP-07 pasan de 🔴 a ✅.
+
+### 10.2 UV-19 — comunicados del directivo
+
+| Prueba | Original | Copia | Evidencia |
+|---|---|---|---|
+| Migración aplicada | ✅ 2 tablas | ✅ 2 tablas | `comunicados`, `comunicado_destinatarios` |
+| Enviar a estudiantes | ✅ 4 destinatarios | ✅ (incluido en “ambos”) | Fila en `comunicados` + fan-out |
+| Enviar a profesores | ✅ 3 destinatarios | ✅ | Profesores activos de la facultad |
+| Enviar a ambos | ✅ | ✅ 7 destinatarios | Sin duplicados |
+| Bandeja del estudiante | ✅ “Nuevo” | ✅ | Asunto, remitente, facultad y fecha |
+| Marcar como leído | ✅ `noLeidos` 1 → 0 | ✅ | `leido_en` con hora |
+| Aislamiento por rol | ✅ Profesor no recibe aviso de estudiantes | ✅ | Bandeja vacía |
+| Notificación | ✅ URL a `.../estudiante/dashboard.php?view=mensajes` | ✅ URL a `.../univirtual-avance/...` | Fila en `notificaciones` |
+| Validación sin asunto | ✅ 422 | ✅ 422 | Mensaje claro |
+| Público inválido | ✅ 422 | ✅ 422 | Mensaje claro |
+| Estudiante intenta enviar | ✅ 400 | ✅ 400 | Acción no válida para su rol |
+| `php -l` | ✅ | ✅ | 12/12 archivos modificados |
+
+**Caso agregado:** CP-31 pasa a ✅. La ficha `03-historias/UV-19-mensajes-directivo.md` queda al 100%.
+
+### 10.3 Estado de la base al cierre
+
+| Base | Tablas | Usuarios | Notificaciones | Comunicados de prueba |
+|---|---:|---:|---:|---:|
+| `univirtual` (original) | 21 | 20 | 92 | 0 |
+| `univirtual_sprints12` (copia) | 21 | 9 | 9 | 0 |
+
+**Conclusión:** las 13 historias vencidas quedan sin bloqueos funcionales (8 cerradas y 5 con observaciones no bloqueantes). Del Sprint 3, UV-19 está cerrada y UV-16, UV-18 y UV-31 conservan deuda de pruebas y reportes declarada.

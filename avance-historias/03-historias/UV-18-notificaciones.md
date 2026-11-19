@@ -52,13 +52,13 @@
 ## 4. Lo logrado / Pendiente
 
 **Lo logrado**
-- 6 eventos académicos ya emiten notificación real, incluido videollamada.
+- 7 eventos académicos ya emiten notificación real: nota, entrega calificada, material, actividad, videollamada, inscripción y comunicado del directivo.
 - Polling de 30s en los tres paneles; sin recarga de página.
 - Clic en la notificación navega al contenido (URL de destino).
 - El `INSERT` usa la columna real `creado_en` y la creación de la clase es transaccional.
 
 **Pendiente**
-- Eventos de foro y mensajería (depende de UV-19).
+- Eventos de foro y respuesta a comunicados.
 - Segmentación de eventos por facultad del directivo.
 - Suite de pruebas para notificaciones y deduplicación.
 

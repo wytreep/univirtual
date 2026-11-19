@@ -885,6 +885,50 @@ const MateriasProf=({onAula})=>{
   </div>;
 };
 
+// ── MENSAJES DEL DIRECTIVO (UV-19) ────────────────────────────────────
+const Mensajes=()=>{
+  const[data,setData]=useState(null);
+  const[abierto,setAbierto]=useState(null);
+  const[alerta,setAlerta]=useState(null);
+  const cargar=useCallback(()=>{
+    api.get('/comunicados.php?action=bandeja').then(r=>{
+      if(r.status==='ok')setData(r.data);
+      else setAlerta({type:'err',msg:r.mensaje||'No se pudieron cargar los mensajes'});
+    });
+  },[]);
+  useEffect(()=>{cargar();},[cargar]);
+  const abrir=async m=>{
+    setAbierto(abierto===m.idComunicado?null:m.idComunicado);
+    if(!Number(m.leido)){
+      const r=await api.post('/comunicados.php',{action:'marcar_leido',idComunicado:m.idComunicado});
+      if(r.status==='ok')cargar();
+      else setAlerta({type:'err',msg:r.mensaje||'No se pudo marcar como leído'});
+    }
+  };
+  if(!data)return<Spinner/>;
+  return<div>
+    <div className="welcome-banner" style={{padding:'20px 28px',marginBottom:20}}>
+      <div><div className="wb-label">Comunicación</div><div className="wb-name" style={{fontSize:22}}>Mensajes del directivo</div></div>
+      <div className="wb-stats"><div className="wb-stat"><div className="wb-stat-num">{data.noLeidos}</div><div className="wb-stat-lbl">Sin leer</div></div></div>
+    </div>
+    <Alert type={alerta?.type} msg={alerta?.msg} onClose={()=>setAlerta(null)}/>
+    {data.mensajes.length===0&&<div className="card" style={{padding:32,textAlign:'center',color:'var(--muted)'}}>No tienes comunicados todavía.</div>}
+    {data.mensajes.map(m=><div key={m.idComunicado} className="card" style={{marginBottom:12,cursor:'pointer'}} onClick={()=>abrir(m)}>
+      <div style={{display:'flex',justifyContent:'space-between',gap:12,alignItems:'center'}}>
+        <div>
+          <div style={{fontWeight:700,color:'var(--navy)'}}>
+            {!Number(m.leido)&&<span className="tag tag-warn" style={{marginRight:8,fontSize:11}}>Nuevo</span>}
+            {m.asunto}
+          </div>
+          <div style={{fontSize:12,color:'var(--muted)',marginTop:3}}>{m.remitente} · {m.facultad} · {new Date(m.creado_en.replace(' ','T')).toLocaleString('es-CO')}</div>
+        </div>
+        <span style={{color:'var(--muted)'}}>{abierto===m.idComunicado?'▾':'▸'}</span>
+      </div>
+      {abierto===m.idComunicado&&<div style={{marginTop:12,paddingTop:12,borderTop:'1px solid var(--border-lt)',fontSize:14,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{m.contenido}</div>}
+    </div>)}
+  </div>;
+};
+
 // ── APP PROFESOR ───────────────────────────────────────────────────────
 const ProfesorApp=()=>{
   const q = new URLSearchParams(window.location.search);
@@ -897,12 +941,13 @@ const ProfesorApp=()=>{
     {id:'materias',      ico:'📚',lbl:'Mis Materias'},
     {id:'calificar',     ico:'✏️', lbl:'Calificar'},
     {id:'reportes',      ico:'📈',lbl:'Reportes'},
+    {id:'mensajes',      ico:'✉️', lbl:'Mensajes'},
     {id:'notificaciones',ico:'🔔',lbl:'Notificaciones',badge:badgeNotifs},
     {id:'configuracion', ico:'⚙️', lbl:'Configuración'},
   ];
   const irAula=m=>{setAulaActiva(m);setVista('aula');};
   const titulo={dashboard:'Dashboard',materias:'Mis Materias',aula:aulaActiva?.nombre||'Aula Virtual',
-    calificar:'Calificar',reportes:'Reportes',notificaciones:'Notificaciones',
+    calificar:'Calificar',reportes:'Reportes',mensajes:'Mensajes',notificaciones:'Notificaciones',
     configuracion:'Configuración'}[vista]||'';
   return<>
     <aside className="sidebar">
@@ -941,6 +986,7 @@ const ProfesorApp=()=>{
       {vista==='aula'&&aulaActiva&&<Aula materia={aulaActiva} onBack={()=>setVista('dashboard')}/>}
       {vista==='calificar'&&<Calificar/>}
       {vista==='reportes'&&<Reportes/>}
+      {vista==='mensajes'&&<Mensajes/>}
       {vista==='notificaciones'&&<NotificacionesProf idProf={idProf}/>}
       {vista==='configuracion'&&<Configuracion rol="profesor"/>}
     </main>

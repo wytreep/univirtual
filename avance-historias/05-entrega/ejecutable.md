@@ -9,11 +9,12 @@
 
 ## 1. Propósito
 
-Entregar una **copia independiente y ejecutable** del proyecto que demuestre el avance de las historias **ya vencidas** (sprints 1 y 2) y el **avance anticipado** de las próximas a vencer (Sprint 3: UV-16, UV-18, UV-19, UV-31), sin modificar el proyecto original `C:\xampp\htdocs\univirtual`.
+Entregar una **copia independiente y ejecutable** del proyecto que demuestre el avance de las historias **ya vencidas** (sprints 1 y 2) y el estado real de las próximas a vencer (Sprint 3: UV-16, UV-18, UV-19, UV-31), sin modificar el proyecto original `C:\xampp\htdocs\univirtual`.
 
 La copia se abre directamente por Apache, igual que el proyecto original, y conserva los parches de los bloqueos detectados:
 
-- creación de usuarios de los cuatro roles (UV-9, **solo en la copia**);
+- creación de usuarios de los cuatro roles (UV-9, aplicado en la copia **y** en el original);
+- comunicados del directivo con bandeja del destinatario y notificación (UV-19);
 - gestión y calificación de entregas con `urlArchivo` (UV-11 y UV-13);
 - validación de propiedad de la materia en notas y entregas;
 - correcciones post-demo: zona horaria, `creado_en`, sala única, `urlArchivo` y columnas de subida (aplicadas en copia **y** original).
@@ -75,8 +76,9 @@ No hay lanzadores ni archivos `.bat`.
 | 15 | Materiales y grabaciones sin columnas inexistentes; descarga con `filesize()`. | `api/v1/profesor.php`, `api/v1/videollamadas.php`, `api/descargar.php` |
 | 16 | Matrícula con tope de 20 créditos y motivo explícito. | `api/v1/inscripciones.php`, `pages/admin/dashboard.php` |
 | 17 | Subidas de 200 MB y bloqueo de PHP en `uploads/`. | `.htaccess`, `uploads/.htaccess` |
+| 18 | Comunicados del directivo por facultad y público, con bandeja y notificación (UV-19). | `api/v1/comunicados.php`, `config/migracion_uv19_comunicados.sql`, dashboards |
 
-Las correcciones 1–6 (UV-9) se aplicaron **solo en la copia**. Las correcciones 7–17 se aplicaron en la copia **y** en el proyecto original, y se verificaron en ambos.
+Las correcciones 1–6 (UV-9) y la 18 (UV-19) se aplicaron en la copia **y** en el proyecto original. Las correcciones 7–17 se aplicaron en ambos y se verificaron en los dos.
 
 ---
 
@@ -84,9 +86,9 @@ Las correcciones 1–6 (UV-9) se aplicaron **solo en la copia**. Las correccione
 
 | Prueba | Resultado |
 |---|---|
-| Sintaxis PHP de la copia | 52/52 archivos sin errores |
+| Sintaxis PHP de la copia | 52/52 archivos de aplicación sin errores |
 | Acceso por Apache | `http://localhost/univirtual-avance/` responde 302 al login |
-| Base importada | 19 tablas, 9 usuarios semilla |
+| Base importada | 21 tablas (19 base + 2 de UV-19), 9 usuarios semilla |
 | Login de los cuatro roles | 302 a su dashboard; dashboards 200 |
 | CSS del panel | 200 |
 | API de usuarios | 200 |
@@ -109,6 +111,10 @@ Las correcciones 1–6 (UV-9) se aplicaron **solo en la copia**. Las correccione
 | Matrícula sobre 20 créditos | ✅ 400 con motivo |
 | Límite de subida | ✅ `200M / 210M` |
 | Health check | ✅ `{"app":"UNIVIRTUAL_SPRINTS12","db":"ok"}` |
+| UV-19: envío a estudiantes y profesores | ✅ 7 destinatarios en la copia |
+| UV-19: bandeja del destinatario | ✅ Asunto, remitente, facultad y marca de “Nuevo” |
+| UV-19: marcar como leído | ✅ `noLeidos` pasa a 0 |
+| UV-19: notificación | ✅ URL a `/univirtual-avance/pages/{rol}/dashboard.php?view=mensajes` |
 
 ---
 
@@ -120,7 +126,8 @@ Las correcciones 1–6 (UV-9) se aplicaron **solo en la copia**. Las correccione
 | Base de datos | `univirtual` | `univirtual_sprints12` |
 | Servidor | Apache de XAMPP | Apache de XAMPP |
 | URL | `http://localhost/univirtual` | `http://localhost/univirtual-avance` |
-| UV-9 | En corrección | Corregido |
+| UV-9 | Corregido | Corregido |
+| UV-19 | Implementado | Implementado |
 | Entregas | `archivoEntrega` + `urlArchivo` | Solo `urlArchivo` |
 | Correcciones post-demo | Aplicadas | Aplicadas |
 | Uso | Desarrollo | Demostración del avance |
@@ -135,8 +142,8 @@ Las correcciones 1–6 (UV-9) se aplicaron **solo en la copia**. Las correccione
 - Requiere conexión a internet para los CDN de React y Chart.js.
 - Las subidas están limitadas a 200 MB por archivo (post de 210 MB) en `.htaccess`.
 - La demo de calificación depende de la entrega de Laura en el Taller 2; si se califica en el ensayo, hay que reiniciarla con el SQL de `06-anexos/guion-edwin.md`.
-- Las historias del Sprint 3 se muestran solo como avance anticipado (videollamadas, notificaciones, panel del directivo); la mensajería del directivo (UV-19) no tiene pantalla y el Sprint 4 no está incluido.
-- Si se mueve a otro equipo, hay que importar `config/database_v8.sql` y `config/fix_passwords.sql` en la base `univirtual_sprints12`.
+- Las historias del Sprint 3 tienen flujo verificable: videollamadas, notificaciones, mensajería del directivo (UV-19) y panel del directivo; el Sprint 4 no está incluido.
+- Si se mueve a otro equipo, hay que importar `config/database_v8.sql`, `config/migracion_uv19_comunicados.sql` y `config/fix_passwords.sql` en la base `univirtual_sprints12`.
 
 ---
 

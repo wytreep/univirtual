@@ -17,7 +17,7 @@
 | UV-28 | Modelo ER y script SQL 3FN con datos semilla | EPIC-09 Base de datos | 1 | 9 oct | 🟡 Con observaciones | `config/database_v8.sql`, `02-producto/modelo-datos.md` | 85% |
 | UV-29 | Estructura base del backend (autoload, PDO, clases base, API JSON) | EPIC-09 Base de datos | 1 | 16 oct | ✅ Completada | `config/config.php`, `api/v1/Controller.php`, `models/Model.php` | 100% |
 | UV-30 | Layout base React, componentes compartidos y consumo de API | EPIC-02 Dashboards | 1 | 30 oct | 🟡 Con observaciones | `pages/*/dashboard.php`, `assets/css/panel.css`, `includes/View.php` | 85% |
-| UV-9 | CRUD de usuarios por Admin | EPIC-01 Autenticación | 2 | 30 oct | 🔴 En corrección | `api/v1/usuarios.php`, `models/Usuario.php`, `pages/admin/dashboard.php` | 60% (corregida en la copia ejecutable) |
+| UV-9 | CRUD de usuarios por Admin | EPIC-01 Autenticación | 2 | 30 oct | ✅ Completada | `api/v1/usuarios.php`, `models/Usuario.php`, `pages/admin/dashboard.php` | 100% |
 | UV-10 | Dashboard del Estudiante | EPIC-02 Dashboards | 2 | 30 oct | ✅ Completada | `api/v1/estudiante.php`, `pages/estudiante/dashboard.php` | 100% |
 | UV-11 | Dashboard del Profesor | EPIC-02 Dashboards | 2 | 30 oct | 🟡 Con observaciones | `api/v1/profesor.php`, `pages/profesor/dashboard.php`, `06-anexos/correcciones-demo.md` | 90% |
 | UV-12 | Inscripción de estudiantes a materias | EPIC-03 Gestión académica | 2 | 23 oct | ✅ Completada | `api/v1/inscripciones.php`, `pages/admin/dashboard.php` | 100% |
@@ -25,7 +25,7 @@
 | UV-32 | Plan de pruebas y casos de aceptación | EPIC-10 Calidad | 2 | 16 oct | ✅ Completada | `04-pruebas/plan-pruebas.md`, `04-pruebas/casos-aceptacion.md` | 100% |
 | UV-16 | Crear y lanzar videollamada por materia (Jitsi) | Clases y comunicación | 3 | 13 nov | 🔵 En avance anticipado | `api/v1/videollamadas.php`, Jitsi en dashboards, tabla `videollamadas`, `06-anexos/correcciones-demo.md` | 85% |
 | UV-18 | Notificaciones internas por evento académico | Clases y comunicación | 3 | 13 nov | 🔵 En avance anticipado | `notificar()`, polling 30s, tabla `notificaciones`, `06-anexos/correcciones-demo.md` | 85% |
-| UV-19 | Mensajes del Directivo a estudiantes y profesores | Clases y comunicación | 3 | 13 nov | 🔵 Iniciada | Base de mensajes y `notificaciones`; sin endpoint propio | 20% |
+| UV-19 | Mensajes del Directivo a estudiantes y profesores | Clases y comunicación | 3 | 13 nov | ✅ Completada | `api/v1/comunicados.php`, `config/migracion_uv19_comunicados.sql`, dashboards | 100% |
 | UV-31 | Dashboard del Directivo | Clases y comunicación | 3 | 13 nov | 🔵 En avance anticipado | `pages/directivo/dashboard.php`, `api/v1/directivo.php`, `api/v1/stats.php` | 75% |
 
 ---
@@ -50,13 +50,13 @@
 | Métrica | Valor |
 |---|---:|
 | HU comprometidas | 6 |
-| HU completamente cerradas | 3 |
+| HU completamente cerradas | 4 |
 | HU con observaciones | 2 |
-| HU en corrección | 1 |
-| Cumplimiento funcional | 83% (5/6 con flujo verificable) |
+| HU en corrección | 0 |
+| Cumplimiento funcional | 100% (6/6 con flujo verificable) |
 | Calidad documental | 100% (6/6 con evidencia) |
 
-**Lectura:** el núcleo académico está operativo. El único bloqueo es la creación de usuarios (UV-9), corregible con un cambio acotado.
+**Lectura:** el núcleo académico está operativo. La creación de usuarios (UV-9) quedó corregida y verificada en original y copia; UV-11 y UV-13 mantienen observaciones menores de pruebas, no de funcionalidad.
 
 ### Sprint 3 — 2 al 13 de noviembre de 2026 (próximas a vencer)
 
@@ -66,10 +66,10 @@ El Sprint 3 inicia el 2 de noviembre; estas historias se documentan como **avanc
 |---|---:|
 | HU comprometidas | 4 |
 | Avances anticipados con flujo verificable | 3 (UV-16, UV-18, UV-31) |
-| Iniciada (solo base técnica ampliada) | 1 (UV-19) |
-| Avance promedio | 66% |
+| Completada | 1 (UV-19) |
+| Avance promedio | 86% |
 
-**Lectura:** tres de las cuatro historias que abren el Sprint 3 ya avanzaron durante los sprints 1 y 2: videollamadas y notificaciones funcionan de punta a punta en su alcance actual, y el dashboard del directivo consume datos reales. UV-19 es la más rezagada y depende de cerrar UV-31.
+**Lectura:** las cuatro historias del Sprint 3 tienen flujo verificable. UV-19 cerró el 19 de noviembre con bandeja, envío por facultad y notificación; UV-16, UV-18 y UV-31 conservan como deuda la formalización de pruebas y los reportes.
 
 ---
 
@@ -78,7 +78,7 @@ El Sprint 3 inicia el 2 de noviembre; estas historias se documentan como **avanc
 | HU | Criterio clave | Resultado |
 |---|---|---|
 | UV-8 | Cada rol llega a su dashboard y no puede entrar al de otro rol. | ✅ Verificado por código y suite Selenium. |
-| UV-9 | Admin crea, edita, activa/desactiva y elimina usuarios de los cuatro roles. | 🔴 Crear estudiante/profesor falla por contrato y esquema. Editar/desactivar sí funciona. |
+| UV-9 | Admin crea, edita, activa/desactiva y elimina usuarios de los cuatro roles. | ✅ Crear los cuatro roles, listar, editar y desactivar verificados en original y copia. |
 | UV-10 | El estudiante ve materias, promedio, asistencia, tareas y notificaciones. | ✅ Endpoint y vista implementados. |
 | UV-11 | El profesor ve materias, estudiantes, entregas por calificar y actividad reciente. | 🟡 Dashboard OK; el listado de entregas quedó corregido (`urlArchivo`) y probado en original y copia. |
 | UV-12 | Admin inscribe y desinscribe estudiantes; se bloquea si no cumple créditos mínimos. | ✅ Validación implementada, tope de 20 créditos por semestre, motivo explícito y notificación al estudiante. |
@@ -92,8 +92,8 @@ El Sprint 3 inicia el 2 de noviembre; estas historias se documentan como **avanc
 | UV-32 | Hay plan de pruebas y casos de aceptación ejecutables. | ✅ 100% — plan y 30 casos; re-ejecución pendiente. |
 | UV-16 | El profesor crea y lanza una videollamada por materia (Jitsi). | 🔵 85% — API completa, permisos por profesor, disponibilidad calculada y Jitsi en los dashboards; falta suite de pruebas. |
 | UV-18 | Notificaciones internas por evento académico. | 🔵 85% — 5 eventos con `notificar()`, `creado_en` corregido y polling 30s; falta cobertura de foros/mensajería. |
-| UV-19 | El directivo envía mensajes a estudiantes y profesores. | 🔵 20% — sin endpoint ni pantalla propia; solo la base de mensajes y `notificaciones`. |
-| UV-31 | El directivo ve su panel con resumen y segmentación por facultad. | 🔵 75% — panel, perfil y contraseña funcionan; faltan reportes y mensajes (UV-19). |
+| UV-19 | El directivo envía mensajes a estudiantes y profesores. | ✅ Envío por facultad y público, bandeja del destinatario, marca de leído y notificación; verificado en original y copia. |
+| UV-31 | El directivo ve su panel con resumen y segmentación por facultad. | 🔵 75% — panel, perfil, contraseña y mensajería (UV-19) funcionan; faltan reportes. |
 
 ---
 

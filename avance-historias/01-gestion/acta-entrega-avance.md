@@ -55,13 +55,13 @@ Dejar constancia de la entrega del avance del proyecto UNI-VIRTUAL conforme al a
 
 ### 3.3 Sprint 3 — Clases y comunicación (2–13 nov 2026, próximas a vencer)
 
-Estas historias aún no inician formalmente (el sprint abre el 2 de noviembre); se entrega el **avance anticipado** construido durante los sprints 1 y 2, sin declararlas cerradas.
+Estas historias se entregan con su estado real: UV-19 quedó cerrada y las otras tres conservan deuda declarada.
 
 | HU | Entregable | Estado | Avance |
 |---|---|---|---|
 | UV-16 | Videollamada por materia (Jitsi) | Avance anticipado | 85% |
 | UV-18 | Notificaciones internas por evento | Avance anticipado | 85% |
-| UV-19 | Mensajes del Directivo | Iniciada — solo base técnica | 20% |
+| UV-19 | Mensajes del Directivo | Completada (19 nov 2026) | 100% |
 | UV-31 | Dashboard del Directivo | Avance anticipado | 75% |
 
 ---
@@ -70,7 +70,7 @@ Estas historias aún no inician formalmente (el sprint abre el 2 de noviembre); 
 
 1. Repositorio Git con ramas `main` y `develop` y tag `v8.0.0`.
 2. 61 archivos PHP verificados con `php -l` sin errores de sintaxis.
-3. Esquema `config/database_v8.sql` con 19 tablas y datos semilla.
+3. Esquema `config/database_v8.sql` con 19 tablas base, más `config/migracion_uv19_comunicados.sql` con 2 tablas (21 en total), y datos semilla.
 4. Documentos de producto, arquitectura, ADRs y modelo de datos.
 5. 17 fichas de historia con criterios, evidencia y porcentaje de avance (13 vencidas + 4 próximas a vencer).
 6. Plan de pruebas con 30 casos de aceptación.

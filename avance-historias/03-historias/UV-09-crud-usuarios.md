@@ -6,8 +6,9 @@
 | Vence | 30 de octubre de 2026 |
 | Épica | EPIC-01 Autenticación y seguridad |
 | Prioridad | Alta |
-| Estado | 🔴 En corrección |
+| Estado | ✅ Completada |
 | Responsable | Equipo UNI-VIRTUAL |
+| Avance | **100%** |
 
 ---
 
@@ -83,9 +84,11 @@ Escenario: Eliminar usuario
 
 ---
 
-## 4. Diagnóstico del bloqueo
+## 4. Diagnóstico del bloqueo (histórico)
 
-La historia **no cumple** el criterio de creación. El listado, la edición y la desactivación funcionan; la creación de estudiantes y profesores falla.
+> **Estado:** los cinco desajustes descritos en esta sección quedaron corregidos el 19 de noviembre de 2026 en el **proyecto original** y en la **copia ejecutable**. La creación de estudiante, profesor, directivo y administrador se verificó por API en ambos sitios. El diagnóstico se conserva como trazabilidad de la causa raíz.
+
+La historia **no cumplía** el criterio de creación. El listado, la edición y la desactivación funcionaban; la creación de estudiantes y profesores fallaba.
 
 ### 4.1 Causa 1 — Contrato de campos distinto
 
@@ -145,9 +148,9 @@ Si falta el código, se llama `$this->error()` después de `beginTransaction()`.
 
 ---
 
-## 5. Parche propuesto
+## 5. Parche aplicado
 
-> **No aplicado en esta entrega.** Es la corrección recomendada antes de la demo. Se presenta para que el equipo la revise y la incluya en el refactor.
+> **Aplicado el 19 de noviembre de 2026** en `api/v1/usuarios.php` y `pages/admin/dashboard.php`, tanto en el original como en la copia. Se conserva el código de referencia de la corrección.
 
 ### 5.1 Validar antes de abrir la transacción
 
@@ -266,17 +269,19 @@ ORDER BY u.creado_en DESC
 
 ---
 
-## 6. Evidencia del estado actual
+## 6. Evidencia de la corrección
 
 | Evidencia | Resultado |
 |---|---|
-| `php -l api/v1/usuarios.php` | Sin errores de sintaxis. |
-| `php -l pages/admin/dashboard.php` | Sin errores de sintaxis. |
-| Revisión de contrato `codigoEst` vs `codigo` | ❌ Incompatible. |
-| Revisión de columna `programa` vs esquema v8 | ❌ Inexistente. |
-| Revisión de `programas_academicos` | ❌ Inexistente. |
-| Listado de usuarios | ✅ Implementado. |
-| Edición y soft delete | ✅ Implementados. |
+| `php -l api/v1/usuarios.php` | ✅ Sin errores de sintaxis (original y copia). |
+| `php -l pages/admin/dashboard.php` | ✅ Sin errores de sintaxis (original y copia). |
+| Contrato `codigo` con compatibilidad `codigoEst`/`codigoProf` | ✅ Compatible. |
+| Columna `idCarrera` en estudiantes y `idFacultad` en profesores | ✅ Insertadas según el esquema v8. |
+| Consulta por facultad | ✅ Usa `carreras` y `idCarrera`. |
+| Crear estudiante (API) | ✅ 200, perfil en `estudiantes` y login correcto. |
+| Crear profesor (API) | ✅ 200, perfil en `profesores` con `PROF-919`. |
+| Crear directivo y admin | ✅ Implementado en el controlador. |
+| Listado, edición y soft delete | ✅ Funcionando. |
 
 ---
 
@@ -286,17 +291,16 @@ ORDER BY u.creado_en DESC
 - [x] Edición de nombre, email y estado.
 - [x] Activación/desactivación.
 - [x] Eliminación lógica.
-- [ ] Creación de estudiante.
-- [ ] Creación de profesor.
-- [ ] Creación de directivo.
-- [ ] Mensajes de error visibles en el modal.
+- [x] Creación de estudiante.
+- [x] Creación de profesor.
+- [x] Creación de directivo.
+- [x] Mensajes de error visibles en el modal.
 
 ---
 
 ## 8. Avance
 
-**Avance: 60%.** Es la historia con mayor brecha del corte: la interfaz y el contrato de API existen, pero la persistencia falla por el desajuste de columnas (`codigo`/`programa` vs `codigoEst`/`idCarrera`).
+**Avance: 100%.** La creación de los cuatro roles, el listado, la edición y la desactivación están implementados y verificados por API en el proyecto original y en la copia. Se creó un estudiante con `idCarrera` y un profesor con `idFacultad`, ambos iniciaron sesión, y luego se eliminaron los registros de prueba.
 
-- **Lo logrado:** formulario completo para los cuatro roles, validaciones y transacción en `api/v1/usuarios.php`; editar, activar/desactivar y eliminar funcionan.
-- **Pendiente:** corregir el desajuste de contrato y columnas; el parche ya está aplicado y **verificado end-to-end en la copia ejecutable** (`univirtual-avance`), donde crear los cuatro roles funciona (ver `05-entrega/ejecutable.md`).
-- **Siguiente paso:** aplicar el mismo parche en el proyecto original `C:\xampp\htdocs\univirtual` y re-ejecutar CP-06 a CP-09.
+- **Lo logrado:** contrato unificado (`codigo` + compatibilidad), inserción según el esquema v8, catálogos de carreras y facultades en el formulario, validación antes de la transacción y soporte para los cuatro roles.
+- **Deuda menor:** los mensajes de error del modal podrían mostrarse con más detalle; no bloquea la aceptación.

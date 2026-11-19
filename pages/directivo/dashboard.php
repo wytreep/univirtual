@@ -385,6 +385,125 @@ class DirectivoView extends View {
       );
     }
 
+    // ── Mensajes (UV-19) ─────────────────────────────────────────────
+    function MensajesDirectivo() {
+      const [enviados, setEnviados] = useState(null);
+      const [form, setForm] = useState({ publico: 'ambos', asunto: '', contenido: '' });
+      const [msg, setMsg] = useState(null);
+      const [saving, setSaving] = useState(false);
+
+      const cargar = () => {
+        fetch(API('comunicados.php?action=enviados'), { credentials: 'include' })
+          .then(r => r.json())
+          .then(d => setEnviados(d.status === 'ok' ? d.data : []))
+          .catch(() => setEnviados([]));
+      };
+
+      useEffect(() => { cargar(); }, []);
+
+      const enviar = async () => {
+        if (!form.asunto.trim() || !form.contenido.trim()) {
+          return setMsg({ ok: false, text: 'Escribe el asunto y el mensaje.' });
+        }
+        setSaving(true);
+        setMsg(null);
+        try {
+          const res = await fetch(API('comunicados.php'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action: 'enviar', ...form }),
+          });
+          const data = await res.json();
+          if (data.status === 'ok') {
+            setMsg({ ok: true, text: data.mensaje });
+            setForm({ publico: form.publico, asunto: '', contenido: '' });
+            cargar();
+          } else {
+            setMsg({ ok: false, text: data.mensaje || 'No se pudo enviar.' });
+          }
+        } catch (e) {
+          setMsg({ ok: false, text: 'Error de red al enviar el comunicado.' });
+        } finally {
+          setSaving(false);
+        }
+      };
+
+      if (!enviados) return <Spinner/>;
+
+      return (
+        <div className="page">
+          <div className="welcome-banner">
+            <h1>✉️ Mensajes</h1>
+            <span className="badge">{enviados.length} enviados</span>
+          </div>
+
+          <div className="card" style={{ marginBottom: 20 }}>
+            <h3 style={{ marginTop: 0 }}>Nuevo comunicado</h3>
+
+            <div className="form-group">
+              <label>Público</label>
+              <select className="form-input" value={form.publico}
+                      onChange={e => setForm({ ...form, publico: e.target.value })}>
+                <option value="ambos">Estudiantes y profesores</option>
+                <option value="estudiantes">Solo estudiantes</option>
+                <option value="profesores">Solo profesores</option>
+              </select>
+            </div>
+
+            <div className="form-group" style={{ marginTop: 12 }}>
+              <label>Asunto</label>
+              <input className="form-input" maxLength={150} value={form.asunto}
+                     onChange={e => setForm({ ...form, asunto: e.target.value })}
+                     placeholder="Ej. Cambio de fecha del parcial" />
+            </div>
+
+            <div className="form-group" style={{ marginTop: 12 }}>
+              <label>Mensaje</label>
+              <textarea className="form-input" rows={5} value={form.contenido}
+                        onChange={e => setForm({ ...form, contenido: e.target.value })}
+                        placeholder="Escribe el aviso para tu facultad..." />
+            </div>
+
+            {msg && <div className={`alert ${msg.ok ? 'alert-success' : 'alert-error'}`} style={{ marginTop: 12 }}>{msg.text}</div>}
+
+            <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={enviar} disabled={saving}>
+              {saving ? 'Enviando...' : 'Enviar comunicado'}
+            </button>
+
+            <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 10 }}>
+              Se envía solo a estudiantes y profesores activos de tu facultad, y cada uno recibe una notificación.
+            </p>
+          </div>
+
+          <div className="card">
+            <h3 style={{ marginTop: 0 }}>Enviados</h3>
+            <table className="tbl">
+              <thead>
+                <tr><th>Asunto</th><th>Público</th><th>Destinatarios</th><th>Leídos</th><th>Fecha</th></tr>
+              </thead>
+              <tbody>
+                {enviados.length === 0 && (
+                  <tr><td colSpan="5" style={{ textAlign: 'center', color: 'var(--muted)' }}>
+                    Aún no has enviado comunicados.
+                  </td></tr>
+                )}
+                {enviados.map(c => (
+                  <tr key={c.idComunicado}>
+                    <td style={{ fontWeight: 600 }}>{c.asunto}</td>
+                    <td>{c.publico}</td>
+                    <td>{c.destinatarios}</td>
+                    <td>{c.leidos} / {c.destinatarios}</td>
+                    <td>{new Date(c.creado_en.replace(' ', 'T')).toLocaleString('es-CO')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
     // ── App principal ────────────────────────────────────────────────
     function DirectivoApp() {
       const [vista, setVista] = useState('resumen');
@@ -395,6 +514,7 @@ class DirectivoView extends View {
         { id: 'profesores',    ico: '👨‍🏫', lbl: 'Profesores'    },
         { id: 'estudiantes',   ico: '👩‍🎓', lbl: 'Estudiantes'   },
         { id: 'materias',      ico: '📚',  lbl: 'Materias'       },
+        { id: 'mensajes',      ico: '✉️',  lbl: 'Mensajes'       },
         { id: 'configuracion', ico: '⚙️',  lbl: 'Configuración'  },
       ];
 
@@ -456,6 +576,7 @@ class DirectivoView extends View {
             {vista === 'profesores'    && <Profesores/>}
             {vista === 'estudiantes'   && <Estudiantes/>}
             {vista === 'materias'      && <MateriasFacultad/>}
+            {vista === 'mensajes'      && <MensajesDirectivo/>}
             {vista === 'configuracion' && <Configuracion/>}
           </main>
         </>

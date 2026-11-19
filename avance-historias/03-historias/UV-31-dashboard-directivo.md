@@ -10,7 +10,7 @@
 | Responsable | Equipo UNI-VIRTUAL |
 | Avance | **75%** |
 
-> Historia del Sprint 3 con **avance anticipado fuerte**: el panel del directivo ya consume datos reales y ofrece perfil y contraseña; lo faltante es la segmentación por facultad y la mensajería (UV-19).
+> Historia del Sprint 3 con **avance anticipado fuerte**: el panel del directivo consume datos reales, ofrece perfil, contraseña y mensajería (UV-19, cerrada). Lo faltante es la segmentación de resultados por facultad y los reportes.
 
 ---
 
@@ -39,6 +39,7 @@
 | API del directivo | `api/v1/directivo.php` | `resumen`, `profesores`, `estudiantes`, `materias`, `actualizarPerfil`, `cambiarPassword`. |
 | Panel React | `pages/directivo/dashboard.php` | Carga con `<?= BASE_URL ?>`, navegación por pestañas y polling de notificaciones. |
 | Estadísticas globales | `api/v1/stats.php` | Totales de usuarios, estudiantes, profesores, materias, entregas. |
+| Mensajería (UV-19) | `api/v1/comunicados.php` + pestaña **Mensajes** | Envío por facultad y público, bandeja y notificación. |
 | Acceso por rol (UV-8) | `includes/auth.php` | El directivo entra y no accede a paneles ajenos. |
 
 ---
@@ -49,10 +50,10 @@
 - Panel operativo con resumen, listados, perfil y contraseña, usando datos reales.
 - API JSON con contrato uniforme; se consume con credenciales de sesión.
 - Polling de notificaciones (comparte la base de UV-18).
+- Mensajería del directivo por facultad y público, con bandeja y notificación (UV-19).
 
 **Pendiente**
 - Segmentación de resultados por la facultad del directivo.
-- Sección de mensajes (dependencia directa de UV-19).
 - Gráficas de desempeño por facultad (reportes, afecta también UV-20).
 
 ---

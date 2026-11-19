@@ -69,7 +69,7 @@ Navegador (React 18 CDN)
 Apache + PHP 8 (API JSON + vistas)
         │  PDO preparado
         ▼
-MySQL 8 (19 tablas, 3FN)
+MySQL 8 (21 tablas: 19 base + 2 de UV-19, 3FN)
         │
         ├── uploads/ (materiales, entregas, avatares)
         └── Jitsi Meet (link externo, Sprint 3)
@@ -380,7 +380,7 @@ El sistema debe operar sobre un esquema MySQL 8 en 3FN, con integridad referenci
 
 **Criterios de aceptación**
 
-- 19 tablas creadas sin errores.
+- 19 tablas base + 2 de la migración UV-19 creadas sin errores.
 - Claves foráneas activas.
 - Datos semilla suficientes para iniciar sesión y demostrar el flujo.
 - Script idempotente (`DROP TABLE IF EXISTS`).
@@ -494,7 +494,7 @@ El proyecto debe tener un plan de pruebas y casos de aceptación ejecutables.
 | UV-25 | — | `PRD.md`, `SRS-IEEE830.md` | Revisión documental |
 | UV-26 | — | `arquitectura.md`, `ADRs.md` | Revisión documental |
 | UV-27 | RF-12 | `README.md`, `docs/GIT_WORKFLOW.md` | CP-30 |
-| UV-28 | RF-11 | `config/database_v8.sql` | Revisión del script (19 tablas) |
+| UV-28 | RF-11 | `config/database_v8.sql`, `config/migracion_uv19_comunicados.sql` | Revisión del script (19 base + 2 migración = 21) |
 | UV-29 | RF-09 | `api/v1/Controller.php`, `models/Model.php` | CP-26 a CP-29 |
 | UV-30 | RF-10 | `pages/*/dashboard.php` | CP-11, CP-14, CP-15 |
 | UV-32 | RF-13 | `04-pruebas/` | CP-01 a CP-30 |

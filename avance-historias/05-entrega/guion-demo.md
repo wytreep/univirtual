@@ -3,7 +3,7 @@
 **Duración objetivo:** 15 minutos  
 **Audiencia:** docente y equipo  
 **Entorno:** `http://localhost/univirtual-avance/` con XAMPP activo (copia ejecutable con los parches aplicados)  
-**Base de datos:** `univirtual_sprints12` (19 tablas)  
+**Base de datos:** `univirtual_sprints12` (21 tablas: 19 del esquema v8 + 2 de la migración UV-19)  
 **Contraseña de los usuarios semilla:** `123456`  
 **Actualización 6 nov 2026:** los cinco fallos vistos en la demo de clase ya están corregidos; el detalle está en `06-anexos/correcciones-demo.md`.
 
@@ -12,7 +12,7 @@
 ## 0. Antes de entrar (1 min)
 
 1. Verificar que Apache y MySQL estén activos en el Panel de Control de XAMPP.
-2. Confirmar que la base `univirtual_sprints12` esté cargada (19 tablas).
+2. Confirmar que la base `univirtual_sprints12` esté cargada (21 tablas, incluida la migración UV-19).
 3. Abrir una pestaña limpia en `http://localhost/univirtual-avance/`.
 4. Tener a mano la consola del navegador por si falla un `fetch`.
 
@@ -63,7 +63,7 @@
 
 1. Entrar como admin.
 2. Abrir **Usuarios**.
-3. **Crear un usuario nuevo de cada rol** (estudiante, profesor, directivo): el parche del contrato `codigo`/`codigoEst` y `idCarrera`/`idFacultad` ya está aplicado en esta copia (UV-9 pasa de 60% de avance solo en el original a verificada aquí).
+3. **Crear un usuario nuevo de cada rol** (estudiante, profesor, directivo): el contrato `codigo`/`codigoEst` y `idCarrera`/`idFacultad` ya está corregido y verificado en el original y en la copia (UV-9, 100%).
 4. Mostrar la generación automática del código del profesor.
 5. Abrir **Inscripciones**.
 6. Inscribir un estudiante en una materia.
@@ -76,25 +76,25 @@
 
 ## 5. Avance anticipado del Sprint 3 (3 min)
 
-Estas historias vencen el 13 de noviembre; no se declaran cerradas, se muestra el avance ya construido:
+Estas historias vencen el 13 de noviembre; se muestra su estado real: UV-19 quedó cerrada y las otras tres tienen avance:
 
 1. Entrar como directivo (`diana@univirtual.edu.co`).
 2. Mostrar el **dashboard del directivo** (UV-31, 75%): resumen, profesores, estudiantes, materias; actualizar el perfil.
 3. Volver al profesor y abrir una materia → **crear una videollamada** (UV-16, 85%): la API `videollamadas.php?action=crear` genera la sesión Jitsi. Aclarar que **solo el profesor dueño de la materia puede crearla**; el admin únicamente monitorea.
 4. Entrar como estudiante y entrar a la videollamada desde su panel; el enlace se habilita 10 minutos antes.
 5. Señalar el **polling de notificaciones** (UV-18, 85%): la campana refresca cada 30 segundos sin recargar.
-6. Aclarar la salvedad: **UV-19 (mensajes del directivo) solo tiene la base técnica** (tabla `mensajes` + `notificar()`); pantalla y endpoint quedan para el Sprint 3.
+6. Cerrar con **UV-19 (mensajería del directivo)**: desde el panel del directivo, enviar un comunicado a estudiantes y profesores; entrar como estudiante, abrir **Mensajes**, mostrar la marca de “Nuevo”, leerlo y verificar la notificación.
 
-**Mensaje:** “Tres de las cuatro historias del Sprint 3 ya avanzaron de punta a punta en su alcance actual; la mensajería del directivo es la más rezagada y lo declaramos así.”
+**Mensaje:** “Las cuatro historias del Sprint 3 tienen flujo verificable; UV-19 quedó cerrada y las otras tres conservan deuda de pruebas y reportes declarada.”
 
 ---
 
 ## 6. Documentación y calidad (1.5 min)
 
 1. Abrir `avance-historias/README.md` y recorrer la estructura.
-2. Mostrar `01-gestion/matriz-historias.md`: 17 historias con porcentaje de avance (7 al 100%, 5 entre 85–90%, UV-9 60% corregida en la copia, 4 del Sprint 3 con avance anticipado).
+2. Mostrar `01-gestion/matriz-historias.md`: 17 historias con porcentaje de avance (8 vencidas al 100%, 5 entre 85–90%; del Sprint 3, UV-19 al 100% y las otras tres con avance).
 3. Mostrar `02-producto/arquitectura.md` y un ADR.
-4. Mostrar `04-pruebas/resultados.md` y `php -l`: 61/61 en el original, 52/52 en la copia.
+4. Mostrar `04-pruebas/resultados.md` y `php -l`: 52/52 archivos de aplicación en original y copia.
 5. Mencionar `06-anexos/correcciones-demo.md`: cinco fallos, cinco causas y cinco pruebas.
 
 **Mensaje:** “No declaramos terminado lo que no está: cada historia muestra su avance real, lo logrado y lo pendiente.”
@@ -105,11 +105,11 @@ Estas historias vencen el 13 de noviembre; no se declaran cerradas, se muestra e
 
 **Puntos a dejar claros:**
 
-- 13 historias vencidas evaluadas: 7 cerradas, 5 con observaciones, 1 en corrección (corregida en la copia ejecutable).
-- 4 historias próximas a vencer (Sprint 3) con avance anticipado: UV-16 85%, UV-18 85%, UV-31 75%, UV-19 20%.
-- El parche de UV-9 está aplicado y verificado en esta copia; falta propagarlo al repositorio original.
+- 13 historias vencidas evaluadas: 8 cerradas y 5 con observaciones no bloqueantes.
+- 4 historias del Sprint 3: UV-19 cerrada (100%); UV-16 85%, UV-18 85%, UV-31 75%.
+- UV-9 quedó corregida y verificada en el proyecto original y en la copia ejecutable.
 - Los cinco fallos de la demo (hora, `creado_en`, sala duplicada, `urlArchivo` y columnas de subida) están corregidos en original y copia.
-- La siguiente fase cierra lo pendiente del Sprint 3 y luego el refactor de clean code.
+- La siguiente fase cierra los reportes del directivo y formaliza las pruebas del Sprint 3.
 
 **Frase final:** “El avance es funcional en el núcleo académico, demuestra ritmo de sobrepaso sobre el Sprint 3 y es honesto en lo que falta: preferimos mostrar el avance real con las salvedades visibles antes que una demo que se caiga en la pregunta.”
 

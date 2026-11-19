@@ -64,7 +64,7 @@ C4Container
 
     Container(web, "Frontend React", "React 18 + Babel CDN", "SPA embebida en cada dashboard PHP")
     Container(php, "Aplicación PHP", "PHP 8 + Apache", "Vistas, API JSON, controladores y modelos")
-    ContainerDb(db, "Base de datos", "MySQL 8", "19 tablas en 3FN")
+    ContainerDb(db, "Base de datos", "MySQL 8", "21 tablas (19 base + 2 UV-19) en 3FN")
     Container(files, "Almacenamiento", "Sistema de archivos", "uploads/ materiales, entregas, avatares")
 
     Rel(user, web, "Navega", "HTTPS")

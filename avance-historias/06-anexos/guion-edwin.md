@@ -11,7 +11,7 @@ Edwin interviene **dos veces**: primero arquitectura (después de Sebastián), y
 
 ## 0. Antes de salir
 
-- [ ] Saber de memoria: **React 18 por CDN → API PHP → PDO → MySQL de 19 tablas**, y **archivos en `uploads/`**.
+- [ ] Saber de memoria: **React 18 por CDN → API PHP → PDO → MySQL de 21 tablas (19 base + 2 de UV-19)**, y **archivos en `uploads/`**.
 - [ ] Saber de memoria: **la nota se valida en el backend y el profesor solo califica sus materias**.
 - [ ] Tener abiertas: `Figura_02_arquitectura.png` y `Figura_11_secuencia_entrega_calificacion.png`.
 - [ ] Tener abierta la copia en `http://localhost/univirtual-avance/`, sesión de James (profesor).
@@ -34,7 +34,7 @@ Edwin interviene **dos veces**: primero arquitectura (después de Sebastián), y
 >
 > Apache sirve las páginas y los endpoints. Cada endpoint es un controlador que hereda de una clase base: esa clase pone los headers CORS, exige sesión y valida el rol antes de ejecutar la acción. Por eso un estudiante no puede llamar una acción de administrador aunque conozca la URL.
 >
-> Debajo, los modelos usan PDO con sentencias preparadas; no concatenamos SQL. Y la base de datos es MySQL —MariaDB 10.4 en XAMPP— con 19 tablas.
+> Debajo, los modelos usan PDO con sentencias preparadas; no concatenamos SQL. Y la base de datos es MySQL —MariaDB 10.4 en XAMPP— con 21 tablas: 19 del esquema base y 2 de la migración de comunicados.
 >
 > Los archivos no van a la base: materiales, entregas y grabaciones se guardan en `uploads/`, y en la base queda la ruta. El `.htaccess` limita las subidas a 200 MB y bloquea la ejecución de PHP dentro de `uploads/`.
 >

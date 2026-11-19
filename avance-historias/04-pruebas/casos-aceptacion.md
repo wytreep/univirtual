@@ -1,4 +1,4 @@
-# Casos de aceptación — CP-01 a CP-30
+# Casos de aceptación — CP-01 a CP-31
 
 **Corte:** 29 de octubre de 2026  
 **Entorno:** XAMPP local, `http://localhost/univirtual`  
@@ -86,21 +86,33 @@ La columna **Estado** refleja la verificación al corte: por ejecución históri
 | CP-26 | Contrato JSON | Endpoint activo | Llamar un endpoint con sesión válida. | Responde `{status, mensaje, data}` con `Content-Type: application/json`. | ✅ |
 | CP-27 | Sin autenticación | Sin sesión | Llamar un endpoint protegido. | HTTP 401 y `status:"error"`. | ✅ |
 | CP-28 | Rol incorrecto | Sesión de estudiante | Llamar un endpoint de admin. | HTTP 403 y `status:"error"`. | ✅ |
-| CP-29 | Sintaxis PHP | Repositorio completo | Ejecutar `php -l` sobre los 61 archivos. | 61/61 sin errores. | ✅ |
+| CP-29 | Sintaxis PHP | Repositorio completo | Ejecutar `php -l` sobre los archivos de aplicación. | 52/52 sin errores (original y copia). | ✅ |
 | CP-30 | Reproducibilidad | Clon limpio | Seguir el README en una máquina nueva. | El sistema arranca sin pasos no documentados. | 🟡 |
 
 **Observación CP-30:** faltan `config/config.example.php` y `fix_passwords_v8.sql`, referenciados por el README. Se incluyen en `05-entrega/plantillas/`.
 
 ---
 
-## 7. Resumen
+## 7. Mensajería del directivo (UV-19)
+
+| ID | Caso | Precondición | Pasos | Resultado esperado | Estado |
+|---|---|---|---|---|---|
+| CP-31 | Comunicado del directivo | Sesión de directivo con facultad asignada | Abrir **Mensajes**, elegir público (estudiantes, profesores o ambos), escribir asunto y mensaje, y enviar. | El sistema crea el comunicado, lo distribuye solo a los usuarios activos de la facultad y genera una notificación por rol. | ✅ |
+| CP-31a | Bandeja y lectura | El destinatario recibió el comunicado | Entrar como estudiante o profesor y abrir **Mensajes**; hacer clic en el comunicado. | Se ve asunto, remitente, facultad y fecha; al abrirlo se marca como leído y `noLeidos` baja a 0. | ✅ |
+| CP-31b | Aislamiento y validación | Sesión de directivo | Enviar a un público sin destinatarios o con asunto vacío; comprobar que otro rol no recibe el aviso. | Responde 422 con mensaje claro y no cruza facultades ni roles. | ✅ |
+
+**Evidencia:** `04-pruebas/resultados.md` §10 y `03-historias/UV-19-mensajes-directivo.md` §5. Verificado en el proyecto original y en la copia ejecutable el 19 de noviembre de 2026.
+
+---
+
+## 8. Resumen
 
 | Estado | Casos | Porcentaje |
 |---|---:|---:|
-| ✅ Aprobado | 24 | 80% |
-| 🟡 Aprobado con observación | 3 | 10% |
-| 🔴 Fallido | 2 | 7% |
-| ⛔ Bloqueado | 1 | 3% |
-| **Total** | **30** | **100%** |
+| ✅ Aprobado | 29 | 94% |
+| 🟡 Aprobado con observación | 2 | 6% |
+| 🔴 Fallido | 0 | 0% |
+| ⛔ Bloqueado | 0 | 0% |
+| **Total** | **31** | **100%** |
 
-Los dos fallos y el bloqueo comparten una misma raíz: el contrato entre el frontend y el esquema v8 en el módulo de usuarios y en el de entregas. Corregidos esos puntos, la suite queda en 29/30 aprobados y 1 observación.
+Los dos fallos históricos de usuarios (CP-06 y CP-07) y el bloqueo de calificación (CP-25) quedaron cerrados y verificados en original y copia. Las dos observaciones restantes son CP-12 (periodo fijo) y CP-30 (reproducibilidad), sin impacto en el flujo demostrado.

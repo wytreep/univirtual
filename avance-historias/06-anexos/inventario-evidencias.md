@@ -1,6 +1,6 @@
 # Inventario de evidencias
 
-**Corte:** 31 de octubre de 2026  
+**Corte:** 31 de octubre de 2026; verificación UV-9/UV-19 el 19 de noviembre de 2026  
 **Convención:** `D` = documento del avance, `C` = código del repositorio, `P` = prueba, `S` = script/datos.
 
 ---
@@ -42,7 +42,7 @@
 | ID | Historia | Ruta | Estado |
 |---|---|---|---|
 | H-01 | UV-8 Login | `03-historias/UV-08-login.md` | ✅ |
-| H-02 | UV-9 CRUD usuarios | `03-historias/UV-09-crud-usuarios.md` | 🔴 |
+| H-02 | UV-9 CRUD usuarios | `03-historias/UV-09-crud-usuarios.md` | ✅ |
 | H-03 | UV-10 Dashboard estudiante | `03-historias/UV-10-dashboard-estudiante.md` | ✅ |
 | H-04 | UV-11 Dashboard profesor | `03-historias/UV-11-dashboard-profesor.md` | 🟡 |
 | H-05 | UV-12 Inscripciones | `03-historias/UV-12-inscripciones.md` | ✅ |
@@ -56,7 +56,7 @@
 | H-13 | UV-32 Pruebas | `03-historias/UV-32-pruebas.md` | ✅ |
 | H-14 | UV-16 Videollamadas (Sprint 3, avance anticipado) | `03-historias/UV-16-videollamadas.md` | 🔵 85% |
 | H-15 | UV-18 Notificaciones (Sprint 3, avance anticipado) | `03-historias/UV-18-notificaciones.md` | 🔵 85% |
-| H-16 | UV-19 Mensajes directivo (Sprint 3, iniciada) | `03-historias/UV-19-mensajes-directivo.md` | 🔵 20% |
+| H-16 | UV-19 Mensajes directivo (Sprint 3, completada) | `03-historias/UV-19-mensajes-directivo.md` | ✅ 100% |
 | H-17 | UV-31 Dashboard directivo (Sprint 3, avance anticipado) | `03-historias/UV-31-dashboard-directivo.md` | 🔵 75% |
 
 ---
@@ -86,6 +86,8 @@
 | C-19 | API directivo (UV-31) | C | `api/v1/directivo.php` |
 | C-20 | API estadísticas (UV-31) | C | `api/v1/stats.php` |
 | C-21 | Emisor de notificaciones (UV-18) | C | `config/config.php::notificar()` |
+| C-22 | API de comunicados (UV-19) | C | `api/v1/comunicados.php` |
+| C-23 | Migración UV-19 | S | `config/migracion_uv19_comunicados.sql` |
 
 ---
 
@@ -98,12 +100,14 @@
 | P-03 | Suite E2E refactor | P | `tests/test_refactor_e2e.py` | Pendiente |
 | P-04 | Fixtures | P | `tests/conftest.py` | — |
 | P-05 | Reporte SCRUM-124 | P | `docs/reporte_tests_scrum124.md` | ✅ |
-| P-06 | Lint PHP | P | `php -l` | 61/61 |
+| P-06 | Lint PHP | P | `php -l` | 52/52 de aplicación |
 | P-07 | Plan de pruebas | D | `04-pruebas/plan-pruebas.md` | ✅ |
-| P-08 | Casos CP-01..CP-30 | D | `04-pruebas/casos-aceptacion.md` | ✅ |
+| P-08 | Casos CP-01..CP-31 | D | `04-pruebas/casos-aceptacion.md` | ✅ |
 | P-09 | Resultados del corte | D | `04-pruebas/resultados.md` | ✅ |
 | P-10 | Verificación post-demo en original y copia | P | `04-pruebas/resultados.md` §9 | ✅ |
 | P-11 | Datos de demo de calificación | S | `uploads/entregas/t2_is201_laura.pdf` + `entregas` id 8 | ✅ |
+| P-12 | UV-19: envío, bandeja, lectura y notificación | P | `04-pruebas/resultados.md` §10 | ✅ |
+| P-13 | UV-9: creación de los cuatro roles en original y copia | P | `04-pruebas/resultados.md` §10 | ✅ |
 
 ---
 
@@ -138,9 +142,9 @@
 | 1 | Capturas de la demo | Pendientes de tomar en el ensayo | Tomar el 6 nov antes de exponer. |
 | 2 | Salida de `pytest` del corte | Entorno detenido | Adjuntar log. |
 | 3 | Cobertura | No medida | Añadir `pytest-cov`. |
-| 4 | Prueba de creación de usuario | UV-9 con parche aplicado solo en la copia ejecutable | Añadir al original tras propagar el parche. |
+| 4 | Prueba de creación de usuario | UV-9 verificado en el original y en la copia el 19 nov 2026 | Registrado en `resultados.md` §10. |
 | 5 | Importación limpia de la base | No ejecutada | Añadir caso CP. |
-| 6 | Casos CP de UV-16, UV-18, UV-31 | Avance anticipado sin suite formal | Definir al iniciar el Sprint 3. |
+| 6 | Casos CP de UV-16, UV-18, UV-31 | Avance anticipado sin suite formal | UV-19 ya tiene CP-31; definir los demás al formalizar el Sprint 3. |
 
 ---
 
@@ -150,8 +154,9 @@
 # Existencia de documentos
 Get-ChildItem avance-historias -Recurse -File
 
-# Conteo de tablas
+# Conteo de tablas (19 del esquema + 2 de la migración UV-19)
 Select-String config\database_v8.sql -Pattern "CREATE TABLE"
+Select-String config\migracion_uv19_comunicados.sql -Pattern "CREATE TABLE"
 
 # Sintaxis PHP
 Get-ChildItem -Recurse -Filter *.php | ForEach-Object { php -l $_.FullName }

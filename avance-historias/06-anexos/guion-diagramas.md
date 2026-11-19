@@ -13,7 +13,7 @@
 |---|---|---|---|---|---:|
 | 1 | Casos de uso | `Figura_01_casos_de_uso.png` | Qué hace el sistema y qué puede hacer cada rol. | Todas | 1 min |
 | 2 | Arquitectura | `Figura_02_arquitectura.png` | React + API JSON en PHP + MySQL; separación por capas. | UV-29, UV-30 | 1 min |
-| 3 | Modelo entidad-relación | `Figura_04_modelo_er.png` | Base de datos relacional en 3FN; 19 tablas en v8. | UV-28 | 1 min |
+| 3 | Modelo entidad-relación | `Figura_04_modelo_er.png` | Base de datos relacional en 3FN; 19 tablas base + 2 de la migración UV-19. | UV-28 | 1 min |
 | 4 | Secuencia de login | `Figura_09_secuencia_login.png` | Autenticación, sesión y redirección por rol. | UV-8 | 1 min |
 | 5 | Secuencia de inscripción | `Figura_10_secuencia_inscripcion.png` | Validación de materia, duplicados y créditos mínimos. | UV-12 | 1 min |
 | 6 | Entrega y calificación | `Figura_11_secuencia_entrega_calificacion.png` | Subida de archivo, calificación y notificación. | UV-11, UV-13 | 1 min |
@@ -47,7 +47,7 @@
 ### 2.3 Modelo entidad-relación — “dónde vive la información”
 
 **Qué decir:**
-> “El modelo parte de `usuarios` y su rol. Alrededor están `facultades`, `carreras`, `estudiantes`, `profesores` y `directivos`. La operación académica está en `materias`, `aulas_virtuales`, `inscripciones`, `materiales`, `actividades` y `entregas`. La comunicación y las videollamadas están en `foros`, `mensajes`, `notificaciones`, `videollamadas` y `grabaciones`. En total son 19 tablas en la versión 8.”
+> “El modelo parte de `usuarios` y su rol. Alrededor están `facultades`, `carreras`, `estudiantes`, `profesores` y `directivos`. La operación académica está en `materias`, `aulas_virtuales`, `inscripciones`, `materiales`, `actividades` y `entregas`. La comunicación y las videollamadas están en `foros`, `mensajes`, `notificaciones`, `videollamadas` y `grabaciones`. En total son 19 tablas en la versión 8, más 2 de la migración de comunicados (UV-19): 21 en la base en ejecución.”
 
 **Mensaje clave:** el esquema soporta el flujo completo y ya incluye las tablas del Sprint 3.
 
@@ -112,7 +112,7 @@ Si el tiempo es corto, mostrar solo estas cuatro:
 4. **Gantt** — alcance y fechas.
 
 Cerrar con:
-> “De las 13 HUs vencidas, 7 están cerradas, 5 tienen observaciones no bloqueantes y 1 estaba en corrección; esa corrección ya está aplicada y verificada en la copia ejecutable. De las 4 próximas, 3 tienen avance anticipado y 1 está iniciada.”
+> “De las 13 HUs vencidas, 8 están cerradas y 5 tienen observaciones no bloqueantes; la corrección de UV-9 ya está aplicada y verificada en el original y en la copia. De las 4 próximas, UV-19 está cerrada y las otras 3 tienen avance anticipado.”
 
 ---
 
@@ -121,14 +121,14 @@ Cerrar con:
 | HU | Estado | Cómo explicarlo |
 |---|---|---|
 | UV-8 | ✅ Cerrada | Login y redirección por rol verificados. |
-| UV-9 | 🟡 Corregida en la copia | En el proyecto original estaba en corrección; en la copia ejecutable ya crea los cuatro roles. |
+| UV-9 | ✅ Cerrada | Creación de los cuatro roles verificada en el original y en la copia. |
 | UV-10 | ✅ Cerrada | Dashboard del estudiante con datos reales. |
 | UV-11 | 🟡 Con observaciones | Funciona; faltan detalles de mantenibilidad. |
 | UV-12 | ✅ Cerrada | Inscripción y validación de créditos. |
 | UV-13 | 🟡 Con observaciones | Registro de notas funciona; se añadió validación de propiedad. |
 | UV-16 | 🟡 Avance anticipado | Jitsi y notificaciones operativos en su alcance actual. |
 | UV-18 | 🟡 Avance anticipado | Notificaciones por evento y polling. |
-| UV-19 | 🔴 Iniciada | Solo base de mensajes; no presentar como terminada. |
+| UV-19 | ✅ Cerrada | Envío del directivo por facultad y público, bandeja y notificación; verificada en original y copia. |
 | UV-31 | 🟡 Avance anticipado | Dashboard del directivo con datos reales; falta segmentación. |
 
 **Regla de oro:** decir “implementado y verificado” solo para lo que está en la tabla como ✅; para el resto, “avance” o “en corrección”.
@@ -153,7 +153,7 @@ Para una defensa técnica, usar:
 - `fuentes/diagramas_grupo_f.puml` — 6 diagramas v8 (arquitectura, modelos, controladores, vistas, casos de uso y ER).
 
 Si el docente pregunta por la diferencia, responder:
-> “Los PNG son la vista conceptual del diseño; el código y el script SQL v8 son la fuente de verdad. La versión 8 agregó facultades, carreras, configuración y grabaciones, y pasó de 17 a 19 tablas.”
+> “Los PNG son la vista conceptual del diseño; el código y el script SQL v8 son la fuente de verdad. La versión 8 agregó facultades, carreras, configuración y grabaciones, y pasó de 17 a 19 tablas; la migración de UV-19 sumó 2 más.”
 
 ---
 
@@ -162,9 +162,9 @@ Si el docente pregunta por la diferencia, responder:
 | Pregunta | Respuesta |
 |---|---|
 | ¿Por qué incluyen HUs del Sprint 3? | Porque vencen el 13 de noviembre y ya tienen avance; el corte es de HUs vencidas y próximas, no de sprints completos. |
-| ¿Entonces no terminaron los sprints 1 y 2? | No se declaran sprints completos: se reportan 13 HUs vencidas con su avance real. 7 cerradas, 5 con observaciones y 1 corregida en la copia. |
-| ¿UV-9 está lista? | En el proyecto original estaba en corrección; en la copia ejecutable ya se probó la creación de los cuatro roles. |
-| ¿Qué falta? | UV-19 (mensajería del directivo), reportes/exportación, pruebas E2E y revisión OWASP del Sprint 4. |
+| ¿Entonces no terminaron los sprints 1 y 2? | No se declaran sprints completos: se reportan 13 HUs vencidas con su avance real. 8 cerradas y 5 con observaciones. |
+| ¿UV-9 está lista? | Sí. Se corrigió y probó la creación de los cuatro roles en el original y en la copia. |
+| ¿Qué falta? | Los reportes del directivo (UV-31), pruebas E2E, revisión OWASP y formalizar los casos de prueba del Sprint 3. |
 | ¿Cómo se ejecuta? | Apache y MySQL en XAMPP; abrir `http://localhost/univirtual-avance/`. |
 | ¿Por qué React por CDN? | Para evitar un build de Node en el entorno académico y mantener el despliegue simple en XAMPP. |
 
@@ -291,10 +291,10 @@ Si el docente limita el tiempo, se recorta proporcionalmente (unos 20 s por bloq
 Que todos expongan no significa que cada uno sepa solo su parte. Antes de la exposición, los seis deben poder responder sin leer:
 
 1. ¿Cuál es el alcance real y por qué no se declaran sprints completos?
-2. ¿Cuántas HUs están cerradas, con observaciones, en corrección e iniciadas?
-3. ¿Qué se corrigió en la copia ejecutable (UV-9 y `urlArchivo`)?
+2. ¿Cuántas HUs están cerradas, con observaciones y con avance en el Sprint 3?
+3. ¿Qué se corrigió el 19 de noviembre (UV-9 en el original y UV-19 con bandeja)?
 4. ¿Cómo se abre el sistema y con qué usuarios?
-5. ¿Qué falta para el cierre (UV-19, reportes, pruebas E2E)?
+5. ¿Qué falta para el cierre (reportes del directivo, pruebas E2E, OWASP)?
 6. ¿Por qué React por CDN y no un build de Node?
 
 Las respuestas cortas están en la sección 6 de este documento.

@@ -9,7 +9,7 @@
 ## 0. Antes de salir
 
 - [ ] Saber de memoria: **17 historias = 13 vencidas + 4 próximas**.
-- [ ] Saber de memoria: **7 cerradas, 5 con observaciones, 1 corregida (UV-9), 4 próximas**.
+- [ ] Saber de memoria: **8 cerradas, 5 con observaciones; del Sprint 3, UV-19 cerrada y tres con avance**.
 - [ ] Tener abiertas: `Figura_16_gantt_sprints.png`, `01-gestion/matriz-historias.md` y la tabla de estados.
 - [ ] Frase de alcance ensayada: “no venimos a decir que los sprints están completos”.
 - [ ] Acordar con Sebastián la transición: “te dejo con Sebastián, que muestra qué hace el sistema”.
@@ -44,9 +44,9 @@
 
 > “Este es el cronograma. El corte del treinta y uno de octubre cerró los sprints uno y dos; el sprint tres vence el trece de noviembre.
 >
-> Por eso el corte no es por sprint completo, sino **por historia y por fecha**: de las trece vencidas, siete están cerradas, cinco tienen observaciones no bloqueantes y una, la UV-9, estaba en corrección. Esa ya la corregimos y la probamos en la copia ejecutable.
+> Por eso el corte no es por sprint completo, sino **por historia y por fecha**: de las trece vencidas, ocho están cerradas y cinco tienen observaciones no bloqueantes. La UV-9, que estaba en corrección, ya quedó corregida y probada en el proyecto original y en la copia.
 >
-> De las cuatro próximas, tres tienen avance anticipado: UV-16 y UV-18 al ochenta y cinco por ciento, y UV-31 al setenta y cinco. UV-19 está iniciada, en veinte.
+> De las cuatro próximas, **UV-19 ya está cerrada**: el directivo envía comunicados a su facultad y el destinatario los recibe en su bandeja y como notificación. UV-16 y UV-18 están al ochenta y cinco por ciento, y UV-31 al setenta y cinco.
 >
 > Eso es lo que hay. Lo que falta no lo vamos a maquillar.”
 
@@ -81,10 +81,9 @@
 
 | Estado | Historias | Cantidad |
 |---|---|---:|
-| ✅ Cerradas | UV-8, UV-10, UV-12, UV-25, UV-26, UV-29, UV-32 | 7 |
+| ✅ Cerradas | UV-8, UV-9, UV-10, UV-12, UV-25, UV-26, UV-29, UV-32 | 8 |
 | 🟡 Con observaciones | UV-11, UV-13, UV-27, UV-28, UV-30 | 5 |
-| 🟠 Corregida en la copia | UV-9 | 1 |
-| 🔵 Próximas (13 nov) | UV-16 (85%), UV-18 (85%), UV-31 (75%), UV-19 (20%) | 4 |
+| ✅/🔵 Próximas (13 nov) | UV-19 (100%), UV-16 (85%), UV-18 (85%), UV-31 (75%) | 4 |
 | **Total** | | **17** |
 
 **Sprints:** Sprint 1 del 1 al 16 de octubre · Sprint 2 del 19 al 30 de octubre · Sprint 3 del 2 al 13 de noviembre.
@@ -97,21 +96,21 @@
 |---|---|
 | ¿Por qué incluyen historias del Sprint 3? | Porque vencen el 13 de noviembre y ya tienen avance. El corte es por historia, no por sprint. |
 | ¿Entonces no terminaron los sprints 1 y 2? | No se declaran completos. Se reportan las 13 historias vencidas con su estado real. |
-| ¿Cuántas historias son y cuántas cerraron? | 17: 13 vencidas y 4 próximas. Cerradas 7, con observaciones 5, corregida 1. |
-| ¿UV-9 está lista? | En el proyecto original estaba en corrección; en la copia ejecutable ya crea los cuatro roles y se probó. |
-| ¿Qué falta? | UV-19 (mensajería del directivo), reportes/exportación, pruebas E2E y revisión OWASP del Sprint 4. |
+| ¿Cuántas historias son y cuántas cerraron? | 17: 13 vencidas y 4 próximas. Cerradas 8, con observaciones 5; del Sprint 3, UV-19 cerrada y tres con avance. |
+| ¿UV-9 está lista? | Sí. Quedó corregida y probada en el proyecto original y en la copia: crea los cuatro roles. |
+| ¿Qué falta? | Los reportes del directivo (UV-31), pruebas E2E, revisión OWASP y la formalización de casos del Sprint 3. |
 | ¿Cómo sé que la matriz no es maquillaje? | Cada fila tiene archivo, evidencia y prueba; y hay una copia ejecutable para verificarlo en vivo. |
 | ¿Por qué 17 y no todas? | Son las vencidas y las próximas a vencer. Las demás están fuera de este corte y se ven en el Sprint 4. |
 | ¿Las fechas son reales? | Sí: Sprint 1 del 1 al 16 de octubre, Sprint 2 del 19 al 30, Sprint 3 del 2 al 13 de noviembre. |
-| ¿Qué pasa si no llegan al 13 de noviembre? | UV-19 es la de mayor riesgo; está al 20% y es la única que no se presenta como avance anticipado. |
+| ¿Qué pasa si no llegan al 13 de noviembre? | UV-19 ya se cerró el 19 de noviembre; el riesgo restante es UV-31 (reportes) y la formalización de pruebas. |
 
 ---
 
 ## 6. Errores que no puede cometer
 
 1. Decir “sprints completos” o “todo terminado”. El mensaje es **avance real**.
-2. Decir que UV-9 está lista **en el proyecto original**. Está corregida **en la copia**.
-3. Presentar UV-19 como terminada: está iniciada, al 20%.
+2. Decir que UV-9 solo funciona en la copia: ya está corregida en el original y en la copia.
+3. Presentar UV-19 como avance parcial: está cerrada, con bandeja, envío por facultad y notificación.
 4. Leer el Gantt línea por línea. Se muestran las tres fechas y los cuatro números.
 5. Prometer fechas nuevas que el equipo no acordó.
 
@@ -122,7 +121,7 @@
 | Bloque | Tiempo | Recorte |
 |---|---:|---|
 | Apertura | 0:40 | Quitar la presentación del equipo; entrar directo al alcance. |
-| Gantt y estados | 0:45 | Decir solo: 13 vencidas, 7 cerradas, 5 con observaciones, 1 corregida, 4 próximas. |
+| Gantt y estados | 0:45 | Decir solo: 13 vencidas, 8 cerradas, 5 con observaciones; del Sprint 3, UV-19 cerrada y tres con avance. |
 | Cierre | 0:25 | Una sola frase de balance y la ronda de 5 segundos. |
 | **Total** | **1:50** | |
 

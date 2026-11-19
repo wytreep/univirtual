@@ -100,7 +100,7 @@ El script incluye:
 
 ### Checklist
 
-- [x] 19 tablas creadas con PK.
+- [x] 19 tablas base creadas con PK (+2 de UV-19 por migración).
 - [x] Claves foráneas declaradas.
 - [x] Índices en columnas de búsqueda.
 - [x] Datos semilla para los cuatro roles.
@@ -118,7 +118,7 @@ El script incluye:
 | 1 | `models/Prueba.php` y `tests/conftest.py` esperan una tabla `pruebas` que el script no crea. | Medio: el módulo de pruebas no persiste. | Añadir la tabla o retirar el modelo si el módulo no entra al alcance. |
 | 2 | `models/Entrega.php` y tres endpoints usan `archivoEntrega`; el esquema v8 define `urlArchivo`. | Alto: las entregas fallan al guardar y al listar. | Migrar el código a `urlArchivo` (ver UV-09 y UV-11). |
 | 3 | `api/v1/usuarios.php` consulta `programas_academicos` y `e.idPrograma`, que no existen; el esquema usa `carreras` y `idCarrera`. | Alto: el listado de estudiantes por facultad falla. | Corregir el JOIN y el nombre de la columna. |
-| 4 | El README y otros documentos declaran 13 o 17 tablas. | Bajo: inconsistencia documental. | Unificar en 19 tablas. |
+| 4 | El README y otros documentos declaran 13 o 17 tablas. | Bajo: inconsistencia documental. | Unificar en 21 (19 base + 2 de UV-19). |
 | 5 | Los hashes de los usuarios semilla no siempre coinciden con `123456`. | Medio: no se puede iniciar sesión tras importar. | Ejecutar `fix_passwords_v8.sql` incluido en `05-entrega/plantillas/`. |
 | 6 | No hay script de migración incremental; solo el `CREATE` completo. | Bajo para el avance; alto en producción. | Añadir migraciones versionadas en el refactor. |
 
@@ -126,8 +126,8 @@ El script incluye:
 
 ## 6. Avance
 
-**Avance: 85%.** Quedan: referencias del código a columnas/tablas de la versión anterior y la tabla `pruebas` que el modelo espera. La base `univirtual_sprints12` de la copia ejecutable importa limpio (19 tablas, 9 usuarios).
+**Avance: 85%.** Quedan: referencias del código a columnas/tablas de la versión anterior y la tabla `pruebas` que el modelo espera. La base `univirtual_sprints12` de la copia ejecutable importa limpio (19 tablas base + 2 de UV-19 = 21, 9 usuarios).
 
-**Cumple parcialmente.** El esquema v8 es sólido: 19 tablas, claves foráneas, índices y datos semilla, con normalización defendible hasta 3FN. No se marca como completo porque el código todavía referencia columnas y una tabla de la versión anterior, y porque falta la tabla `pruebas` que el propio modelo espera.
+**Cumple parcialmente.** El esquema v8 es sólido: 19 tablas base (21 con la migración UV-19), claves foráneas, índices y datos semilla, con normalización defendible hasta 3FN. No se marca como completo porque el código todavía referencia columnas y una tabla de la versión anterior, y porque falta la tabla `pruebas` que el propio modelo espera.
 
 El script es la fuente de verdad; la deuda está en el código que aún no lo respeta.

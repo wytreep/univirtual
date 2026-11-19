@@ -237,6 +237,10 @@ erDiagram
 | 17 | `notificaciones` | Avisos por usuario. | `idNotif` |
 | 18 | `videollamadas` | Salas Jitsi programadas. | `idVideoLlamada` |
 | 19 | `grabaciones_videollamadas` | Grabaciones asociadas. | `idGrabacion` |
+| 20 | `comunicados` | Cabecera del aviso del directivo (migración UV-19). | `idComunicado` |
+| 21 | `comunicado_destinatarios` | Fan-out y estado de lectura por usuario (migración UV-19). | `idComunicado` + `idUsuario` |
+
+**Nota:** las tablas 1–19 las crea `config/database_v8.sql`; las tablas 20–21 las crea `config/migracion_uv19_comunicados.sql`. La base en ejecución queda con 21 tablas.
 
 ---
 
@@ -366,6 +370,24 @@ erDiagram
 | `leida` | TINYINT(1) | Sí | Default 0 |
 | `creado_en` | TIMESTAMP | Sí | Default CURRENT_TIMESTAMP |
 
+### 4.7 `comunicados` y `comunicado_destinatarios` (UV-19)
+
+| Tabla | Columna | Tipo | Regla |
+|---|---|---|---|
+| `comunicados` | `idComunicado` | INT AI | PK |
+| | `idRemitente` | INT | FK → usuarios |
+| | `idFacultad` | INT | FK → facultades |
+| | `publico` | ENUM | estudiantes, profesores, ambos |
+| | `asunto` | VARCHAR(150) | Obligatorio |
+| | `contenido` | TEXT | Obligatorio |
+| | `creado_en` | TIMESTAMP | Default CURRENT_TIMESTAMP |
+| `comunicado_destinatarios` | `idComunicado` | INT | PK compuesta, FK → comunicados |
+| | `idUsuario` | INT | PK compuesta, FK → usuarios |
+| | `leido` | TINYINT(1) | Default 0 |
+| | `leido_en` | DATETIME | Se llena al abrir el comunicado |
+
+La tabla `mensajes` **no** se usa para esta mensajería: pertenece al foro por aula (`idForo NOT NULL`). Las dos tablas nuevas se eliminan en cascada con el comunicado o el usuario.
+
 ---
 
 ## 5. Reglas de integridad
@@ -400,12 +422,12 @@ erDiagram
 
 | Código actual | Esquema v8 | Archivos afectados | Corrección |
 |---|---|---|---|
-| `estudiantes.programa` | `idCarrera` + `carreras.nombre` | `api/v1/usuarios.php`, `models/Estudiante.php` | Usar `idCarrera` y join a `carreras`. |
-| `programas_academicos` / `idPrograma` | `carreras` / `idCarrera` | `api/v1/usuarios.php` | Reemplazar tabla y columna. |
-| `entregas.archivoEntrega` | `entregas.urlArchivo` | `models/Entrega.php`, `api/v1/estudiante.php`, `api/v1/profesor.php` | Renombrar en consultas e inserts. |
-| `codigo` en API de usuarios | `codigoEst` / `codigoProf` en formulario | `api/v1/usuarios.php`, `pages/admin/dashboard.php` | Alinear contrato. |
+| `estudiantes.programa` | `idCarrera` + `carreras.nombre` | `api/v1/usuarios.php`, `models/Estudiante.php` | ✅ Corregido: usa `idCarrera` y join a `carreras`. |
+| `programas_academicos` / `idPrograma` | `carreras` / `idCarrera` | `api/v1/usuarios.php` | ✅ Corregido: reemplazada tabla y columna. |
+| `entregas.archivoEntrega` | `entregas.urlArchivo` | `models/Entrega.php`, `api/v1/estudiante.php`, `api/v1/profesor.php` | ✅ Renombrado en consultas e inserts. |
+| `codigo` en API de usuarios | `codigoEst` / `codigoProf` en formulario | `api/v1/usuarios.php`, `pages/admin/dashboard.php` | ✅ Contrato alineado con compatibilidad. |
 
-**Decisión:** aplicar ADR-011. Mientras no se corrija, UV-9 no se acepta y UV-11/UV-13 quedan con observación.
+**Decisión:** la deriva de UV-9 y UV-13 quedó corregida y verificada en original y copia el 19 de noviembre de 2026. Se conserva la tabla como trazabilidad de la causa raíz.
 
 ---
 
@@ -413,12 +435,13 @@ erDiagram
 
 ```text
 1. Abrir phpMyAdmin o MySQL Workbench.
-2. Ejecutar config/database_v8.sql completo.
-3. Verificar que se crearon 19 tablas.
-4. Regenerar hashes si el login falla:
+2. Ejecutar config/database_v8.sql completo (19 tablas).
+3. Ejecutar config/migracion_uv19_comunicados.sql (2 tablas de UV-19).
+4. Verificar que se crearon 21 tablas.
+5. Regenerar hashes si el login falla:
    php -r "echo password_hash('123456', PASSWORD_BCRYPT), PHP_EOL;"
    UPDATE usuarios SET password = '<hash>' WHERE email = '<correo>';
-5. Verificar login con admin@univirtual.edu.co / 123456.
+6. Verificar login con admin@univirtual.edu.co / 123456.
 ```
 
 La plantilla `05-entrega/plantillas/fix_passwords_v8.sql` contiene el bloque listo para ejecutar.

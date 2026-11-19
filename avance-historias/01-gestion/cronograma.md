@@ -81,10 +81,10 @@ Cualquier retraso en UV-9 impacta directamente UV-12 y UV-13. Por eso su correcc
 |---|---|---|---|
 | UV-16 | Crear y lanzar videollamada por materia | UV-11, Jitsi Meet | 🔵 85% — API y Jitsi operativos en dashboards. |
 | UV-18 | Notificaciones internas por evento académico | UV-10/11, `notificar()` | 🔵 85% — 5 eventos y polling 30s. |
-| UV-19 | Mensajes del Directivo a estudiantes y profesores | UV-31 | 🔵 20% — tabla `mensajes` e infraestructura de notificaciones; sin endpoint ni pantalla. |
-| UV-31 | Dashboard del Directivo | UV-8, UV-28 | 🔵 75% — panel con datos reales; falta segmentación por facultad y mensajería. |
+| UV-19 | Mensajes del Directivo a estudiantes y profesores | UV-31 | ✅ 100% — tablas `comunicados`/`comunicado_destinatarios`, bandeja y notificación; cerrada el 19 nov 2026. |
+| UV-31 | Dashboard del Directivo | UV-8, UV-28 | 🔵 75% — panel con datos reales y mensajería; faltan reportes y segmentación. |
 
-**Nota:** el sprint abre el 2 de noviembre; estos porcentajes corresponden al avance anticipado construido durante los sprints 1 y 2 y no declaran historias cerradas. Ver fichas en `03-historias/UV-16`, `UV-18`, `UV-19` y `UV-31`.
+**Nota:** UV-19 se cerró el 19 de noviembre de 2026. Las demás historias del Sprint 3 conservan su avance y deuda declarada. Ver fichas en `03-historias/UV-16`, `UV-18`, `UV-19` y `UV-31`.
 
 ## 6. Vista previa del Sprint 4
 

@@ -86,18 +86,21 @@ Reiniciar Apache después de cambiar `php.ini`.
 2. Pestaña **Importar**.
 3. Seleccionar `config/database_v8.sql`.
 4. Ejecutar.
-5. Verificar que aparecen 19 tablas.
+5. Importar `config/migracion_uv19_comunicados.sql`.
+6. Verificar que aparecen 21 tablas (19 base + 2 de UV-19).
 
 ### Opción B — MySQL Workbench
 
 1. Conectar a `127.0.0.1:3307`, usuario `root`.
 2. Abrir `config/database_v8.sql`.
 3. Ejecutar todo (`Ctrl + Shift + Enter`).
+4. Abrir `config/migracion_uv19_comunicados.sql` y ejecutarlo.
 
 ### Opción C — Línea de comandos
 
 ```bash
 C:\xampp\mysql\bin\mysql.exe -u root -P 3307 < config\database_v8.sql
+C:\xampp\mysql\bin\mysql.exe -u root -P 3307 < config\migracion_uv19_comunicados.sql
 ```
 
 ---
@@ -264,7 +267,7 @@ univirtual/
 - [ ] XAMPP con Apache y MySQL activos.
 - [ ] Proyecto en `C:\xampp\htdocs\univirtual`.
 - [ ] `config/config.php` creado y con puerto 3307.
-- [ ] Base `univirtual` importada con 19 tablas.
+- [ ] Base `univirtual` importada con 21 tablas (19 base + 2 de UV-19).
 - [ ] Hashes regenerados.
 - [ ] `uploads/` con permisos de escritura.
 - [ ] Login de los cuatro roles probado.
