@@ -345,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
   <div class="ll">
     <div class="ll-inner">
-      <div class="ll-badge">PLATAFORMA ACADÉMICA · 2026-I</div>
+      <div class="ll-badge">PLATAFORMA ACADÉMICA · <?= periodoEtiqueta() ?></div>
       <div class="ll-title">UNI<em>CAMACHO</em></div>
       <div class="ll-sub">
         Sistema web de educación virtual de la Institución Universitaria Antonio José Camacho.

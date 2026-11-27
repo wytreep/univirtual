@@ -16,6 +16,46 @@ class DirectivoView extends View {
         parent::__construct('directivo');
     }
 
+    /**
+     * UV-31: expone la facultad y el periodo vigente al frontend (window.__S).
+     */
+    protected function sessionExtra(): array {
+        $facultad = [
+            'idFacultad'  => 0,
+            'nombre'      => 'Sin facultad asignada',
+            'codigo'      => '—',
+            'descripcion' => '',
+            'cargo'       => '',
+        ];
+
+        try {
+            $stmt = db()->prepare(
+                "SELECT d.idFacultad, d.cargo, f.nombre, f.codigo, f.descripcion
+                 FROM directivos d
+                 JOIN facultades f ON f.idFacultad = d.idFacultad
+                 WHERE d.idUsuario = ?"
+            );
+            $stmt->execute([$this->idUsuario]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $facultad = [
+                    'idFacultad'  => (int)$row['idFacultad'],
+                    'nombre'      => $row['nombre'],
+                    'codigo'      => $row['codigo'],
+                    'descripcion' => $row['descripcion'],
+                    'cargo'       => $row['cargo'],
+                ];
+            }
+        } catch (Throwable $e) {
+            // La vista sigue funcionando aunque falle la consulta de facultad.
+        }
+
+        return [
+            'facultad' => $facultad,
+            'periodo'  => periodoAcademico(),
+        ];
+    }
+
     public function render(): void {
         $sJS = $this->sessionJS();
         ?>
@@ -26,6 +66,7 @@ class DirectivoView extends View {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>UNI-VIRTUAL — Panel Directivo</title>
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/panel.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -38,7 +79,7 @@ class DirectivoView extends View {
   </script>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
     const S   = window.__S;
     const API = (path) => `<?= BASE_URL ?>/api/v1/${path}`;
 
@@ -46,6 +87,35 @@ class DirectivoView extends View {
     function Spinner() {
       return <div className="spinner"></div>;
     }
+
+    // ── Gráfica reutilizable (Chart.js) ──────────────────────────────
+    function ChartCanvas({ type, data, options = {} }) {
+      const canvasRef = useRef();
+      const chartRef  = useRef();
+
+      useEffect(() => {
+        if (!canvasRef.current || !data) return;
+        if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
+        chartRef.current = new Chart(canvasRef.current, {
+          type,
+          data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { font: { family: 'DM Sans', size: 11 } } } },
+            ...options,
+          },
+        });
+        return () => {
+          if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
+        };
+      }, [data]);
+
+      return <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }}></canvas>;
+    }
+
+    const fmtNota = (v) => (v === null || v === undefined) ? '—' : Number(v).toFixed(2);
+    const fmtPct  = (v) => (v === null || v === undefined) ? '—' : `${Number(v).toFixed(1)}%`;
 
     // ── Configuración (SCRUM-121) ────────────────────────────────────
     function Configuracion() {
@@ -188,18 +258,32 @@ class DirectivoView extends View {
 
       if (!stats) return <Spinner/>;
 
-      // directivo.php?action=resumen devuelve campos directos
+      const facultad = stats.facultad || S.facultad || {};
+      const periodo  = stats.periodo  || S.periodo  || {};
+
+      // directivo.php?action=resumen devuelve los KPI ya segmentados
       const items = [
-        { label: 'Profesores',      value: stats.totalProfesores  ?? '—', icon: '👨‍🏫' },
-        { label: 'Estudiantes',     value: stats.totalEstudiantes ?? '—', icon: '👩‍🎓' },
-        { label: 'Materias',        value: stats.totalMaterias    ?? '—', icon: '📚' },
-        { label: 'Tasa aprobación', value: `${stats.tasaAprobacion ?? 0}%`, icon: '✅' },
+        { label: 'Profesores',       value: stats.totalProfesores    ?? '—', icon: '👨‍🏫' },
+        { label: 'Estudiantes',      value: stats.totalEstudiantes   ?? '—', icon: '👩‍🎓' },
+        { label: 'Materias',         value: stats.totalMaterias      ?? '—', icon: '📚' },
+        { label: 'Carreras',         value: stats.totalCarreras      ?? '—', icon: '🎓' },
+        { label: 'Inscripciones',    value: stats.totalInscripciones ?? '—', icon: '📝' },
+        { label: 'Tasa aprobación',  value: `${stats.tasaAprobacion ?? 0}%`, icon: '✅' },
+        { label: 'Promedio general', value: fmtNota(stats.promedioGeneral), icon: '📈' },
       ];
 
       return (
         <div className="page">
           <div className="welcome-banner">
-            <h1>📊 Resumen — Facultad de Ingeniería</h1>
+            <div>
+              <div className="wb-label">Panel del directivo</div>
+              <h1>📊 {facultad.nombre || 'Mi facultad'}</h1>
+              <div className="wb-sub">
+                {periodo.etiqueta || '—'} · Semana {periodo.semanaActual ?? '—'} de {periodo.totalSemanas ?? '—'}
+                {periodo.inicio && periodo.fin ? ` · ${periodo.inicio} a ${periodo.fin}` : ''}
+              </div>
+            </div>
+            <span className="badge">{facultad.codigo || '—'}</span>
           </div>
           <div className="stat-grid-6" style={{gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))'}}>
             {items.map(s => (
@@ -209,6 +293,196 @@ class DirectivoView extends View {
                 <div style={{fontSize:'0.9rem',color:'var(--muted)',marginTop:'4px'}}>{s.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      );
+    }
+
+    // ── Reportes (UV-31) ─────────────────────────────────────────────
+    function ReportesFacultad() {
+      const [data, setData] = useState(null);
+
+      useEffect(() => {
+        fetch(API('directivo.php?action=reportes'), { credentials: 'include' })
+          .then(r => r.json())
+          .then(d => setData(d.status === 'ok' ? d.data : null))
+          .catch(() => setData(null));
+      }, []);
+
+      if (!data) return <Spinner/>;
+
+      const { facultad, periodo, resumen, carreras, materias, profesores,
+              distribucionNotas, asistencia } = data;
+
+      const kpis = [
+        { label: 'Carreras',        value: resumen.totalCarreras,      icon: '🎓' },
+        { label: 'Estudiantes',     value: resumen.totalEstudiantes,   icon: '👩‍🎓' },
+        { label: 'Profesores',      value: resumen.totalProfesores,    icon: '👨‍🏫' },
+        { label: 'Materias',        value: resumen.totalMaterias,      icon: '📚' },
+        { label: 'Inscripciones',   value: resumen.totalInscripciones, icon: '📝' },
+        { label: 'Tasa aprobación', value: `${resumen.tasaAprobacion}%`, icon: '✅' },
+        { label: 'Promedio',        value: fmtNota(resumen.promedioGeneral), icon: '📈' },
+        { label: 'Asistencia',      value: fmtPct(asistencia.porcentaje), icon: '🗓️' },
+      ];
+
+      const notasChart = {
+        labels: distribucionNotas.map(d => d.rango),
+        datasets: [{
+          label: 'Inscripciones',
+          data: distribucionNotas.map(d => d.total),
+          backgroundColor: ['#d64545', '#e3a008', '#2462b0', '#1a7a48'],
+          borderRadius: 6,
+          maxBarThickness: 54,
+        }],
+      };
+
+      const carrerasChart = {
+        labels: carreras.map(c => c.codigo),
+        datasets: [{
+          label: 'Estudiantes',
+          data: carreras.map(c => c.estudiantes),
+          backgroundColor: '#2462b0',
+          borderRadius: 6,
+          maxBarThickness: 42,
+        }],
+      };
+
+      const asistenciaChart = {
+        labels: ['Asistencias', 'Ausencias'],
+        datasets: [{
+          data: [asistencia.asistencias, asistencia.ausencias],
+          backgroundColor: ['#1a7a48', '#d64545'],
+          borderWidth: 0,
+        }],
+      };
+
+      const chartCard = { padding: '18px' };
+      const chartBox  = { height: 250, marginTop: 10 };
+      const grid      = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 18, marginBottom: 18 };
+
+      return (
+        <div className="page">
+          <div className="welcome-banner">
+            <div>
+              <div className="wb-label">Reportes académicos</div>
+              <h1>📈 {facultad.nombre}</h1>
+              <div className="wb-sub">
+                {periodo.etiqueta} · Semana {periodo.semanaActual} de {periodo.totalSemanas}
+                {periodo.inicio && periodo.fin ? ` · ${periodo.inicio} a ${periodo.fin}` : ''}
+              </div>
+            </div>
+            <span className="badge">{periodo.etiqueta}</span>
+          </div>
+
+          <div className="stat-grid-6" style={{gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', marginBottom:18}}>
+            {kpis.map(s => (
+              <div key={s.label} className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+                <div style={{fontSize:'1.4rem',marginBottom:'4px'}}>{s.icon}</div>
+                <div style={{fontSize:'1.5rem',fontWeight:700,color:'var(--navy)'}}>{s.value}</div>
+                <div style={{fontSize:'0.8rem',color:'var(--muted)',marginTop:'2px'}}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={grid}>
+            <div className="card" style={chartCard}>
+              <h3 style={{marginTop:0}}>Distribución de notas finales</h3>
+              <div style={chartBox}><ChartCanvas type="bar" data={notasChart}/></div>
+            </div>
+            <div className="card" style={chartCard}>
+              <h3 style={{marginTop:0}}>Estudiantes por carrera</h3>
+              <div style={chartBox}><ChartCanvas type="bar" data={carrerasChart}/></div>
+            </div>
+            <div className="card" style={chartCard}>
+              <h3 style={{marginTop:0}}>Asistencia global</h3>
+              <div style={chartBox}><ChartCanvas type="doughnut" data={asistenciaChart}/></div>
+            </div>
+          </div>
+
+          <div className="card" style={{marginBottom:18}}>
+            <h3 style={{marginTop:0}}>Reporte por carrera</h3>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Carrera</th><th>Código</th><th>Estudiantes</th><th>Materias</th>
+                  <th>Inscripciones</th><th>Aprobados</th><th>Tasa</th><th>Promedio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {carreras.length === 0 && (
+                  <tr><td colSpan="8" style={{textAlign:'center',color:'var(--muted)'}}>Sin carreras en la facultad</td></tr>
+                )}
+                {carreras.map(c => (
+                  <tr key={c.idCarrera}>
+                    <td style={{fontWeight:600}}>{c.nombre}</td>
+                    <td>{c.codigo}</td>
+                    <td>{c.estudiantes}</td>
+                    <td>{c.materias}</td>
+                    <td>{c.inscripciones}</td>
+                    <td>{c.aprobados} / {c.calificadas}</td>
+                    <td>{c.tasaAprobacion}%</td>
+                    <td>{fmtNota(c.promedio)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="card" style={{marginBottom:18}}>
+            <h3 style={{marginTop:0}}>Reporte por materia</h3>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Materia</th><th>Carrera</th><th>Profesor</th><th>Inscritos</th>
+                  <th>Aprobados</th><th>Reprobados</th><th>Promedio</th><th>Asistencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {materias.length === 0 && (
+                  <tr><td colSpan="8" style={{textAlign:'center',color:'var(--muted)'}}>Sin materias en la facultad</td></tr>
+                )}
+                {materias.map(m => (
+                  <tr key={m.idMateria}>
+                    <td style={{fontWeight:600}}>{m.nombre} <span style={{color:'var(--muted)',fontWeight:400}}>({m.codigo})</span></td>
+                    <td>{m.carrera || '—'}</td>
+                    <td>{m.profesor || '—'}</td>
+                    <td>{m.inscritos}</td>
+                    <td>{m.aprobados}</td>
+                    <td>{m.reprobados}</td>
+                    <td>{fmtNota(m.promedio)}</td>
+                    <td>{fmtPct(m.asistencia)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="card">
+            <h3 style={{marginTop:0}}>Reporte por profesor</h3>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Profesor</th><th>Código</th><th>Departamento</th>
+                  <th>Materias</th><th>Estudiantes</th><th>Promedio</th><th>Asistencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {profesores.length === 0 && (
+                  <tr><td colSpan="7" style={{textAlign:'center',color:'var(--muted)'}}>Sin profesores en la facultad</td></tr>
+                )}
+                {profesores.map(p => (
+                  <tr key={p.idProfesor}>
+                    <td style={{fontWeight:600}}>{p.nombre}<div style={{fontSize:12,color:'var(--muted)',fontWeight:400}}>{p.email}</div></td>
+                    <td>{p.codigoProf}</td>
+                    <td>{p.departamento || '—'}</td>
+                    <td>{p.materias}</td>
+                    <td>{p.estudiantes}</td>
+                    <td>{fmtNota(p.promedio)}</td>
+                    <td>{fmtPct(p.asistencia)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       );
@@ -231,7 +505,7 @@ class DirectivoView extends View {
         <div className="page">
           <div className="welcome-banner">
             <h1>👨‍🏫 Profesores</h1>
-            <span className="badge">{lista.length} registrados</span>
+            <span className="badge">{lista.length} · {S.facultad?.nombre || 'Mi facultad'}</span>
           </div>
           <div className="card">
             <table className="tbl">
@@ -285,7 +559,7 @@ class DirectivoView extends View {
         <div className="page">
           <div className="welcome-banner">
             <h1>👩‍🎓 Estudiantes</h1>
-            <span className="badge">{lista.length} registrados</span>
+            <span className="badge">{lista.length} · {S.facultad?.nombre || 'Mi facultad'}</span>
           </div>
           <div className="card">
             <table className="tbl">
@@ -294,14 +568,15 @@ class DirectivoView extends View {
                   <th>Nombre</th>
                   <th>Email</th>
                   <th>Código</th>
+                  <th>Carrera</th>
                   <th>Semestre</th>
                   <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {lista.length === 0 && (
-                  <tr><td colSpan="5" style={{textAlign:'center',color:'var(--muted)'}}>
-                    Sin estudiantes registrados
+                  <tr><td colSpan="6" style={{textAlign:'center',color:'var(--muted)'}}>
+                    Sin estudiantes registrados en esta facultad
                   </td></tr>
                 )}
                 {lista.map(e => (
@@ -309,6 +584,7 @@ class DirectivoView extends View {
                     <td>{e.nombre}</td>
                     <td>{e.email}</td>
                     <td>{e.codigoEst || '—'}</td>
+                    <td>{e.carrera || '—'}</td>
                     <td>{e.semestre || '—'}</td>
                     <td>
                       <span className={`badge ${e.activo==1?'badge-success':'badge-danger'}`}>
@@ -341,7 +617,7 @@ class DirectivoView extends View {
         <div className="page">
           <div className="welcome-banner">
             <h1>📚 Materias</h1>
-            <span className="badge">{lista.length} activas</span>
+            <span className="badge">{lista.length} · {S.facultad?.nombre || 'Mi facultad'}</span>
           </div>
           <div className="card">
             <table className="tbl">
@@ -349,6 +625,7 @@ class DirectivoView extends View {
                 <tr>
                   <th>Nombre</th>
                   <th>Código</th>
+                  <th>Carrera</th>
                   <th>Créditos</th>
                   <th>Profesor</th>
                   <th>Inscritos</th>
@@ -356,8 +633,8 @@ class DirectivoView extends View {
               </thead>
               <tbody>
                 {lista.length === 0 && (
-                  <tr><td colSpan="5" style={{textAlign:'center',color:'var(--muted)'}}>
-                    Sin materias registradas
+                  <tr><td colSpan="6" style={{textAlign:'center',color:'var(--muted)'}}>
+                    Sin materias registradas en esta facultad
                   </td></tr>
                 )}
                 {lista.map(m => (
@@ -373,6 +650,7 @@ class DirectivoView extends View {
                       {m.nombre}
                     </td>
                     <td>{m.codigo}</td>
+                    <td>{m.carrera || '—'}</td>
                     <td>{m.creditos}</td>
                     <td>{m.profesor || '—'}</td>
                     <td>{m.totalInscritos ?? '—'}</td>
@@ -511,6 +789,7 @@ class DirectivoView extends View {
 
       const nav = [
         { id: 'resumen',       ico: '📊',  lbl: 'Resumen'       },
+        { id: 'reportes',      ico: '📈',  lbl: 'Reportes'      },
         { id: 'profesores',    ico: '👨‍🏫', lbl: 'Profesores'    },
         { id: 'estudiantes',   ico: '👩‍🎓', lbl: 'Estudiantes'   },
         { id: 'materias',      ico: '📚',  lbl: 'Materias'       },
@@ -566,13 +845,14 @@ class DirectivoView extends View {
               <div className="tb-title">{titulo}</div>
             </div>
             <div className="tb-right">
-              <span className="tb-semester">2026-I</span>
+              <span className="tb-semester"><?= periodoEtiqueta() ?></span>
               <div className="tb-notif"><span>🔔</span></div>
             </div>
           </header>
 
           <main className="main">
             {vista === 'resumen'       && <ResumenFacultad/>}
+            {vista === 'reportes'      && <ReportesFacultad/>}
             {vista === 'profesores'    && <Profesores/>}
             {vista === 'estudiantes'   && <Estudiantes/>}
             {vista === 'materias'      && <MateriasFacultad/>}

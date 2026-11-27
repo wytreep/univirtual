@@ -46,7 +46,7 @@
 >
 > Por eso el corte no es por sprint completo, sino **por historia y por fecha**: de las trece vencidas, ocho están cerradas y cinco tienen observaciones no bloqueantes. La UV-9, que estaba en corrección, ya quedó corregida y probada en el proyecto original y en la copia.
 >
-> De las cuatro próximas, **UV-19 ya está cerrada**: el directivo envía comunicados a su facultad y el destinatario los recibe en su bandeja y como notificación. UV-16 y UV-18 están al ochenta y cinco por ciento, y UV-31 al setenta y cinco.
+> De las cuatro próximas, **UV-19 y UV-31 ya están cerradas**: UV-19 porque el directivo envía comunicados a su facultad y el destinatario los recibe en su bandeja y como notificación; UV-31 porque el panel del directivo ya tiene segmentación por facultad, reportes por carrera, materia y profesor, distribución de notas, asistencia y periodo dinámico. UV-16 y UV-18 están al ochenta y cinco por ciento.
 >
 > Eso es lo que hay. Lo que falta no lo vamos a maquillar.”
 
@@ -83,7 +83,7 @@
 |---|---|---:|
 | ✅ Cerradas | UV-8, UV-9, UV-10, UV-12, UV-25, UV-26, UV-29, UV-32 | 8 |
 | 🟡 Con observaciones | UV-11, UV-13, UV-27, UV-28, UV-30 | 5 |
-| ✅/🔵 Próximas (13 nov) | UV-19 (100%), UV-16 (85%), UV-18 (85%), UV-31 (75%) | 4 |
+| ✅/🔵 Próximas (13 nov) | UV-19 (100%), UV-31 (100%), UV-16 (85%), UV-18 (85%) | 4 |
 | **Total** | | **17** |
 
 **Sprints:** Sprint 1 del 1 al 16 de octubre · Sprint 2 del 19 al 30 de octubre · Sprint 3 del 2 al 13 de noviembre.
@@ -96,13 +96,13 @@
 |---|---|
 | ¿Por qué incluyen historias del Sprint 3? | Porque vencen el 13 de noviembre y ya tienen avance. El corte es por historia, no por sprint. |
 | ¿Entonces no terminaron los sprints 1 y 2? | No se declaran completos. Se reportan las 13 historias vencidas con su estado real. |
-| ¿Cuántas historias son y cuántas cerraron? | 17: 13 vencidas y 4 próximas. Cerradas 8, con observaciones 5; del Sprint 3, UV-19 cerrada y tres con avance. |
+| ¿Cuántas historias son y cuántas cerraron? | 17: 13 vencidas y 4 próximas. Cerradas 8, con observaciones 5; del Sprint 3, UV-19 y UV-31 cerradas y dos con avance. |
 | ¿UV-9 está lista? | Sí. Quedó corregida y probada en el proyecto original y en la copia: crea los cuatro roles. |
-| ¿Qué falta? | Los reportes del directivo (UV-31), pruebas E2E, revisión OWASP y la formalización de casos del Sprint 3. |
+| ¿Qué falta? | Pruebas E2E y de regresión, revisión OWASP, exportación de los reportes del directivo y formalización de los casos de UV-16 y UV-18. |
 | ¿Cómo sé que la matriz no es maquillaje? | Cada fila tiene archivo, evidencia y prueba; y hay una copia ejecutable para verificarlo en vivo. |
 | ¿Por qué 17 y no todas? | Son las vencidas y las próximas a vencer. Las demás están fuera de este corte y se ven en el Sprint 4. |
 | ¿Las fechas son reales? | Sí: Sprint 1 del 1 al 16 de octubre, Sprint 2 del 19 al 30, Sprint 3 del 2 al 13 de noviembre. |
-| ¿Qué pasa si no llegan al 13 de noviembre? | UV-19 ya se cerró el 19 de noviembre; el riesgo restante es UV-31 (reportes) y la formalización de pruebas. |
+| ¿Qué pasa si no llegan al 13 de noviembre? | UV-19 se cerró el 19 de noviembre y UV-31 el 26 de noviembre; el riesgo restante es la formalización de pruebas de UV-16 y UV-18. |
 
 ---
 

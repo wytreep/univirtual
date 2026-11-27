@@ -320,7 +320,7 @@ body::before{
 
   <div class="header">
     <div class="uni-logo">UNI<em>VIRTUAL</em></div>
-    <div class="uni-sub">PLATAFORMA ACADÉMICA · UNIAJC · 2026-I</div>
+    <div class="uni-sub">PLATAFORMA ACADÉMICA · UNIAJC · <?= periodoEtiqueta() ?></div>
   </div>
 
   <div class="body">

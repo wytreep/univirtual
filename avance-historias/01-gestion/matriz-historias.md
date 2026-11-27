@@ -26,7 +26,7 @@
 | UV-16 | Crear y lanzar videollamada por materia (Jitsi) | Clases y comunicación | 3 | 13 nov | 🔵 En avance anticipado | `api/v1/videollamadas.php`, Jitsi en dashboards, tabla `videollamadas`, `06-anexos/correcciones-demo.md` | 85% |
 | UV-18 | Notificaciones internas por evento académico | Clases y comunicación | 3 | 13 nov | 🔵 En avance anticipado | `notificar()`, polling 30s, tabla `notificaciones`, `06-anexos/correcciones-demo.md` | 85% |
 | UV-19 | Mensajes del Directivo a estudiantes y profesores | Clases y comunicación | 3 | 13 nov | ✅ Completada | `api/v1/comunicados.php`, `config/migracion_uv19_comunicados.sql`, dashboards | 100% |
-| UV-31 | Dashboard del Directivo | Clases y comunicación | 3 | 13 nov | 🔵 En avance anticipado | `pages/directivo/dashboard.php`, `api/v1/directivo.php`, `api/v1/stats.php` | 75% |
+| UV-31 | Dashboard del Directivo | Clases y comunicación | 3 | 13 nov | ✅ Completada | `pages/directivo/dashboard.php`, `api/v1/directivo.php`, `includes/periodo.php` | 100% |
 
 ---
 
@@ -65,11 +65,11 @@ El Sprint 3 inicia el 2 de noviembre; estas historias se documentan como **avanc
 | Métrica | Valor |
 |---|---:|
 | HU comprometidas | 4 |
-| Avances anticipados con flujo verificable | 3 (UV-16, UV-18, UV-31) |
-| Completada | 1 (UV-19) |
-| Avance promedio | 86% |
+| Avances anticipados con flujo verificable | 2 (UV-16, UV-18) |
+| Completadas | 2 (UV-19, UV-31) |
+| Avance promedio | 93% |
 
-**Lectura:** las cuatro historias del Sprint 3 tienen flujo verificable. UV-19 cerró el 19 de noviembre con bandeja, envío por facultad y notificación; UV-16, UV-18 y UV-31 conservan como deuda la formalización de pruebas y los reportes.
+**Lectura:** las cuatro historias del Sprint 3 tienen flujo verificable. UV-19 cerró el 19 de noviembre con bandeja, envío por facultad y notificación. UV-31 cerró el 26 de noviembre con segmentación, reportes y periodo dinámico. UV-16 y UV-18 conservan como deuda la formalización de pruebas.
 
 ---
 
@@ -93,7 +93,7 @@ El Sprint 3 inicia el 2 de noviembre; estas historias se documentan como **avanc
 | UV-16 | El profesor crea y lanza una videollamada por materia (Jitsi). | 🔵 85% — API completa, permisos por profesor, disponibilidad calculada y Jitsi en los dashboards; falta suite de pruebas. |
 | UV-18 | Notificaciones internas por evento académico. | 🔵 85% — 5 eventos con `notificar()`, `creado_en` corregido y polling 30s; falta cobertura de foros/mensajería. |
 | UV-19 | El directivo envía mensajes a estudiantes y profesores. | ✅ Envío por facultad y público, bandeja del destinatario, marca de leído y notificación; verificado en original y copia. |
-| UV-31 | El directivo ve su panel con resumen y segmentación por facultad. | 🔵 75% — panel, perfil, contraseña y mensajería (UV-19) funcionan; faltan reportes. |
+| UV-31 | El directivo ve su panel con resumen, reportes y segmentación por facultad. | ✅ Resumen, listados segmentados, reportes por carrera/materia/profesor, notas, asistencia y periodo dinámico; verificado en original y copia. |
 
 ---
 
@@ -115,7 +115,7 @@ Cuando falla uno de los puntos, la historia se marca 🟡 o 🔴 y se registra l
 
 | Sprint | HU | Tratamiento |
 |---|---|---|
-| 3 | UV-16, UV-18, UV-19, UV-31 | **Incluidas como avance anticipado** (vencen el 13 nov); ver fichas y matriz. |
+| 3 | UV-16, UV-18, UV-19, UV-31 | **Incluidas** (vencen el 13 nov); UV-19 y UV-31 cerradas; UV-16 y UV-18 en avance anticipado. |
 | 4 | UV-17, UV-20, UV-21, UV-33, UV-34, UV-35 | Fuera del avance; se incluyen en el cronograma solo para mostrar dependencias. |
 
 Se incluyen en el cronograma solo para mostrar dependencias con el avance.

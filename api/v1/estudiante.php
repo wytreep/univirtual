@@ -99,10 +99,10 @@ public function handle(): void {
         $entregaModel = new Entrega();
         $conteos      = $entregaModel->getConteoEstudiante($this->idEst);
 
-        // Estadísticas de avance del semestre
-        $semanaInicio = strtotime('2026-01-19');
-        $semanaActual = max(1, (int)floor((time() - $semanaInicio) / 604800));
-        $totalSemanas = 20;
+        // Estadísticas de avance del periodo vigente (calculado dinámicamente)
+        $periodo      = periodoAcademico();
+        $semanaActual = $periodo['semanaActual'];
+        $totalSemanas = $periodo['totalSemanas'];
 
         $this->ok([
             'materias'       => $materias,
@@ -120,6 +120,9 @@ public function handle(): void {
                 'noLeidas'             => $noLeidas,
                 'semanasTranscurridas' => min($semanaActual, $totalSemanas),
                 'totalSemanas'         => $totalSemanas,
+                'periodo'              => $periodo['etiqueta'],
+                'periodoInicio'        => $periodo['inicio'],
+                'periodoFin'           => $periodo['fin'],
                 'entregasHechas'       => (int)($conteos['entregas_hechas']   ?? 0),
                 'totalActividades'     => (int)($conteos['total_actividades'] ?? 0),
             ],

@@ -42,7 +42,7 @@
 
 **Mensaje:** “El estudiante consume la API con `fetch` y credenciales; no hay recarga de página.”
 
-**Si se pregunta por el periodo:** reconocer que el semestre está fijo en `2026-I` y que se parametriza en el refactor.
+**Si se pregunta por el periodo:** el periodo ya no está fijo. `includes/periodo.php` lo calcula desde la fecha del servidor (enero–junio → `AAAA-I`, julio–diciembre → `AAAA-II`) e informa inicio, fin y semana actual.
 
 ---
 
@@ -76,23 +76,23 @@
 
 ## 5. Avance anticipado del Sprint 3 (3 min)
 
-Estas historias vencen el 13 de noviembre; se muestra su estado real: UV-19 quedó cerrada y las otras tres tienen avance:
+Estas historias vencieron el 13 de noviembre; se muestra su estado real: UV-19 y UV-31 quedaron cerradas y UV-16 y UV-18 tienen avance:
 
 1. Entrar como directivo (`diana@univirtual.edu.co`).
-2. Mostrar el **dashboard del directivo** (UV-31, 75%): resumen, profesores, estudiantes, materias; actualizar el perfil.
+2. Mostrar el **dashboard del directivo** (UV-31, 100%): resumen segmentado por facultad, pestaña **Reportes** con gráficas y tablas por carrera, materia y profesor, distribución de notas, asistencia y periodo dinámico; actualizar el perfil.
 3. Volver al profesor y abrir una materia → **crear una videollamada** (UV-16, 85%): la API `videollamadas.php?action=crear` genera la sesión Jitsi. Aclarar que **solo el profesor dueño de la materia puede crearla**; el admin únicamente monitorea.
 4. Entrar como estudiante y entrar a la videollamada desde su panel; el enlace se habilita 10 minutos antes.
 5. Señalar el **polling de notificaciones** (UV-18, 85%): la campana refresca cada 30 segundos sin recargar.
 6. Cerrar con **UV-19 (mensajería del directivo)**: desde el panel del directivo, enviar un comunicado a estudiantes y profesores; entrar como estudiante, abrir **Mensajes**, mostrar la marca de “Nuevo”, leerlo y verificar la notificación.
 
-**Mensaje:** “Las cuatro historias del Sprint 3 tienen flujo verificable; UV-19 quedó cerrada y las otras tres conservan deuda de pruebas y reportes declarada.”
+**Mensaje:** “Las cuatro historias del Sprint 3 tienen flujo verificable; UV-19 y UV-31 quedaron cerradas y UV-16 y UV-18 conservan deuda de pruebas declarada.”
 
 ---
 
 ## 6. Documentación y calidad (1.5 min)
 
 1. Abrir `avance-historias/README.md` y recorrer la estructura.
-2. Mostrar `01-gestion/matriz-historias.md`: 17 historias con porcentaje de avance (8 vencidas al 100%, 5 entre 85–90%; del Sprint 3, UV-19 al 100% y las otras tres con avance).
+2. Mostrar `01-gestion/matriz-historias.md`: 17 historias con porcentaje de avance (8 vencidas al 100%, 5 entre 85–90%; del Sprint 3, UV-19 y UV-31 al 100%, UV-16 y UV-18 al 85%).
 3. Mostrar `02-producto/arquitectura.md` y un ADR.
 4. Mostrar `04-pruebas/resultados.md` y `php -l`: 52/52 archivos de aplicación en original y copia.
 5. Mencionar `06-anexos/correcciones-demo.md`: cinco fallos, cinco causas y cinco pruebas.
@@ -106,10 +106,10 @@ Estas historias vencen el 13 de noviembre; se muestra su estado real: UV-19 qued
 **Puntos a dejar claros:**
 
 - 13 historias vencidas evaluadas: 8 cerradas y 5 con observaciones no bloqueantes.
-- 4 historias del Sprint 3: UV-19 cerrada (100%); UV-16 85%, UV-18 85%, UV-31 75%.
+- 4 historias del Sprint 3: UV-19 y UV-31 cerradas (100%); UV-16 y UV-18 al 85%.
 - UV-9 quedó corregida y verificada en el proyecto original y en la copia ejecutable.
 - Los cinco fallos de la demo (hora, `creado_en`, sala duplicada, `urlArchivo` y columnas de subida) están corregidos en original y copia.
-- La siguiente fase cierra los reportes del directivo y formaliza las pruebas del Sprint 3.
+- La siguiente fase formaliza las pruebas de videollamadas y notificaciones, y exporta los reportes del directivo a PDF/XLSX.
 
 **Frase final:** “El avance es funcional en el núcleo académico, demuestra ritmo de sobrepaso sobre el Sprint 3 y es honesto en lo que falta: preferimos mostrar el avance real con las salvedades visibles antes que una demo que se caiga en la pregunta.”
 

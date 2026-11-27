@@ -1,6 +1,6 @@
-# Casos de aceptación — CP-01 a CP-31
+# Casos de aceptación — CP-01 a CP-34
 
-**Corte:** 29 de octubre de 2026  
+**Corte:** 26 de noviembre de 2026  
 **Entorno:** XAMPP local, `http://localhost/univirtual`  
 **Datos:** usuarios semilla de los cuatro roles, contraseña `123456`
 
@@ -41,13 +41,13 @@ La columna **Estado** refleja la verificación al corte: por ejecución históri
 | ID | Caso | Precondición | Pasos | Resultado esperado | Estado |
 |---|---|---|---|---|---|
 | CP-11 | Dashboard admin | Sesión admin | Abrir el panel. | Sidebar, métricas y acceso a usuarios/materias/inscripciones. | ✅ |
-| CP-12 | Dashboard estudiante | Sesión estudiante | Abrir el panel. | Materias, promedio, asistencia, tareas y notificaciones del periodo. | 🟡 |
+| CP-12 | Dashboard estudiante | Sesión estudiante | Abrir el panel. | Materias, promedio, asistencia, tareas y notificaciones del periodo vigente, calculado desde la fecha del servidor. | ✅ |
 | CP-13 | Dashboard profesor | Sesión profesor | Abrir el panel. | Materias, estudiantes y entregas por calificar. | 🟡 |
-| CP-14 | Dashboard directivo | Sesión directivo | Abrir el panel. | Resumen de facultad, docentes y estudiantes. | ✅ |
+| CP-14 | Dashboard directivo | Sesión directivo | Abrir el panel y la pestaña **Reportes**. | Resumen segmentado de la facultad, docentes, estudiantes, materias y reportes por carrera, materia y profesor. | ✅ |
 | CP-15 | Navegación sin recarga | Cualquier sesión | Cambiar de sección en el sidebar. | El contenido cambia sin recargar la página. | ✅ |
 | CP-16 | Tab de videollamadas | Sesión profesor | Entrar a una materia y abrir Videollamadas. | El tab muestra el enlace Jitsi en formato correcto. | ✅ |
 
-**Observación CP-12:** el periodo `2026-I` y la semana `2026-01-19` están fijos en el código; fuera de ese rango los datos no corresponden.  
+**Observación CP-12 (resuelta):** el periodo y la semana ya no están fijos. `includes/periodo.php` calcula `AAAA-I` (enero–junio) o `AAAA-II` (julio–diciembre), el inicio institucional (tercer lunes) y la semana actual. Verificado con `2026-02-15→2026-I`, `2026-09-10→2026-II`, `2027-03-01→2027-I` y `2028-11-01→2028-II`.
 **Observación CP-13:** el listado de entregas consulta `archivoEntrega`, columna que en v8 se llama `urlArchivo`.
 
 ---
@@ -87,9 +87,9 @@ La columna **Estado** refleja la verificación al corte: por ejecución históri
 | CP-27 | Sin autenticación | Sin sesión | Llamar un endpoint protegido. | HTTP 401 y `status:"error"`. | ✅ |
 | CP-28 | Rol incorrecto | Sesión de estudiante | Llamar un endpoint de admin. | HTTP 403 y `status:"error"`. | ✅ |
 | CP-29 | Sintaxis PHP | Repositorio completo | Ejecutar `php -l` sobre los archivos de aplicación. | 52/52 sin errores (original y copia). | ✅ |
-| CP-30 | Reproducibilidad | Clon limpio | Seguir el README en una máquina nueva. | El sistema arranca sin pasos no documentados. | 🟡 |
+| CP-30 | Reproducibilidad | Clon limpio | Seguir el README en una máquina nueva. | El sistema arranca con `config/config.example.php`, `database_v8.sql` y la migración UV-19, sin pasos no documentados. | ✅ |
 
-**Observación CP-30:** faltan `config/config.example.php` y `fix_passwords_v8.sql`, referenciados por el README. Se incluyen en `05-entrega/plantillas/`.
+**Observación CP-30 (resuelta):** se agregaron `config/config.example.php` y `config/fix_passwords_v8.sql`, y el README ahora indica `database_v8.sql` + `migracion_uv19_comunicados.sql`. La importación limpia en una base vacía produjo 21 tablas y 9 usuarios (26 nov 2026).
 
 ---
 
@@ -105,14 +105,26 @@ La columna **Estado** refleja la verificación al corte: por ejecución históri
 
 ---
 
-## 8. Resumen
+## 8. Reportes y segmentación del directivo (UV-31)
+
+| ID | Caso | Precondición | Pasos | Resultado esperado | Estado |
+|---|---|---|---|---|---|
+| CP-32 | Segmentación por facultad | Sesión de directivo con facultad asignada | Abrir **Profesores**, **Estudiantes** y **Materias**; comparar con otra facultad. | Solo aparecen profesores, estudiantes y materias de la facultad del directivo; otra facultad devuelve sus propios datos (o conjuntos vacíos). | ✅ |
+| CP-33 | Reportes académicos | Sesión de directivo | Abrir **Reportes**. | KPI, tabla por carrera, tabla por materia, tabla por profesor, distribución de notas y asistencia, todos segmentados por facultad. | ✅ |
+| CP-34 | Periodo dinámico | Fecha del servidor en otro semestre | Consultar el panel y `api/v1/estudiante.php?action=dashboard`. | La etiqueta, el inicio y la semana cambian con la fecha; no hay `2026-I` ni `2026-01-19` fijos. | ✅ |
+
+**Evidencia:** `04-pruebas/resultados.md` §11 y `03-historias/UV-31-dashboard-directivo.md` §6. Verificado en el proyecto original y en la copia ejecutable el 26 de noviembre de 2026.
+
+---
+
+## 9. Resumen
 
 | Estado | Casos | Porcentaje |
 |---|---:|---:|
-| ✅ Aprobado | 29 | 94% |
-| 🟡 Aprobado con observación | 2 | 6% |
+| ✅ Aprobado | 35 | 97,2% |
+| 🟡 Aprobado con observación | 1 | 2,8% |
 | 🔴 Fallido | 0 | 0% |
 | ⛔ Bloqueado | 0 | 0% |
-| **Total** | **31** | **100%** |
+| **Total** | **36** | **100%** |
 
-Los dos fallos históricos de usuarios (CP-06 y CP-07) y el bloqueo de calificación (CP-25) quedaron cerrados y verificados en original y copia. Las dos observaciones restantes son CP-12 (periodo fijo) y CP-30 (reproducibilidad), sin impacto en el flujo demostrado.
+Los dos fallos históricos de usuarios (CP-06 y CP-07) y el bloqueo de calificación (CP-25) quedaron cerrados y verificados en original y copia. CP-12 (periodo fijo) y CP-30 (reproducibilidad) quedaron resueltos y verificados. La única observación abierta es CP-13 (columna `archivoEntrega` en el listado de entregas del profesor), sin impacto en UV-31.

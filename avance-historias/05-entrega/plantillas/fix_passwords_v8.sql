@@ -1,6 +1,6 @@
 -- =====================================================================
 --  UNI-VIRTUAL — Reparación de contraseñas de usuarios semilla
---  Base: univirtual (MySQL 8)
+--  Base: MySQL 8 (selecciona antes la base: univirtual o la copia)
 --  Uso:
 --    mysql -u root -P 3307 univirtual < fix_passwords_v8.sql
 --
@@ -11,8 +11,6 @@
 --  ADVERTENCIA: script solo para entorno local/académico.
 --  No ejecutar en producción.
 -- =====================================================================
-
-USE univirtual;
 
 -- 1. Verificar el estado actual (opcional, solo lectura)
 SELECT idUsuario, email, rol, LEFT(password, 7) AS prefijo_hash

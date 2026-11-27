@@ -397,7 +397,7 @@ Apache/Nginx + PHP-FPM
 | Código usa `archivoEntrega`; esquema v8 usa `urlArchivo`. | Entregas y calificación pueden fallar. | Unificar a `urlArchivo`. |
 | `usuarios.php` usa `programa` y `programas_academicos`. | Crear estudiante falla. | Usar `idCarrera` y `carreras`. |
 | Formulario envía `codigoEst`; API espera `codigo`. | Crear estudiante/profesor falla. | Alinear contrato. |
-| Semestre fijo a 2026-I. | Métricas desactualizadas. | Leer de `configuracion`. |
+| Semestre fijo a 2026-I. | **Resuelto:** `includes/periodo.php` calcula el periodo, el inicio y la semana desde la fecha del servidor. | — |
 | Componentes React duplicados. | Mantenimiento costoso. | Extraer shared components. |
 
 El detalle y el plan están en `05-entrega/riesgos-y-deuda.md`.

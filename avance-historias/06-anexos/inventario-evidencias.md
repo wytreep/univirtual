@@ -57,7 +57,7 @@
 | H-14 | UV-16 Videollamadas (Sprint 3, avance anticipado) | `03-historias/UV-16-videollamadas.md` | 🔵 85% |
 | H-15 | UV-18 Notificaciones (Sprint 3, avance anticipado) | `03-historias/UV-18-notificaciones.md` | 🔵 85% |
 | H-16 | UV-19 Mensajes directivo (Sprint 3, completada) | `03-historias/UV-19-mensajes-directivo.md` | ✅ 100% |
-| H-17 | UV-31 Dashboard directivo (Sprint 3, avance anticipado) | `03-historias/UV-31-dashboard-directivo.md` | 🔵 75% |
+| H-17 | UV-31 Dashboard directivo (Sprint 3, completada) | `03-historias/UV-31-dashboard-directivo.md` | ✅ 100% |
 
 ---
 
@@ -85,6 +85,7 @@
 | C-18 | API videollamadas (UV-16) | C | `api/v1/videollamadas.php` |
 | C-19 | API directivo (UV-31) | C | `api/v1/directivo.php` |
 | C-20 | API estadísticas (UV-31) | C | `api/v1/stats.php` |
+| C-21 | Periodo académico dinámico (UV-31 / CP-12) | C | `includes/periodo.php` |
 | C-21 | Emisor de notificaciones (UV-18) | C | `config/config.php::notificar()` |
 | C-22 | API de comunicados (UV-19) | C | `api/v1/comunicados.php` |
 | C-23 | Migración UV-19 | S | `config/migracion_uv19_comunicados.sql` |
@@ -102,11 +103,12 @@
 | P-05 | Reporte SCRUM-124 | P | `docs/reporte_tests_scrum124.md` | ✅ |
 | P-06 | Lint PHP | P | `php -l` | 52/52 de aplicación |
 | P-07 | Plan de pruebas | D | `04-pruebas/plan-pruebas.md` | ✅ |
-| P-08 | Casos CP-01..CP-31 | D | `04-pruebas/casos-aceptacion.md` | ✅ |
+| P-08 | Casos CP-01..CP-34 | D | `04-pruebas/casos-aceptacion.md` | ✅ |
 | P-09 | Resultados del corte | D | `04-pruebas/resultados.md` | ✅ |
 | P-10 | Verificación post-demo en original y copia | P | `04-pruebas/resultados.md` §9 | ✅ |
 | P-11 | Datos de demo de calificación | S | `uploads/entregas/t2_is201_laura.pdf` + `entregas` id 8 | ✅ |
 | P-12 | UV-19: envío, bandeja, lectura y notificación | P | `04-pruebas/resultados.md` §10 | ✅ |
+| P-13 | UV-31: segmentación, reportes y periodo dinámico | P | `04-pruebas/resultados.md` §11 | ✅ |
 | P-13 | UV-9: creación de los cuatro roles en original y copia | P | `04-pruebas/resultados.md` §10 | ✅ |
 
 ---
@@ -143,8 +145,8 @@
 | 2 | Salida de `pytest` del corte | Entorno detenido | Adjuntar log. |
 | 3 | Cobertura | No medida | Añadir `pytest-cov`. |
 | 4 | Prueba de creación de usuario | UV-9 verificado en el original y en la copia el 19 nov 2026 | Registrado en `resultados.md` §10. |
-| 5 | Importación limpia de la base | No ejecutada | Añadir caso CP. |
-| 6 | Casos CP de UV-16, UV-18, UV-31 | Avance anticipado sin suite formal | UV-19 ya tiene CP-31; definir los demás al formalizar el Sprint 3. |
+| 5 | Importación limpia de la base | Verificada el 26 nov 2026 | CP-30: 21 tablas y 9 usuarios en base vacía. |
+| 6 | Casos CP de UV-16 y UV-18 | Avance anticipado sin suite formal | UV-19 tiene CP-31 y UV-31 tiene CP-32 a CP-34; definir los de UV-16 y UV-18 al formalizar el Sprint 3. |
 
 ---
 

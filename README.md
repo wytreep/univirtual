@@ -76,14 +76,22 @@ define('BASE_PATH', __DIR__ . '/..');
 
 ### Paso 3 — Crear la base de datos
 
+El esquema vigente es `config/database_v8.sql` (incluye facultades, carreras y
+directivos). Después de importarlo, aplica la migración de mensajería UV-19.
+
 **Opción A — MySQL Workbench:**
 1. Conexión → `localhost:3307` usuario `root`
-2. File → Open SQL Script → selecciona `config/database.sql`
-3. `Ctrl + Shift + Enter` para ejecutar todo
+2. File → Open SQL Script → selecciona `config/database_v8.sql` → ejecutar todo
+3. Repite con `config/migracion_uv19_comunicados.sql`
 
 **Opción B — phpMyAdmin:**
 1. `http://localhost/phpmyadmin`
-2. Importar → selecciona `config/database.sql` → Ejecutar
+2. Importar → `config/database_v8.sql` → Ejecutar
+3. Importar → `config/migracion_uv19_comunicados.sql` → Ejecutar
+
+> El periodo académico se calcula dinámicamente desde la fecha del servidor
+> (`includes/periodo.php`): enero–junio = `AAAA-I`, julio–diciembre = `AAAA-II`.
+> No hay que editar el periodo en el código ni en la base de datos.
 
 ### Paso 4 — Instalar FPDF (opcional pero recomendado)
 

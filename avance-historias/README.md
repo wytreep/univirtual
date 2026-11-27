@@ -2,10 +2,10 @@
 
 **Proyecto:** Plataforma de Educación Virtual — Institución Universitaria Antonio José Camacho  
 **Documento:** Entrega de avance académico  
-**Corte:** 31 de octubre de 2026  
+**Corte:** 26 de noviembre de 2026  
 **Alcance:** las historias de usuario **ya vencidas** (sprints 1 y 2, cerrados al 30 oct) y las **próximas a vencer** (Sprint 3, vence el 13 nov)  
 **Historias cubiertas:** 17 — vencidas: UV-8, UV-25, UV-26, UV-27, UV-28, UV-29, UV-30, UV-9, UV-10, UV-11, UV-12, UV-13, UV-32 · próximas: UV-16, UV-18, UV-19, UV-31  
-**Versión del documento:** 2.2 (UV-19 cerrada y UV-9 propagada al original, 19 nov 2026)
+**Versión del documento:** 2.3 (UV-31 cerrada, periodo dinámico y CP al día, 26 nov 2026)
 
 > **Importante:** esta entrega no declara los sprints 1 y 2 como completos ni cubre todas sus historias. Se enfoca en las **HUs que ya vencieron** y en las que **vencen pronto** (Sprint 3, 13 nov), para mostrar el avance real de esas historias.
 
@@ -49,11 +49,11 @@ avance-historias/
 │   ├── UV-28-base-datos.md
 │   ├── UV-29-backend.md
 │   ├── UV-30-frontend.md
-│   ├── UV-31-dashboard-directivo.md  ← Sprint 3 (avance anticipado)
+│   ├── UV-31-dashboard-directivo.md  ← Sprint 3 (cerrada)
 │   └── UV-32-pruebas.md
 ├── 04-pruebas/
 │   ├── plan-pruebas.md               ← estrategia, alcance y criterios
-│   ├── casos-aceptacion.md           ← CP-01 a CP-30
+│   ├── casos-aceptacion.md           ← CP-01 a CP-34
 │   └── resultados.md                 ← ejecución y evidencia disponible
 ├── 05-entrega/
 │   ├── checklist-entrega.md          ← lista de verificación previa
@@ -83,11 +83,11 @@ avance-historias/
 | ✅ Completada (vencidas, 100%) | UV-8, UV-9, UV-10, UV-12, UV-25, UV-26, UV-29, UV-32 | 8 |
 | 🟡 Con observaciones (85–90%) | UV-11, UV-13, UV-27, UV-28, UV-30 | 5 |
 | 🔴 En corrección | — | 0 |
-| ✅/🔵 Sprint 3 | UV-19 (100%), UV-16 (85%), UV-18 (85%), UV-31 (75%) | 4 |
+| ✅/🔵 Sprint 3 | UV-19 (100%), UV-31 (100%), UV-16 (85%), UV-18 (85%) | 4 |
 | **Total** | | **17** |
 
 - **Cobertura documental:** 17/17 HU con ficha, criterios y evidencia.
-- **Cobertura funcional:** las 13 historias vencidas tienen implementación verificable (100%); de las 4 del Sprint 3, una está cerrada y las otras tres tienen flujo verificable con deuda de pruebas.
+- **Cobertura funcional:** las 13 historias vencidas tienen implementación verificable (100%); de las 4 del Sprint 3, UV-19 y UV-31 están cerradas y UV-16 y UV-18 tienen flujo verificable con deuda de pruebas.
 - **UV-9 cerrada:** la creación de los cuatro roles quedó corregida y verificada el 19 de noviembre de 2026 en el proyecto original y en la copia. El diagnóstico histórico y la evidencia están en [`03-historias/UV-09-crud-usuarios.md`](03-historias/UV-09-crud-usuarios.md).
 - **Correcciones post-demo (6 nov 2026):** se corrigieron y verificaron en el proyecto original y en la copia los cinco fallos observados en clase: zona horaria, columna `creado_en`, `roomName` duplicado, `archivoEntrega` frente a `urlArchivo` y columnas inexistentes en materiales/grabaciones. El detalle está en [`06-anexos/correcciones-demo.md`](06-anexos/correcciones-demo.md).
 - **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026); los archivos corregidos y los nuevos se validaron el 19 nov 2026.
@@ -131,7 +131,7 @@ Estas historias se documentan con su avance real: UV-19 quedó cerrada y las otr
 | UV-16 | Crear y lanzar videollamada por materia (Jitsi) | 🔵 85% |
 | UV-18 | Notificaciones internas por evento académico | 🔵 85% |
 | UV-19 | Mensajes del Directivo a estudiantes y profesores | ✅ 100% |
-| UV-31 | Dashboard del Directivo | 🔵 75% |
+| UV-31 | Dashboard del Directivo | ✅ 100% |
 
 ---
 
@@ -160,7 +160,7 @@ Estas historias se documentan con su avance real: UV-19 quedó cerrada y las otr
 
 ## 6. Alcance explícito
 
-**Incluido:** las 13 HU vencidas de los sprints 1 y 2 y el avance anticipado de las 4 HU que conforman el Sprint 3 (UV-16, UV-18, UV-19, UV-31). Documentación de producto, arquitectura, base de datos, evidencias, pruebas y demo.
+**Incluido:** las 13 HU vencidas de los sprints 1 y 2 y las 4 HU del Sprint 3 (UV-16, UV-18, UV-19, UV-31). UV-19 y UV-31 están cerradas; UV-16 y UV-18 conservan deuda de pruebas. Documentación de producto, arquitectura, base de datos, evidencias, pruebas y demo.
 
 **No incluido:** el cierre formal del Sprint 3 (pruebas de sus HU) y el Sprint 4 (UV-17, UV-20, UV-21, UV-33, UV-34, UV-35). Se referencian en `01-gestion/cronograma.md` solo para mostrar dependencias.
 

@@ -1,8 +1,8 @@
 # Matriz de trazabilidad — Historias → Criterios → Casos → Evidencia
 
-**Corte:** 31 de octubre de 2026
+**Corte:** 26 de noviembre de 2026
 
-> **Nota de alcance:** esta matriz cubre las 13 historias vencidas (sprints 1 y 2) y la evidencia de las 4 historias del Sprint 3 (UV-16, UV-18, UV-19, UV-31). UV-19 quedó cerrada el 19 de noviembre de 2026 con CP-31; las otras tres conservan su avance declarado. El porcentaje de cada historia está en `01-gestion/matriz-historias.md` y en su ficha de `03-historias/`.
+> **Nota de alcance:** esta matriz cubre las 13 historias vencidas (sprints 1 y 2) y la evidencia de las 4 historias del Sprint 3 (UV-16, UV-18, UV-19, UV-31). UV-19 quedó cerrada el 19 de noviembre de 2026 con CP-31 y UV-31 el 26 de noviembre con CP-32 a CP-34; UV-16 y UV-18 conservan su avance declarado. El porcentaje de cada historia está en `01-gestion/matriz-historias.md` y en su ficha de `03-historias/`.
 
 ---
 
@@ -16,7 +16,7 @@
 | UV-9 | Admin edita usuario. | CP-08 | `api/v1/usuarios.php` | Inspección | ✅ |
 | UV-9 | Admin activa/desactiva. | CP-09 | `api/v1/usuarios.php` | Inspección | ✅ |
 | UV-9 | Admin elimina (soft delete). | CP-10 | `api/v1/usuarios.php` | Inspección | ✅ |
-| UV-10 | Estudiante ve materias, promedio, asistencia, tareas y notificaciones. | CP-12 | `api/v1/estudiante.php`, `pages/estudiante/dashboard.php` | Inspección + `TestEstudiante` | 🟡 |
+| UV-10 | Estudiante ve materias, promedio, asistencia, tareas y notificaciones. | CP-12 | `api/v1/estudiante.php`, `pages/estudiante/dashboard.php`, `includes/periodo.php` | Inspección + `TestEstudiante` | ✅ |
 | UV-11 | Profesor ve materias, estudiantes y entregas. | CP-13 | `api/v1/profesor.php`, `pages/profesor/dashboard.php` | Inspección + `TestProfesor` | 🟡 |
 | UV-11 | Profesor abre tab de videollamadas. | CP-16 | `api/v1/videollamadas.php` | `TestVideollamadas` | ✅ |
 | UV-12 | Admin inscribe estudiante. | CP-17 | `api/v1/inscripciones.php` | Inspección | ✅ |
@@ -34,11 +34,11 @@
 | UV-28 | Esquema 3FN con datos semilla. | — | `config/database_v8.sql`, `config/migracion_uv19_comunicados.sql`, `02-producto/modelo-datos.md` | Conteo de 19 base + 2 migración = 21 | 🟡 |
 | UV-29 | Autoload, PDO, clase base y JSON. | CP-26, CP-27, CP-28, CP-29 | `config/config.php`, `api/v1/Controller.php`, `models/Model.php` | `php -l` 52/52 de aplicación | ✅ |
 | UV-30 | Layout React y consumo de API. | CP-11, CP-14, CP-15 | `pages/*/dashboard.php`, `includes/View.php` | Inspección + historial | 🟡 |
-| UV-32 | Plan y casos de aceptación. | CP-01 – CP-30 | `04-pruebas/*` | Este documento | ✅ |
+| UV-32 | Plan y casos de aceptación. | CP-01 – CP-34 | `04-pruebas/*` | Este documento | ✅ |
 | UV-16 | Crear, listar, finalizar videollamada Jitsi. | (Sprint 3, sin CP aún) | `api/v1/videollamadas.php`, dashboards | Inspección de código | 🔵 85% |
 | UV-18 | Notificar 5 eventos + polling 30s. | (Sprint 3, sin CP aún) | `notificar()` en `inscripciones.php` y `profesor.php` | Inspección de código | 🔵 85% |
 | UV-19 | Enviar mensajes a estudiantes y profesores de la facultad. | CP-31 | `api/v1/comunicados.php`, `config/migracion_uv19_comunicados.sql`, dashboards | Prueba manual en original y copia (19 nov 2026) | ✅ 100% |
-| UV-31 | Resumen, listados, perfil y contraseña del directivo. | (Sprint 3, sin CP aún) | `api/v1/directivo.php`, `api/v1/stats.php`, `pages/directivo/dashboard.php` | Inspección de código | 🔵 75% |
+| UV-31 | Resumen, reportes y segmentación por facultad del directivo. | CP-14, CP-32, CP-33, CP-34 | `api/v1/directivo.php`, `pages/directivo/dashboard.php`, `includes/periodo.php`, `models/Usuario.php`, `models/Materia.php` | Prueba manual en original y copia (26 nov 2026) | ✅ 100% |
 
 ---
 
@@ -51,7 +51,7 @@
 | CP-11 | UV-30 |
 | CP-12 | UV-10, UV-30 |
 | CP-13 | UV-11, UV-30 |
-| CP-14, CP-15 | UV-30 |
+| CP-14, CP-15 | UV-30, UV-31 |
 | CP-16 | UV-11 |
 | CP-17 – CP-20 | UV-12 |
 | CP-21 – CP-25 | UV-13 |
@@ -59,8 +59,9 @@
 | CP-29 | UV-29 |
 | CP-30 | UV-27 |
 | CP-31 | UV-19 |
+| CP-32 – CP-34 | UV-31 |
 
-Todos los casos tienen al menos una historia; todas las historias vencidas tienen al menos un caso, salvo UV-25, UV-26 y UV-28, que se verifican por revisión documental. UV-19 se traza con CP-31. Las historias UV-16, UV-18 y UV-31 se trazan por inspección de código hasta que se formalicen sus CP.
+Todos los casos tienen al menos una historia; todas las historias vencidas tienen al menos un caso, salvo UV-25, UV-26 y UV-28, que se verifican por revisión documental. UV-19 se traza con CP-31 y UV-31 con CP-14 y CP-32 a CP-34. UV-16 y UV-18 se trazan por inspección de código hasta que se formalicen sus CP.
 
 ---
 
@@ -81,10 +82,10 @@ Todos los casos tienen al menos una historia; todas las historias vencidas tiene
 | # | Brecha | Acción |
 |---|---|---|
 | 1 | UV-9 no tiene prueba automatizada de creación. | Verificado manualmente por API en original y copia; queda pendiente automatizarlo. |
-| 2 | UV-28 no tiene caso de ejecución del script. | Añadir CP de importación limpia. |
+| 2 | UV-28 no tiene caso de ejecución del script. | Cubierto parcialmente por CP-30 (importación limpia de `database_v8.sql`). |
 | 3 | UV-25 y UV-26 no tienen caso de aceptación formal. | Agregar revisión por checklist documental. |
 | 4 | El reporte de pruebas es de abril, no del corte. | Re-ejecutar y actualizar. |
-| 5 | UV-16, UV-18 y UV-31 sin casos CP. | UV-19 ya tiene CP-31; definir los demás al formalizar el Sprint 3. |
+| 5 | UV-16 y UV-18 sin casos CP. | UV-19 tiene CP-31 y UV-31 tiene CP-32 a CP-34; definir los demás al formalizar el Sprint 3. |
 
 ---
 

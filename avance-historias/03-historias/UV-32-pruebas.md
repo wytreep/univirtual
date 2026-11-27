@@ -53,16 +53,18 @@ Escenario: Caso ejecutable
 
 ### 3.2 Casos de aceptación
 
-30 casos (`CP-01` a `CP-30`) distribuidos así:
+34 identificadores base (`CP-01` a `CP-34`), con `CP-31a` y `CP-31b`, para 36 casos ejecutables:
 
 | Módulo | Casos | Cubre |
-|---|---:|---|
+|---|---|---|
 | Autenticación | CP-01 a CP-05 | Login por rol, bloqueo cruzado, logout. |
 | Usuarios | CP-06 a CP-10 | Crear, editar, activar/desactivar, eliminar. |
 | Dashboards | CP-11 a CP-16 | Contenido por rol y navegación. |
 | Inscripciones | CP-17 a CP-20 | Inscribir, desinscribir, créditos mínimos. |
 | Notas | CP-21 a CP-25 | Registrar, consultar, promedio, validación. |
 | Calidad técnica | CP-26 a CP-30 | Contrato JSON, 401/403, lint, reproducibilidad. |
+| Mensajería directiva | CP-31, CP-31a, CP-31b | Envío por facultad, bandeja, aislamiento. |
+| Reportes del directivo | CP-32 a CP-34 | Segmentación, reportes y periodo dinámico. |
 
 ### 3.3 Suites existentes
 

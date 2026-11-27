@@ -147,8 +147,8 @@ Respuesta:
 
 | # | Observación | Impacto | Recomendación |
 |---|---|---|---|
-| 1 | Semestre fijo `2026-I` en la vista y en `configuracion`. | Las métricas no corresponden a octubre de 2026 (semestre 2026-II). | Leer el semestre activo desde `configuracion`. |
-| 2 | Semana de inicio fija `2026-01-19` en el endpoint. | `semanasTranscurridas` queda fuera de rango o saturada. | Parametrizar `fecha_inicio_semestre`. |
+| 1 | Semestre fijo `2026-I` en la vista y en `configuracion`. | **Resuelto:** `includes/periodo.php` calcula la etiqueta desde la fecha del servidor. | — |
+| 2 | Semana de inicio fija `2026-01-19` en el endpoint. | **Resuelto:** `periodoSemanaActual()` calcula la semana con el inicio institucional. | — |
 | 3 | El promedio incluye notas de todas las materias sin ponderar créditos. | Es un indicador aproximado. | Documentar o ponderar por créditos. |
 | 4 | `tareas` incluye actividades vencidas y próximas sin separar por estado en el dashboard. | Puede confundir. | Añadir pestañas “Pendientes” y “Vencidas”. |
 | 5 | El endpoint recibe `idEst` por query, aunque la sesión ya lo tiene. | Riesgo de manipulación si no se valida contra sesión. | Usar siempre `idEspecifico` de la sesión. |

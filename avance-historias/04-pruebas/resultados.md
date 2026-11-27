@@ -80,9 +80,9 @@ Resultado: 61 OK, 0 errores de sintaxis
 | CP-09 | Activar/desactivar | ✅ | Código |
 | CP-10 | Eliminar usuario | ✅ | Código (soft delete) |
 | CP-11 | Dashboard admin | ✅ | Código + historial |
-| CP-12 | Dashboard estudiante | 🟡 | Código: periodo fijo `2026-I` |
+| CP-12 | Dashboard estudiante | ✅ | Periodo dinámico verificado (`includes/periodo.php`) |
 | CP-13 | Dashboard profesor | 🟡 | Código: `archivoEntrega` |
-| CP-14 | Dashboard directivo | ✅ | Código + historial |
+| CP-14 | Dashboard directivo | ✅ | Segmentación + reportes verificados (26 nov 2026) |
 | CP-15 | Navegación | ✅ | Código + historial |
 | CP-16 | Videollamadas | ✅ | Código + historial |
 | CP-17 | Inscribir | ✅ | Código |
@@ -98,8 +98,13 @@ Resultado: 61 OK, 0 errores de sintaxis
 | CP-27 | 401 | ✅ | Código (`requireAuth`) |
 | CP-28 | 403 | ✅ | Código (`requireAuth`) |
 | CP-29 | Sintaxis PHP | ✅ | Ejecutado: 52/52 archivos de aplicación en original y copia |
-| CP-30 | Reproducibilidad | 🟡 | Faltan dos archivos referenciados |
+| CP-30 | Reproducibilidad | ✅ | Importación limpia: 21 tablas y 9 usuarios (26 nov 2026) |
 | CP-31 | Comunicado del directivo | ✅ | Ejecutado en original y copia (19 nov 2026) |
+| CP-31a | Bandeja y lectura | ✅ | Ejecutado en original y copia (19 nov 2026) |
+| CP-31b | Aislamiento y validación | ✅ | Ejecutado en original y copia (19 nov 2026) |
+| CP-32 | Segmentación por facultad | ✅ | Facultad 1 con datos; facultad 2 aislada (26 nov 2026) |
+| CP-33 | Reportes académicos | ✅ | Endpoint + pestaña Reportes (26 nov 2026) |
+| CP-34 | Periodo dinámico | ✅ | Probado con 6 fechas de 2026–2028 (26 nov 2026) |
 
 ---
 
@@ -107,14 +112,14 @@ Resultado: 61 OK, 0 errores de sintaxis
 
 | Estado | Casos | % |
 |---|---:|---:|
-| ✅ Aprobado | 29 | 94% |
-| 🟡 Aprobado con observación | 2 | 6% |
+| ✅ Aprobado | 35 | 97,2% |
+| 🟡 Aprobado con observación | 1 | 2,8% |
 | 🔴 Fallido | 0 | 0% |
 | ⛔ Bloqueado | 0 | 0% |
-| **Total** | **30** | **100%** |
+| **Total** | **36** | **100%** |
 
-**Cumplimiento funcional:** 27/30 (90%) si se cuentan como válidos los aprobados con observación.  
-**Cumplimiento estricto:** 24/30 (80%).
+**Cumplimiento funcional:** 35/36 (97,2%).  
+**Cumplimiento estricto:** 35/36 (97,2%).
 
 ---
 
@@ -277,4 +282,57 @@ Con Apache y MySQL activos se verificó el cierre de las dos historias pendiente
 | `univirtual` (original) | 21 | 20 | 92 | 0 |
 | `univirtual_sprints12` (copia) | 21 | 9 | 9 | 0 |
 
-**Conclusión:** las 13 historias vencidas quedan sin bloqueos funcionales (8 cerradas y 5 con observaciones no bloqueantes). Del Sprint 3, UV-19 está cerrada y UV-16, UV-18 y UV-31 conservan deuda de pruebas y reportes declarada.
+**Conclusión:** las 13 historias vencidas quedan sin bloqueos funcionales (8 cerradas y 5 con observaciones no bloqueantes). Del Sprint 3, UV-19 y UV-31 están cerradas; UV-16 y UV-18 conservan deuda de pruebas declarada.
+
+---
+
+## 11. Cierre de UV-31 y del periodo dinámico — 26 de noviembre de 2026
+
+Se verificó la segmentación y los reportes del directivo en el proyecto original
+y en la copia ejecutable. Los datos de prueba se eliminaron al terminar.
+
+### 11.1 Segmentación por facultad
+
+| Prueba | Original | Copia | Evidencia |
+|---|---|---|---|
+| Resumen de la facultad del directivo | ✅ | ✅ | `facultad=Facultad de Ingeniería`, KPI reales |
+| Profesores segmentados | ✅ 3 | ✅ 3 | Solo `idFacultad=1` |
+| Estudiantes segmentados | ✅ 4 | ✅ 4 | Vía `carreras.idFacultad` |
+| Materias segmentadas | ✅ 8 | ✅ 5 | Por carrera o por profesor |
+| Aislamiento con facultad 2 | ✅ 0 profesores, 0 estudiantes, 0 materias, 4 carreras | ✅ | Usuario temporal eliminado al terminar |
+| Intento de acceso a otra facultad | ✅ Ignorado: la API usa la sesión | ✅ | No acepta `idFacultad` por parámetro |
+
+### 11.2 Reportes
+
+| Prueba | Original | Copia | Evidencia |
+|---|---|---|---|
+| `GET ?action=reportes` | ✅ 200 | ✅ 200 | Contrato `{status, mensaje, data}` |
+| Reporte por carrera | ✅ 4 carreras | ✅ 4 carreras | Estudiantes, materias, inscripciones, tasa, promedio |
+| Reporte por materia | ✅ 8 materias | ✅ 5 materias | Inscritos, aprobados, reprobados, promedio, asistencia |
+| Reporte por profesor | ✅ 3 profesores | ✅ 3 profesores | Materias, estudiantes, promedio, asistencia |
+| Distribución de notas | ✅ 4 rangos | ✅ 4 rangos | `0.0-2.9`, `3.0-3.9`, `4.0-4.5`, `4.6-5.0` |
+| Asistencia global | ✅ 84,2% | ✅ | Asistencias/ausencias |
+| Pestaña **Reportes** | ✅ | ✅ | Chart.js + tablas, sin errores de consola |
+
+### 11.3 Periodo académico dinámico
+
+| Fecha de referencia | Etiqueta | Inicio | Semana |
+|---|---|---|---|
+| 2026-02-15 | 2026-I | 2026-01-19 | 4/20 |
+| 2026-09-10 | 2026-II | 2026-07-20 | 8/20 |
+| 2027-03-01 | 2027-I | 2027-01-18 | 7/20 |
+| 2027-08-20 | 2027-II | 2027-07-19 | 5/20 |
+| 2028-01-25 | 2028-I | 2028-01-17 | 2/20 |
+| 2028-11-01 | 2028-II | 2028-07-17 | 16/20 |
+
+También se verificó que `api/v1/estudiante.php?action=dashboard` devuelve
+`periodo=2026-II`, `periodoInicio=2026-07-20` y `semanasTranscurridas=19`.
+
+### 11.4 Reproducibilidad (CP-30)
+
+Se creó una base vacía `univirtual_cp30`, se importaron `config/database_v8.sql`
+y `config/migracion_uv19_comunicados.sql`, y se obtuvieron **21 tablas** y
+**9 usuarios** sin pasos manuales adicionales. La base temporal se eliminó.
+
+**Casos actualizados:** CP-12, CP-14, CP-30, CP-32, CP-33 y CP-34 pasan a ✅.
+La ficha `03-historias/UV-31-dashboard-directivo.md` queda al 100%.

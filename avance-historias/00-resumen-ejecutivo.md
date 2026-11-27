@@ -95,8 +95,8 @@ Además, se documenta el **avance de las 4 historias del Sprint 3** (próximas a
 |---|---|---|---|---|
 | H-01 | El formulario de usuarios enviaba `codigoEst` y el controlador esperaba `codigo`; además intentaba insertar `programa`, columna que no existe en v8. | 🔴 Alta | ✅ Corregido y verificado en original y copia el 19 nov 2026; UV-9 cerrada. | `03-historias/UV-09-crud-usuarios.md` |
 | H-02 | El código usaba `archivoEntrega` en entregas, pero el esquema v8 define `urlArchivo`. | 🟠 Media | ✅ Corregido y probado en original y copia; afectaba UV-11 y UV-13. | `06-anexos/correcciones-demo.md` |
-| H-03 | `config.example.php` y `fix_passwords_v8.sql` están referenciados pero no existen en el repositorio. | 🟠 Media | Un clon nuevo no puede configurarse siguiendo el README. | `05-entrega/plantillas/` |
-| H-04 | El semestre y la semana académica están fijos a `2026-I` y `2026-01-19` en el dashboard del estudiante. | 🟡 Baja | Las métricas de avance no corresponden al corte de octubre de 2026. | `03-historias/UV-10-dashboard-estudiante.md` |
+| H-03 | `config.example.php` y `fix_passwords_v8.sql` están referenciados pero no existen en el repositorio. | 🟠 Media | ✅ Resuelto: publicados en `config/` y verificados con una importación limpia el 26 nov 2026. | `05-entrega/plantillas/` |
+| H-04 | El semestre y la semana académica están fijos a `2026-I` y `2026-01-19` en el dashboard del estudiante. | 🟡 Baja | ✅ Resuelto: `includes/periodo.php` calcula periodo, inicio y semana desde la fecha del servidor. | `03-historias/UV-10-dashboard-estudiante.md` |
 | H-05 | Cada dashboard redefine sus propios componentes React; no hay carpeta de componentes compartidos. | 🟡 Baja | Duplicación y mayor costo de mantenimiento. | `03-historias/UV-30-frontend.md` |
 | H-06 | Cinco fallos de integración vistos en la demo: hora, `creada_en`, `roomName` duplicado, `archivoEntrega` y columnas de subida. | 🔴 Alta | ✅ Corregidos y verificados el 6 nov 2026 en original y copia. | `06-anexos/correcciones-demo.md` |
 
@@ -121,11 +121,11 @@ Si el docente exige el 100% de las historias cerradas, las 13 vencidas ya están
 
 | Prioridad | Acción | HU relacionada |
 |---|---|---|
-| 1 | Cerrar los reportes y la segmentación por facultad del panel del directivo. | UV-31 |
-| 2 | Formalizar casos CP y pruebas de videollamadas, notificaciones y mensajería. | UV-16, UV-18, UV-19 |
-| 3 | Unificar el esquema: `urlArchivo`, `idCarrera`, `creditos_aprobados`. | UV-28 / refactor |
-| 3 | Extraer componentes React compartidos y un `api` único. | UV-30 / refactor |
-| 4 | Parametrizar semestre, fechas y `BASE_URL`. | UV-10 / UV-27 |
+| 1 | Formalizar casos CP y pruebas de videollamadas y notificaciones. | UV-16, UV-18 |
+| 2 | Unificar el esquema: `urlArchivo`, `idCarrera`, `creditos_aprobados`. | UV-28 / refactor |
+| 2 | Extraer componentes React compartidos y un `api` único. | UV-30 / refactor |
+| 3 | Parametrizar `BASE_URL` por entorno. | UV-27 |
+| 4 | Exportar los reportes del directivo a PDF/XLSX. | UV-20 / UV-21 |
 | 5 | Convertir la suite de pruebas en parte del flujo de entrega. | UV-32 |
 
 Estas acciones son la entrada al refactor de código limpio y arquitectura que se realizará en la siguiente fase.

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../includes/periodo.php';
+
 /**
  * Clase base para todos los controladores de la API REST.
  * Maneja headers CORS, autenticación de sesión y respuestas JSON.

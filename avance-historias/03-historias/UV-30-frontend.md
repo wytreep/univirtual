@@ -118,7 +118,7 @@ Aplica **Template Method**:
 | 3 | Babel transforma JSX en el navegador. | Medio: coste de arranque y riesgo de seguridad. | Precompilar o usar `htm`/`createElement`. |
 | 4 | Header, sidebar y tarjetas se repiten en cada dashboard. | Alto: cuatro copias que divergen. | Extraer componentes compartidos (`Layout`, `Sidebar`, `Card`). |
 | 5 | Hay estilos en línea mezclados con `panel.css`. | Medio: difícil mantener el tema. | Mover a clases CSS. |
-| 6 | El dashboard de estudiante fija el semestre `2026-I` y la semana `2026-01-19`. | Alto: datos incorrectos fuera de ese periodo. | Leer periodo desde configuración o API. |
+| 6 | El dashboard de estudiante fijaba el semestre `2026-I` y la semana `2026-01-19`. | **Resuelto:** `includes/periodo.php` calcula periodo, inicio y semana desde la fecha del servidor. | — |
 | 7 | No hay manejo uniforme de errores de red. | Medio: pantallas en blanco. | Componente `ErrorState` y reintento. |
 
 ---

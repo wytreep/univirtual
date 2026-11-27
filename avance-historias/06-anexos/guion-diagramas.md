@@ -129,7 +129,7 @@ Cerrar con:
 | UV-16 | 🟡 Avance anticipado | Jitsi y notificaciones operativos en su alcance actual. |
 | UV-18 | 🟡 Avance anticipado | Notificaciones por evento y polling. |
 | UV-19 | ✅ Cerrada | Envío del directivo por facultad y público, bandeja y notificación; verificada en original y copia. |
-| UV-31 | 🟡 Avance anticipado | Dashboard del directivo con datos reales; falta segmentación. |
+| UV-31 | ✅ Cerrada | Resumen y listados segmentados por facultad, reportes por carrera/materia/profesor, notas, asistencia y periodo dinámico; verificada en original y copia. |
 
 **Regla de oro:** decir “implementado y verificado” solo para lo que está en la tabla como ✅; para el resto, “avance” o “en corrección”.
 
@@ -164,7 +164,7 @@ Si el docente pregunta por la diferencia, responder:
 | ¿Por qué incluyen HUs del Sprint 3? | Porque vencen el 13 de noviembre y ya tienen avance; el corte es de HUs vencidas y próximas, no de sprints completos. |
 | ¿Entonces no terminaron los sprints 1 y 2? | No se declaran sprints completos: se reportan 13 HUs vencidas con su avance real. 8 cerradas y 5 con observaciones. |
 | ¿UV-9 está lista? | Sí. Se corrigió y probó la creación de los cuatro roles en el original y en la copia. |
-| ¿Qué falta? | Los reportes del directivo (UV-31), pruebas E2E, revisión OWASP y formalizar los casos de prueba del Sprint 3. |
+| ¿Qué falta? | Pruebas E2E y de regresión, revisión OWASP, exportación de reportes y formalizar los casos de UV-16 y UV-18. |
 | ¿Cómo se ejecuta? | Apache y MySQL en XAMPP; abrir `http://localhost/univirtual-avance/`. |
 | ¿Por qué React por CDN? | Para evitar un build de Node en el entorno académico y mantener el despliegue simple en XAMPP. |
 

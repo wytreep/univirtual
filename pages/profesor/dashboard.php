@@ -88,7 +88,7 @@ const Dashboard=({onAula,setVistaPrincipal})=>{
       <div>
         <div className="wb-label">Bienvenido de nuevo</div>
         <div className="wb-name">{nombre.split(' ')[0]} <em>{nombre.split(' ').slice(1).join(' ')}</em></div>
-        <div className="wb-sub">Docente · 2026-I</div>
+        <div className="wb-sub">Docente · <?= periodoEtiqueta() ?></div>
       </div>
       <div className="wb-stats">
         {[{n:data.totalMaterias,l:'Materias'},{n:data.totalSinCalificar,l:'Por calificar'},{n:data.totalEstudiantes,l:'Estudiantes'}].map(s=>(
@@ -972,7 +972,7 @@ const ProfesorApp=()=>{
         <div className="tb-title">{titulo}</div>
       </div>
       <div className="tb-right">
-        <span className="tb-semester">2026-I</span>
+        <span className="tb-semester"><?= periodoEtiqueta() ?></span>
         <div className="tb-notif" onClick={()=>setVista('notificaciones')} style={{cursor:'pointer'}}>
           <span>🔔</span>
           {badgeNotifs>0&&<div className="tb-notif-dot"/>}

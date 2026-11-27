@@ -497,7 +497,7 @@ El proyecto debe tener un plan de pruebas y casos de aceptación ejecutables.
 | UV-28 | RF-11 | `config/database_v8.sql`, `config/migracion_uv19_comunicados.sql` | Revisión del script (19 base + 2 migración = 21) |
 | UV-29 | RF-09 | `api/v1/Controller.php`, `models/Model.php` | CP-26 a CP-29 |
 | UV-30 | RF-10 | `pages/*/dashboard.php` | CP-11, CP-14, CP-15 |
-| UV-32 | RF-13 | `04-pruebas/` | CP-01 a CP-30 |
+| UV-32 | RF-13 | `04-pruebas/` | CP-01 a CP-34 |
 
 ### 4.2 Requisitos fuera de alcance
 

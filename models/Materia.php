@@ -30,21 +30,33 @@ class Materia extends Model {
 
     /**
      * Retorna todas las materias con nombre del profesor y conteo de inscritos.
-     * Usado por DirectivoController y AdminPanel — SCRUM-128.
+     * Usado por DirectivoController y AdminPanel — SCRUM-128 / UV-31.
+     *
+     * @param int|null $idFacultad Si se indica, limita a las materias de las
+     *                             carreras o de los profesores de la facultad.
      */
-    public function getAll(): array {
-        $stmt = $this->db->prepare(
-            "SELECT m.idMateria, m.nombre, m.codigo, m.creditos, m.color,
-                    u.nombre AS profesor,
-                    COUNT(i.idEstudiante) AS totalInscritos
-             FROM materias m
-             LEFT JOIN profesores p  ON m.idProfesor = p.idProfesor
-             LEFT JOIN usuarios u    ON p.idUsuario   = u.idUsuario
-             LEFT JOIN inscripciones i ON m.idMateria = i.idMateria
-             GROUP BY m.idMateria
-             ORDER BY m.nombre"
-        );
-        $stmt->execute();
+    public function getAll(?int $idFacultad = null): array {
+        $sql = "SELECT m.idMateria, m.nombre, m.codigo, m.creditos, m.color,
+                       m.idCarrera, c.nombre AS carrera,
+                       u.nombre AS profesor,
+                       COUNT(i.idEstudiante) AS totalInscritos
+                FROM materias m
+                LEFT JOIN profesores p  ON m.idProfesor = p.idProfesor
+                LEFT JOIN usuarios u    ON p.idUsuario   = u.idUsuario
+                LEFT JOIN carreras c    ON c.idCarrera    = m.idCarrera
+                LEFT JOIN inscripciones i ON m.idMateria = i.idMateria";
+
+        $params = [];
+        if ($idFacultad !== null) {
+            $sql .= " WHERE (m.idCarrera IN (SELECT idCarrera FROM carreras WHERE idFacultad = ?)
+                        OR p.idFacultad = ?)";
+            $params = [$idFacultad, $idFacultad];
+        }
+
+        $sql .= " GROUP BY m.idMateria ORDER BY m.nombre";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

@@ -71,7 +71,7 @@ Verificar que las historias ya vencidas de los sprints 1 y 2 cumplen sus criteri
 
 ## 5. Casos
 
-Se definen 30 casos (`CP-01` a `CP-30`) en `casos-aceptacion.md`. La distribución por módulo es:
+Se definen 34 identificadores base (`CP-01` a `CP-34`), con las variantes `CP-31a` y `CP-31b`, para 36 casos ejecutables en `casos-aceptacion.md`. La distribución por módulo es:
 
 | Módulo | Casos | Cantidad |
 |---|---|---:|
@@ -81,7 +81,9 @@ Se definen 30 casos (`CP-01` a `CP-30`) en `casos-aceptacion.md`. La distribuci�
 | Inscripciones | CP-17 – CP-20 | 4 |
 | Notas y entregas | CP-21 – CP-25 | 5 |
 | Calidad técnica | CP-26 – CP-30 | 5 |
-| **Total** | | **30** |
+| Mensajería directiva | CP-31, CP-31a, CP-31b | 3 |
+| Reportes del directivo | CP-32 – CP-34 | 3 |
+| **Total** | | **36** |
 
 ---
 

@@ -74,7 +74,7 @@ const Dashboard=()=>{
       <div>
         <div className="wb-label">Panel de Administración</div>
         <div className="wb-name">UNI-<em>VIRTUAL</em></div>
-        <div className="wb-sub">Sistema académico virtual — 2026-I</div>
+        <div className="wb-sub">Sistema académico virtual — <?= periodoEtiqueta() ?></div>
       </div>
       <div className="wb-stats">
         {[{n:stats.totales.usuarios,l:'Usuarios'},{n:stats.totales.materias,l:'Materias'},{n:stats.sinCalificar,l:'Sin calificar'}].map(s=>(
@@ -770,7 +770,7 @@ const nav=[
         <div className="tb-title">{titulo}</div>
       </div>
       <div className="tb-right">
-        <span className="tb-semester">2026-I</span>
+        <span className="tb-semester"><?= periodoEtiqueta() ?></span>
         <div className="tb-notif" style={{cursor:'pointer'}} onClick={()=>setVista('notificaciones')}>
           <span>🔔</span>{badgeNotifs>0&&<div className="tb-notif-dot"/>}
         </div>

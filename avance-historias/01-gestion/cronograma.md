@@ -11,7 +11,7 @@
 |---|---|---|---|---|
 | Sprint 1 — Fundamentos | 1–16 oct 2026 | Dejar la base documental, técnica y de datos del proyecto. | UV-8, UV-25, UV-26, UV-27, UV-28, UV-29, UV-30 | Cerrado / en entrega |
 | Sprint 2 — Núcleo académico | 19–30 oct 2026 | Operar usuarios, dashboards, inscripciones y notas. | UV-9, UV-10, UV-11, UV-12, UV-13, UV-32 | Cierra el 30 oct |
-| Sprint 3 - Clases y comunicación | 2-13 nov 2026 | Videollamadas, notificaciones y mensajería directiva. | UV-16, UV-18, UV-19, UV-31 | No iniciado — avance anticipado documentado (ver fichas) |
+| Sprint 3 — Clases y comunicación | 2–13 nov 2026 | Videollamadas, notificaciones y mensajería directiva. | UV-16, UV-18, UV-19, UV-31 | UV-19 y UV-31 cerradas; UV-16 y UV-18 en avance anticipado |
 | Sprint 4 — Reportes y cierre | 16–27 nov 2026 | Grabaciones, reportes, exportación, pruebas E2E/seguridad y documentación final. | UV-17, UV-20, UV-21, UV-33, UV-34, UV-35 | No iniciado |
 
 ---
@@ -82,9 +82,9 @@ Cualquier retraso en UV-9 impacta directamente UV-12 y UV-13. Por eso su correcc
 | UV-16 | Crear y lanzar videollamada por materia | UV-11, Jitsi Meet | 🔵 85% — API y Jitsi operativos en dashboards. |
 | UV-18 | Notificaciones internas por evento académico | UV-10/11, `notificar()` | 🔵 85% — 5 eventos y polling 30s. |
 | UV-19 | Mensajes del Directivo a estudiantes y profesores | UV-31 | ✅ 100% — tablas `comunicados`/`comunicado_destinatarios`, bandeja y notificación; cerrada el 19 nov 2026. |
-| UV-31 | Dashboard del Directivo | UV-8, UV-28 | 🔵 75% — panel con datos reales y mensajería; faltan reportes y segmentación. |
+| UV-31 | Dashboard del Directivo | UV-8, UV-28 | ✅ 100% — resumen, segmentación por facultad, reportes, gráficas y periodo dinámico; cerrada el 26 nov 2026. |
 
-**Nota:** UV-19 se cerró el 19 de noviembre de 2026. Las demás historias del Sprint 3 conservan su avance y deuda declarada. Ver fichas en `03-historias/UV-16`, `UV-18`, `UV-19` y `UV-31`.
+**Nota:** UV-19 se cerró el 19 de noviembre y UV-31 el 26 de noviembre de 2026. UV-16 y UV-18 conservan su avance y deuda declarada. Ver fichas en `03-historias/UV-16`, `UV-18`, `UV-19` y `UV-31`.
 
 ## 6. Vista previa del Sprint 4
 

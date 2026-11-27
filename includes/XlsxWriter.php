@@ -233,10 +233,10 @@ class XlsxWriter {
 
     private function getSubtitle(string $name): string {
         return match($name) {
-            'Calificaciones' => 'Reporte de Calificaciones — Semestre 2026-I',
-            'Asistencia'     => 'Reporte de Asistencia — Semestre 2026-I',
-            'Métricas'       => 'Métricas del Grupo — Semestre 2026-I',
-            default          => $name . ' — 2026-I',
+            'Calificaciones' => 'Reporte de Calificaciones — Semestre ' . periodoEtiqueta(),
+            'Asistencia'     => 'Reporte de Asistencia — Semestre ' . periodoEtiqueta(),
+            'Métricas'       => 'Métricas del Grupo — Semestre ' . periodoEtiqueta(),
+            default          => $name . ' — ' . periodoEtiqueta(),
         };
     }
 

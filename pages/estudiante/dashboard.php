@@ -128,7 +128,7 @@ class EstudianteView extends View
               <div>
                 <div className="wb-label">Bienvenido de nuevo</div>
                 <div className="wb-name">{pnombre} <em>{apellido}</em></div>
-                <div className="wb-sub">{semestre} · {programa} · 2026-I</div>
+                <div className="wb-sub">{semestre} · {programa} · <?= periodoEtiqueta() ?></div>
               </div>
               <div className="wb-stats">
                 {[{ n: materias.length, l: 'Materias' }, { n: st.tareasProximas || 0, l: 'Pendientes' }, { n: `${st.asistencia || 0}%`, l: 'Asistencia' }].map(s => (
@@ -859,7 +859,7 @@ class EstudianteView extends View
                 <div className="tb-breadcrumb"><span>UNI-VIRTUAL</span><span>›</span><strong>Estudiante</strong>{vista === 'aula' && <><span>›</span><strong>{aulaActiva?.nombre}</strong></>}</div>
                 <div className="tb-title">{titulo}</div>
               </div>
-              <div className="tb-right"><span className="tb-semester">2026-I</span><div className="tb-notif" style={{ cursor: 'pointer' }} onClick={() => setVista('notificaciones')}><span>🔔</span>{badge.notifs > 0 && <div className="tb-notif-dot" />}</div>
+              <div className="tb-right"><span className="tb-semester"><?= periodoEtiqueta() ?></span><div className="tb-notif" style={{ cursor: 'pointer' }} onClick={() => setVista('notificaciones')}><span>🔔</span>{badge.notifs > 0 && <div className="tb-notif-dot" />}</div>
                 <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#1a7a48', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, cursor: 'pointer', marginLeft: 8 }} onClick={() => setVista('configuracion')}>{window.__S.initials}</div>
               </div>
             </header>

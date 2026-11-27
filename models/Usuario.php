@@ -70,32 +70,47 @@ class Usuario extends Model {
     /**
      * Retorna todos los usuarios de un rol específico con datos extendidos.
      * Incluye codigoEst/codigoProf y semestre según corresponda.
-     * Usado por DirectivoController — SCRUM-128.
+     * Usado por DirectivoController — SCRUM-128 / UV-31.
+     *
+     * @param int|null $idFacultad Si se indica, limita estudiantes y profesores
+     *                             a la facultad del directivo.
      */
-    public function getByRol(string $rol): array {
+    public function getByRol(string $rol, ?int $idFacultad = null): array {
         if ($rol === 'estudiante') {
-            $stmt = $this->db->prepare(
-                "SELECT u.idUsuario, u.nombre, u.email, u.activo,
-                        e.codigoEst, e.semestre, e.creditos_aprobados
-                 FROM usuarios u
-                 JOIN estudiantes e ON e.idUsuario = u.idUsuario
-                 WHERE u.rol = 'estudiante'
-                 ORDER BY u.nombre"
-            );
-            $stmt->execute();
+            $sql = "SELECT u.idUsuario, u.nombre, u.email, u.activo,
+                           e.codigoEst, e.semestre, e.creditos_aprobados,
+                           c.nombre AS carrera
+                    FROM usuarios u
+                    JOIN estudiantes e ON e.idUsuario = u.idUsuario
+                    LEFT JOIN carreras c ON c.idCarrera = e.idCarrera
+                    WHERE u.rol = 'estudiante'";
+            $params = [];
+            if ($idFacultad !== null) {
+                $sql .= " AND c.idFacultad = ?";
+                $params[] = $idFacultad;
+            }
+            $sql .= " ORDER BY u.nombre";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll();
         }
 
         if ($rol === 'profesor') {
-            $stmt = $this->db->prepare(
-                "SELECT u.idUsuario, u.nombre, u.email, u.activo,
-                        p.codigoProf, p.departamento
-                 FROM usuarios u
-                 JOIN profesores p ON p.idUsuario = u.idUsuario
-                 WHERE u.rol = 'profesor'
-                 ORDER BY u.nombre"
-            );
-            $stmt->execute();
+            $sql = "SELECT u.idUsuario, u.nombre, u.email, u.activo,
+                           p.codigoProf, p.departamento, p.idFacultad,
+                           f.nombre AS facultad
+                    FROM usuarios u
+                    JOIN profesores p ON p.idUsuario = u.idUsuario
+                    LEFT JOIN facultades f ON f.idFacultad = p.idFacultad
+                    WHERE u.rol = 'profesor'";
+            $params = [];
+            if ($idFacultad !== null) {
+                $sql .= " AND p.idFacultad = ?";
+                $params[] = $idFacultad;
+            }
+            $sql .= " ORDER BY u.nombre";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll();
         }
 

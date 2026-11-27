@@ -62,7 +62,7 @@ Estas historias se entregan con su estado real: UV-19 quedó cerrada y las otras
 | UV-16 | Videollamada por materia (Jitsi) | Avance anticipado | 85% |
 | UV-18 | Notificaciones internas por evento | Avance anticipado | 85% |
 | UV-19 | Mensajes del Directivo | Completada (19 nov 2026) | 100% |
-| UV-31 | Dashboard del Directivo | Avance anticipado | 75% |
+| UV-31 | Dashboard del Directivo | Completada (26 nov 2026) | 100% |
 
 ---
 
@@ -83,10 +83,10 @@ Estas historias se entregan con su estado real: UV-19 quedó cerrada y las otras
 
 | # | Observación | Compromiso | Responsable | Fecha objetivo |
 |---|---|---|---|---|
-| O-01 | UV-9 no crea estudiantes ni profesores por incompatibilidad de campos. | Corregir contrato del formulario/API y alinear con el esquema v8. **Hecho y verificado en la copia ejecutable; falta aplicar al repositorio original.** | Developer | Antes de la demo |
+| O-01 | UV-9 no crea estudiantes ni profesores por incompatibilidad de campos. | Corregir contrato del formulario/API y alinear con el esquema v8. **Hecho y verificado en original y copia (19 nov 2026).** | Developer | Antes de la demo |
 | O-02 | `archivoEntrega` vs `urlArchivo` en el módulo de entregas. | Unificar el nombre según el esquema v8. **Hecho en la copia ejecutable.** | Developer | Sprint 3 |
-| O-03 | Faltan `config.example.php` y `fix_passwords_v8.sql`. | Publicar las plantillas incluidas en `05-entrega/plantillas/`. | Developer | Antes de la entrega |
-| O-04 | Semestre y semana académica fijos a 2026-I. | Parametrizar desde configuración. | Developer | Sprint 3 |
+| O-03 | Faltan `config.example.php` y `fix_passwords_v8.sql`. | **Resuelto:** publicados en `config/`, versionados y usados en la importación limpia (26 nov 2026). | Developer | Antes de la entrega |
+| O-04 | Semestre y semana académica fijos a 2026-I. | **Resuelto:** `includes/periodo.php` calcula etiqueta, inicio y semana desde la fecha (UV-31, 26 nov 2026). | Developer | Sprint 3 |
 | O-05 | Componentes React duplicados entre dashboards. | Extraer componentes compartidos en el refactor. | Developer | Sprint 4 |
 
 ---

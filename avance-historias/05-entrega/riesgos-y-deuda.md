@@ -19,7 +19,7 @@ Este documento concentra los hallazgos que no se corrigieron en la fase document
 | R-06 | Excepción no controlada devuelve HTML y rompe el contrato JSON. | Media | Medio | Media | Manejador global de excepciones. |
 | R-07 | CORS fijo en `http://localhost`. | Media | Medio | Media | Origen configurable por entorno. |
 | R-08 | URL de API hardcodeada en los cuatro dashboards. | Alta | Medio | 🟡 Mitigado | Los dashboards usan `BASE_URL`; quedan literales históricos por revisar. |
-| R-09 | Periodo académico fijo (`2026-I`) y semana fija. | Alta | Medio | Media | Leer de configuración o API. |
+| R-09 | Periodo académico fijo (`2026-I`) y semana fija. | Alta | Medio | ✅ Resuelto | `includes/periodo.php` calcula etiqueta, inicio y semana (UV-31). |
 | R-10 | `guardarNota` no verifica que la materia pertenezca al profesor. | Media | Alto | ✅ Resuelto | Validación de propiedad aplicada y probada (403). |
 | R-11 | Autoload por `glob` carga todos los modelos. | Alta | Bajo | Baja | `spl_autoload_register`. |
 | R-12 | Babel transforma JSX en el navegador. | Alta | Bajo | Baja | Precompilar o usar `htm`. |
@@ -62,7 +62,6 @@ Este documento concentra los hallazgos que no se corrigieron en la fase document
 | Build de desarrollo de React. | `includes/View.php` | `production.min.js`. |
 | JSX en el navegador. | `pages/*/dashboard.php` | Precompilar. |
 | Estilos en línea. | `pages/*/dashboard.php` | Mover a `panel.css`. |
-| Periodo fijo. | `pages/estudiante/dashboard.php` | Leer de `configuracion`. |
 | Manejo de errores dispar. | `pages/*/dashboard.php` | Componente `ErrorState`. |
 
 ### 2.4 Documentación
