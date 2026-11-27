@@ -90,7 +90,7 @@ avance-historias/
 - **Cobertura funcional:** las 13 historias vencidas tienen implementación verificable (100%); de las 4 del Sprint 3, UV-19 y UV-31 están cerradas y UV-16 y UV-18 tienen flujo verificable con deuda de pruebas.
 - **UV-9 cerrada:** la creación de los cuatro roles quedó corregida y verificada el 19 de noviembre de 2026 en el proyecto original y en la copia. El diagnóstico histórico y la evidencia están en [`03-historias/UV-09-crud-usuarios.md`](03-historias/UV-09-crud-usuarios.md).
 - **Correcciones post-demo (6 nov 2026):** se corrigieron y verificaron en el proyecto original y en la copia los cinco fallos observados en clase: zona horaria, columna `creado_en`, `roomName` duplicado, `archivoEntrega` frente a `urlArchivo` y columnas inexistentes en materiales/grabaciones. El detalle está en [`06-anexos/correcciones-demo.md`](06-anexos/correcciones-demo.md).
-- **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026); los archivos corregidos y los nuevos se validaron el 19 nov 2026.
+- **Verificación estática:** 61 archivos PHP revisados con `php -l`, sin errores de sintaxis (29 oct 2026); los archivos corregidos y los nuevos se validaron el 19 y el 26 nov 2026 (UV-31 y periodo dinámico).
 - **Pruebas automatizadas:** última ejecución registrada 23/23 aprobadas (24 abr 2026, Selenium). La re-ejecución contra el estado actual está pendiente y se describe en [`04-pruebas/resultados.md`](04-pruebas/resultados.md).
 
 > **Lectura recomendada para la entrega:** primero este README, luego `00-resumen-ejecutivo.md`, después `01-gestion/matriz-historias.md` y finalmente las fichas de las HU que se van a demostrar.
